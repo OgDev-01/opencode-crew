@@ -153,7 +153,7 @@ describe("category-skill-reminder hook", () => {
     test("should NOT inject reminder if call_agent is used", async () => {
       // given - captain agent that uses call_agent
       const hook = createHook()
-      const sessionID = "omo-agent-session"
+      const sessionID = "crew-agent-session"
       updateSessionAgent(sessionID, "Captain")
 
       const output = { title: "", output: "result", metadata: {} }

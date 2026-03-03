@@ -34,7 +34,7 @@ export { createStrategistMdOnlyHook } from "./strategist-md-only";
 export { createCadetNotepadHook } from "./cadet-notepad";
 export { createTaskResumeInfoHook } from "./task-resume-info";
 export { createStartWorkHook } from "./start-work";
-export { createRelayHook } from "./atlas";
+export { createRelayHook } from "./relay";
 export { createDelegateTaskRetryHook } from "./delegate-task-retry";
 export { createQuestionLabelTruncatorHook } from "./question-label-truncator";
 export { createStopContinuationGuardHook, type StopContinuationGuard } from "./stop-continuation-guard";

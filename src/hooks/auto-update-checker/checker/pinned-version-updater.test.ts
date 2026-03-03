@@ -9,7 +9,7 @@ describe("pinned-version-updater", () => {
   let configPath: string
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "omo-updater-test-"))
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "crew-updater-test-"))
     configPath = path.join(tmpDir, "opencode.json")
   })
 

@@ -56,7 +56,7 @@ function convertSDKMessageToStoredMessage(msg: SDKMessage): StoredMessage | null
 // TODO: These SDK-based functions are exported for future use when hooks migrate to async.
 // Currently, callers still use the sync JSON-based functions which return null on beta.
 // Migration requires making callers async, which is a larger refactoring.
-// See: https://github.com/code-yeongyu/opencode-crew/pull/1837
+// See: https://github.com/buldtech/opencode-crew/pull/1837
 
 /**
  * Finds the nearest message with required fields using SDK (for beta/SQLite backend).

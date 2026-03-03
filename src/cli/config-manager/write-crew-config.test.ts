@@ -33,7 +33,7 @@ describe("writeCrewConfig", () => {
   let testConfigPath = ""
 
   beforeEach(() => {
-    testConfigDir = join(tmpdir(), `omo-write-config-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+    testConfigDir = join(tmpdir(), `crew-write-config-${Date.now()}-${Math.random().toString(36).slice(2)}`)
     testConfigPath = join(testConfigDir, "opencode-crew.json")
 
     mkdirSync(testConfigDir, { recursive: true })

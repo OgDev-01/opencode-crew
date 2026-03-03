@@ -9,7 +9,7 @@ describe("findPluginEntry", () => {
   let configPath: string
 
   beforeEach(() => {
-    temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "omo-plugin-entry-test-"))
+    temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "crew-plugin-entry-test-"))
     const opencodeDirectory = path.join(temporaryDirectory, ".opencode")
     fs.mkdirSync(opencodeDirectory, { recursive: true })
     configPath = path.join(opencodeDirectory, "opencode.json")

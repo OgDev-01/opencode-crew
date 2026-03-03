@@ -8,7 +8,7 @@ import { getMemoryManager, resetMemoryManager } from "../manager"
 import { createMemoryStorage } from "../storage/memory-storage"
 
 const makeDbPath = (label: string) =>
-  join(tmpdir(), `omo-migration-test-${label}-${Date.now()}-${crypto.randomUUID()}.db`)
+  join(tmpdir(), `crew-migration-test-${label}-${Date.now()}-${crypto.randomUUID()}.db`)
 
 describe("Memory migration and backward compatibility", () => {
   const dbPaths: string[] = []

@@ -18,7 +18,7 @@ import { createMemoryStorage } from "../storage/memory-storage"
 import type { GoldenRule, Learning, MemoryConfig, MemoryScope } from "../types"
 
 const DAY_MS = 86400000
-const makeDbPath = (label: string) => join(tmpdir(), `omo-integration-test-${label}-${Date.now()}-${crypto.randomUUID()}.db`)
+const makeDbPath = (label: string) => join(tmpdir(), `crew-integration-test-${label}-${Date.now()}-${crypto.randomUUID()}.db`)
 const makeConfig = (dbPath: string): MemoryConfig => ({
   enabled: true,
   scope: "project",

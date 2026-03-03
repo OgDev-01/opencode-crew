@@ -1,0 +1,13 @@
+$ tsc --noEmit
+src/agents/builtin-agents.ts(33,3): error TS2353: Object literal may only specify known properties, and 'sisyphus' does not exist in type 'Record<BuiltinAgentName, AgentSource>'.
+src/agents/builtin-agents.ts(51,3): error TS2353: Object literal may only specify known properties, and 'oracle' does not exist in type 'Partial<Record<BuiltinAgentName, AgentPromptMetadata>>'.
+src/agents/builtin-agents/atlas-agent.ts(38,32): error TS7053: Element implicitly has an 'any' type because expression of type '"atlas"' can't be used to index type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.
+  Property 'atlas' does not exist on type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.
+src/agents/builtin-agents/general-agents.ts(50,9): error TS2367: This comparison appears to be unintentional because the types 'BuiltinAgentName' and '"sisyphus"' have no overlap.
+src/agents/builtin-agents/general-agents.ts(51,9): error TS2367: This comparison appears to be unintentional because the types 'BuiltinAgentName' and '"hephaestus"' have no overlap.
+src/agents/builtin-agents/general-agents.ts(52,9): error TS2367: This comparison appears to be unintentional because the types 'BuiltinAgentName' and '"atlas"' have no overlap.
+src/agents/builtin-agents/general-agents.ts(85,9): error TS2367: This comparison appears to be unintentional because the types 'BuiltinAgentName' and '"librarian"' have no overlap.
+src/agents/builtin-agents/hephaestus-agent.ts(42,30): error TS7053: Element implicitly has an 'any' type because expression of type '"hephaestus"' can't be used to index type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.
+  Property 'hephaestus' does not exist on type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.
+src/agents/builtin-agents/sisyphus-agent.ts(43,28): error TS7053: Element implicitly has an 'any' type because expression of type '"sisyphus"' can't be used to index type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.
+  Property 'sisyphus' does not exist on type 'Partial<Record<OverridableAgentName, AgentOverrideConfig>>'.

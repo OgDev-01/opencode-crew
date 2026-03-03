@@ -1,0 +1,8 @@
+node_modules
+package.json
+bun.lock
+.gitignore
+
+# Runtime state (local only)
+elf/
+background-tasks.json

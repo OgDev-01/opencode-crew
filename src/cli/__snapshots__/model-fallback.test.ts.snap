@@ -1,0 +1,1482 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generateModelConfig no providers available returns ULTIMATE_FALLBACK for all agents and categories when no providers 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "craftsman": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "critic": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "lookout": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "relay": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "sage": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "spotter": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "strategist": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "deep": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "quick": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "ultrabrain": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-high": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-low": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "visual-engineering": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "writing": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses Claude models when only Claude is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "spotter": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "writing": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses Claude models with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "spotter": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "writing": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses OpenAI models when only OpenAI is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "openai/gpt-5.2",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "openai/gpt-5.2",
+    },
+    "strategist": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+  },
+  "categories": {
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "unspecified-low": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "visual-engineering": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "writing": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses OpenAI models with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "openai/gpt-5.2",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "openai/gpt-5.2",
+    },
+    "strategist": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+  },
+  "categories": {
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "unspecified-low": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "visual-engineering": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "writing": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses Gemini models when only Gemini is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "critic": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "google/gemini-3.1-pro-preview",
+    },
+    "sage": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "google/gemini-3.1-pro-preview",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "quick": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "ultrabrain": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "unspecified-high": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "unspecified-low": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig single native provider uses Gemini models with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "critic": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "google/gemini-3.1-pro-preview",
+    },
+    "sage": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "google/gemini-3.1-pro-preview",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "quick": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "ultrabrain": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "unspecified-high": {
+      "model": "google/gemini-3.1-pro-preview",
+    },
+    "unspecified-low": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig all native providers uses preferred models from fallback chains when all natives available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig all native providers uses preferred models with isMax20 flag when all natives available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses OpenCode Zen models when only OpenCode Zen is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "opencode/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "opencode/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "opencode/gemini-3-flash",
+    },
+    "strategist": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "opencode/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "opencode/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "opencode/gemini-3-flash",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses OpenCode Zen models with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "opencode/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "opencode/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "opencode/gemini-3-flash",
+    },
+    "strategist": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "opencode/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-low": {
+      "model": "opencode/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "opencode/gemini-3-flash",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses GitHub Copilot models when only Copilot is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "assessor": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "github-copilot/gpt-5-mini",
+    },
+    "relay": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "sage": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "quick": {
+      "model": "github-copilot/claude-haiku-4.5",
+    },
+    "ultrabrain": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "unspecified-high": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "unspecified-low": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses GitHub Copilot models with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "assessor": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "github-copilot/gpt-5-mini",
+    },
+    "relay": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "sage": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "quick": {
+      "model": "github-copilot/claude-haiku-4.5",
+    },
+    "ultrabrain": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "unspecified-high": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "unspecified-low": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses ZAI model for archivist when only ZAI is available 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "captain": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "critic": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "sage": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "spotter": {
+      "model": "zai-coding-plan/glm-4.6v",
+    },
+    "strategist": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+  "categories": {
+    "quick": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "ultrabrain": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-high": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-low": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "visual-engineering": {
+      "model": "zai-coding-plan/glm-5",
+    },
+    "writing": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig fallback providers uses ZAI model for archivist with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "captain": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "critic": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "lookout": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "relay": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "sage": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "spotter": {
+      "model": "zai-coding-plan/glm-4.6v",
+    },
+    "strategist": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+  "categories": {
+    "quick": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "ultrabrain": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-high": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "unspecified-low": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "visual-engineering": {
+      "model": "zai-coding-plan/glm-5",
+    },
+    "writing": {
+      "model": "opencode/glm-4.7-free",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses Claude + OpenCode Zen combination 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "opencode/glm-4.7-free",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "opencode/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "opencode/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "opencode/gemini-3-flash",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "opencode/gemini-3.1-pro",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "opencode/gemini-3-flash",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses OpenAI + Copilot combination 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "assessor": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "github-copilot/gpt-5-mini",
+    },
+    "relay": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "github-copilot/claude-haiku-4.5",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "unspecified-low": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses Claude + ZAI combination (archivist uses ZAI) 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "spotter": {
+      "model": "zai-coding-plan/glm-4.6v",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "zai-coding-plan/glm-5",
+    },
+    "writing": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses Gemini + Claude combination (lookout uses Gemini) 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "critic": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "sage": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses all fallback providers together 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "github-copilot/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "github-copilot/claude-opus-4.6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "github-copilot/claude-haiku-4.5",
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "unspecified-low": {
+      "model": "github-copilot/claude-sonnet-4.5",
+    },
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "github-copilot/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses all providers together 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;
+
+exports[`generateModelConfig mixed provider scenarios uses all providers with isMax20 flag 1`] = `
+{
+  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "agents": {
+    "archivist": {
+      "model": "zai-coding-plan/glm-4.7",
+    },
+    "assessor": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "captain": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "craftsman": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "critic": {
+      "model": "openai/gpt-5.2",
+      "variant": "medium",
+    },
+    "lookout": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "relay": {
+      "model": "opencode/kimi-k2.5-free",
+    },
+    "sage": {
+      "model": "openai/gpt-5.2",
+      "variant": "high",
+    },
+    "spotter": {
+      "model": "google/gemini-3-flash-preview",
+    },
+    "strategist": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+  },
+  "categories": {
+    "artistry": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "medium",
+    },
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.3-codex",
+      "variant": "xhigh",
+    },
+    "unspecified-high": {
+      "model": "anthropic/claude-opus-4-6",
+      "variant": "max",
+    },
+    "unspecified-low": {
+      "model": "anthropic/claude-sonnet-4-5",
+    },
+    "visual-engineering": {
+      "model": "google/gemini-3.1-pro-preview",
+      "variant": "high",
+    },
+    "writing": {
+      "model": "google/gemini-3-flash-preview",
+    },
+  },
+}
+`;

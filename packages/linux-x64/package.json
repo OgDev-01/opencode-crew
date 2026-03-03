@@ -1,0 +1,29 @@
+{
+  "name": "@buldtech/opencode-crew-linux-x64",
+  "version": "1.0.0",
+  "description": "Platform-specific binary for opencode-crew (linux-x64)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buldtech/opencode-crew"
+  },
+  "bugs": {
+    "url": "https://github.com/buldtech/opencode-crew/issues"
+  },
+  "homepage": "https://github.com/buldtech/opencode-crew#readme",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "bin"
+  ],
+  "bin": {
+    "opencode-crew": "./bin/opencode-crew"
+  }
+}

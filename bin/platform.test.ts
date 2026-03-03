@@ -12,7 +12,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name
-    expect(result).toBe("opencode-crew-darwin-arm64");
+    expect(result).toBe("@ogdev/opencode-crew-darwin-arm64");
   });
 
   test("returns darwin-x64 for macOS Intel", () => {
@@ -23,7 +23,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name
-    expect(result).toBe("opencode-crew-darwin-x64");
+    expect(result).toBe("@ogdev/opencode-crew-darwin-x64");
   });
   // #endregion
 
@@ -36,7 +36,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name
-    expect(result).toBe("opencode-crew-linux-x64");
+    expect(result).toBe("@ogdev/opencode-crew-linux-x64");
   });
 
   test("returns linux-arm64 for Linux ARM64 with glibc", () => {
@@ -47,7 +47,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name
-    expect(result).toBe("opencode-crew-linux-arm64");
+    expect(result).toBe("@ogdev/opencode-crew-linux-arm64");
   });
   // #endregion
 
@@ -60,7 +60,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name with musl suffix
-    expect(result).toBe("opencode-crew-linux-x64-musl");
+    expect(result).toBe("@ogdev/opencode-crew-linux-x64-musl");
   });
 
   test("returns linux-arm64-musl for Alpine ARM64", () => {
@@ -71,7 +71,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name with musl suffix
-    expect(result).toBe("opencode-crew-linux-arm64-musl");
+    expect(result).toBe("@ogdev/opencode-crew-linux-arm64-musl");
   });
   // #endregion
 
@@ -84,7 +84,7 @@ describe("getPlatformPackage", () => {
     const result = getPlatformPackage(input);
 
     // #then returns correct package name with 'windows' not 'win32'
-    expect(result).toBe("opencode-crew-windows-x64");
+    expect(result).toBe("@ogdev/opencode-crew-windows-x64");
   });
   // #endregion
 
@@ -157,8 +157,8 @@ describe("getPlatformPackageCandidates", () => {
 
     // #then returns modern first then baseline fallback
     expect(result).toEqual([
-      "opencode-crew-linux-x64",
-      "opencode-crew-linux-x64-baseline",
+      "@ogdev/opencode-crew-linux-x64",
+      "@ogdev/opencode-crew-linux-x64-baseline",
     ]);
   });
 
@@ -171,8 +171,8 @@ describe("getPlatformPackageCandidates", () => {
 
     // #then returns musl modern first then musl baseline fallback
     expect(result).toEqual([
-      "opencode-crew-linux-x64-musl",
-      "opencode-crew-linux-x64-musl-baseline",
+      "@ogdev/opencode-crew-linux-x64-musl",
+      "@ogdev/opencode-crew-linux-x64-musl-baseline",
     ]);
   });
 
@@ -185,8 +185,8 @@ describe("getPlatformPackageCandidates", () => {
 
     // #then baseline package is preferred first
     expect(result).toEqual([
-      "opencode-crew-windows-x64-baseline",
-      "opencode-crew-windows-x64",
+      "@ogdev/opencode-crew-windows-x64-baseline",
+      "@ogdev/opencode-crew-windows-x64",
     ]);
   });
 
@@ -198,6 +198,6 @@ describe("getPlatformPackageCandidates", () => {
     const result = getPlatformPackageCandidates(input);
 
     // #then baseline fallback is not included
-    expect(result).toEqual(["opencode-crew-linux-arm64"]);
+    expect(result).toEqual(["@ogdev/opencode-crew-linux-arm64"]);
   });
 });

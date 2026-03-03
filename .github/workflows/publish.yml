@@ -50,7 +50,7 @@ jobs:
           # These files use mock.module() which pollutes module cache
           # Run them in separate processes to prevent cross-file contamination
           bun test src/plugin-handlers
-          bun test src/hooks/atlas
+          bun test src/hooks/relay
           bun test src/hooks/compaction-context-injector
           bun test src/features/tmux-subagent
           bun test src/cli/doctor/formatter.test.ts
@@ -121,7 +121,7 @@ jobs:
   publish-main:
     runs-on: ubuntu-latest
     needs: [test, typecheck]
-    if: github.repository == 'code-yeongyu/opencode-crew'
+    if: github.repository == 'OgDev-01/opencode-crew'
     outputs:
       version: ${{ steps.version.outputs.version }}
       dist_tag: ${{ steps.version.outputs.dist_tag }}
@@ -213,6 +213,7 @@ jobs:
           fi
           npm publish --access public --provenance $TAG_ARG
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: Git commit and tag
@@ -282,15 +283,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Merge to master
+      - name: Merge to main
         continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           VERSION="${{ needs.publish-main.outputs.version }}"
           git stash --include-untracked || true
-          git checkout master
+          git checkout main
           git reset --hard "v${VERSION}"
-          git push -f origin master || echo "::warning::Failed to push to master"
+          git push -f origin main || echo "::warning::Failed to push to main"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

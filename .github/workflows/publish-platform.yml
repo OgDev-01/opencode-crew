@@ -265,6 +265,6 @@ jobs:
           
           npm publish --access public --provenance $TAG_ARG
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         timeout-minutes: 15

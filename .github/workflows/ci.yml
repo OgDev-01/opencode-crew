@@ -2,26 +2,26 @@ name: CI
 
 on:
   push:
-    branches: [master, dev]
+    branches: [main, dev]
   pull_request:
-    branches: [master, dev]
+    branches: [main, dev]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Block PRs targeting master branch
-  block-master-pr:
+  # Block PRs targeting main branch
+  block-main-pr:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - name: Check PR target branch
         run: |
-          if [ "${{ github.base_ref }}" = "master" ]; then
-            echo "::error::PRs to master branch are not allowed. Please target the 'dev' branch instead."
+          if [ "${{ github.base_ref }}" = "main" ]; then
+            echo "::error::PRs to main branch are not allowed. Please target the 'dev' branch instead."
             echo ""
-            echo "PULL REQUESTS TO MASTER ARE BLOCKED"
+            echo "PULL REQUESTS TO MAIN ARE BLOCKED"
             echo ""
             echo "All PRs must target the 'dev' branch."
             echo "Please close this PR and create a new one targeting 'dev'."
@@ -49,7 +49,7 @@ jobs:
           # These files use mock.module() which pollutes module cache
           # Run them in separate processes to prevent cross-file contamination
           bun test src/plugin-handlers
-          bun test src/hooks/atlas
+          bun test src/hooks/relay
           bun test src/hooks/compaction-context-injector
           bun test src/features/tmux-subagent
           bun test src/cli/doctor/formatter.test.ts
@@ -145,7 +145,7 @@ jobs:
           test -f dist/index.d.ts || (echo "ERROR: dist/index.d.ts not found!" && exit 1)
 
       - name: Auto-commit schema changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           if git diff --quiet assets/opencode-crew.schema.json; then
             echo "No schema changes to commit"

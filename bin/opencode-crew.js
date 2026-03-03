@@ -32,7 +32,7 @@ function supportsAvx2() {
     return null;
   }
 
-  if (process.env.OH_MY_OPENCODE_FORCE_BASELINE === "1") {
+  if (process.env.OPENCODE_CREW_FORCE_BASELINE === "1") {
     return false;
   }
 

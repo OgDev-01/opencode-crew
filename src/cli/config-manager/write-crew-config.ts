@@ -5,7 +5,7 @@ import { getConfigDir, getOmoConfigPath } from "./config-context"
 import { deepMergeRecord } from "./deep-merge-record"
 import { ensureConfigDirectoryExists } from "./ensure-config-directory-exists"
 import { formatErrorWithSuggestion } from "./format-error-with-suggestion"
-import { generateOmoConfig } from "./generate-omo-config"
+import { generateCrewConfig } from "./generate-crew-config"
 
 function isEmptyOrWhitespace(content: string): boolean {
   return content.trim().length === 0
@@ -25,7 +25,7 @@ export function writeCrewConfig(installConfig: InstallConfig): ConfigMergeResult
   const omoConfigPath = getOmoConfigPath()
 
   try {
-    const newConfig = generateOmoConfig(installConfig)
+    const newConfig = generateCrewConfig(installConfig)
 
     if (existsSync(omoConfigPath)) {
       try {

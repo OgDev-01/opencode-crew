@@ -1,5 +1,5 @@
 {
-  "name": "@buldtech/opencode-crew-linux-x64",
+  "name": "@ogdev/opencode-crew-linux-x64",
   "version": "1.0.0",
   "description": "Platform-specific binary for opencode-crew (linux-x64)",
   "license": "MIT",

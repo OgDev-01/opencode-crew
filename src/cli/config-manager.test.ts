@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, afterEach } from "bun:test"
 
-import { ANTIGRAVITY_PROVIDER_CONFIG, getPluginNameWithVersion, fetchNpmDistTags, generateOmoConfig } from "./config-manager"
+import { ANTIGRAVITY_PROVIDER_CONFIG, getPluginNameWithVersion, fetchNpmDistTags, generateCrewConfig } from "./config-manager"
 import type { InstallConfig } from "./types"
 
 describe("getPluginNameWithVersion", () => {
@@ -239,7 +239,7 @@ describe("config-manager ANTIGRAVITY_PROVIDER_CONFIG", () => {
   })
 })
 
-describe("generateOmoConfig - model fallback system", () => {
+describe("generateCrewConfig - model fallback system", () => {
   test("uses github-copilot sonnet fallback when only copilot available", () => {
     // #given user has only copilot (no max plan)
     const config: InstallConfig = {
@@ -254,7 +254,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then Captain uses Copilot (OR logic - copilot is in claude-opus-4-6 providers)
     expect((result.agents as Record<string, { model: string }>).captain.model).toBe("github-copilot/claude-opus-4.6")
@@ -274,7 +274,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then Captain is omitted (requires all fallback providers)
     expect(result.$schema).toBe("https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json")
@@ -295,7 +295,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then archivist should use ZAI model
     expect((result.agents as Record<string, { model: string }>).archivist.model).toBe("zai-coding-plan/glm-4.7")
@@ -317,7 +317,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then Captain is omitted (requires all fallback providers)
     expect((result.agents as Record<string, { model: string }>).captain).toBeUndefined()
@@ -341,7 +341,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then lookout should use haiku (max20 plan uses Claude quota)
     expect((result.agents as Record<string, { model: string }>).lookout.model).toBe("anthropic/claude-haiku-4-5")
@@ -361,7 +361,7 @@ describe("generateOmoConfig - model fallback system", () => {
     }
 
     // #when generating config
-    const result = generateOmoConfig(config)
+    const result = generateCrewConfig(config)
 
     // #then lookout should use haiku (isMax20 doesn't affect lookout anymore)
     expect((result.agents as Record<string, { model: string }>).lookout.model).toBe("anthropic/claude-haiku-4-5")

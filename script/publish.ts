@@ -4,7 +4,7 @@ import { $ } from "bun"
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 
-const PACKAGE_NAME = "oh-my-opencode"
+const PACKAGE_NAME = "opencode-crew"
 const bump = process.env.BUMP as "major" | "minor" | "patch" | undefined
 const versionOverride = process.env.VERSION
 const republishMode = process.env.REPUBLISH === "true"
@@ -20,7 +20,7 @@ const PLATFORM_PACKAGES = [
   "windows-x64",
 ]
 
-console.log("=== Publishing oh-my-opencode (multi-package) ===\n")
+console.log("=== Publishing opencode-crew (multi-package) ===\n")
 
 async function fetchPreviousVersion(): Promise<string> {
   try {
@@ -66,7 +66,7 @@ async function updateAllPackageVersions(newVersion: string): Promise<void> {
   // Update optionalDependencies versions in main package.json
   let mainPkg = await Bun.file(mainPkgPath).text()
   for (const platform of PLATFORM_PACKAGES) {
-    const pkgName = `oh-my-opencode-${platform}`
+    const pkgName = `opencode-crew-${platform}`
     mainPkg = mainPkg.replace(
       new RegExp(`"${pkgName}": "[^"]+"`),
       `"${pkgName}": "${newVersion}"`
@@ -137,11 +137,11 @@ async function generateChangelog(previous: string, currentVersion?: string): Pro
 async function getContributors(previous: string): Promise<string[]> {
   const notes: string[] = []
 
-  const team = ["actions-user", "github-actions[bot]", "code-yeongyu"]
+  const team = ["actions-user", "github-actions[bot]", "OgDev-01"]
 
   try {
     const compare =
-      await $`gh api "/repos/code-yeongyu/oh-my-opencode/compare/v${previous}...HEAD" --jq '.commits[] | {login: .author.login, message: .commit.message}'`.text()
+      await $`gh api "/repos/OgDev-01/opencode-crew/compare/v${previous}...HEAD" --jq '.commits[] | {login: .author.login, message: .commit.message}'`.text()
     const contributors = new Map<string, string[]>()
 
     for (const line of compare.split("\n").filter(Boolean)) {
@@ -270,7 +270,7 @@ async function publishAllPackages(version: string): Promise<void> {
       
       const publishPromises = batch.map(async (platform) => {
         const pkgDir = join(process.cwd(), "packages", platform)
-        const pkgName = `oh-my-opencode-${platform}`
+        const pkgName = `opencode-crew-${platform}`
         
         console.log(`    Starting ${pkgName}...`)
         const result = await publishPackage(pkgDir, distTag, false, pkgName, version)
@@ -337,7 +337,7 @@ async function gitTagAndRelease(newVersion: string, notes: string[]): Promise<vo
   await $`git config user.name "github-actions[bot]"`
   
   // Add all package.json files
-  await $`git add package.json assets/oh-my-opencode.schema.json`
+  await $`git add package.json assets/opencode-crew.schema.json`
   for (const platform of PLATFORM_PACKAGES) {
     await $`git add packages/${platform}/package.json`.nothrow()
   }

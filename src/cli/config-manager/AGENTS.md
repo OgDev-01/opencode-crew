@@ -20,7 +20,7 @@
 | `detect-current-config.ts` | Read existing OpenCode config, detect installed plugins |
 | `ensure-config-directory-exists.ts` | Create `.opencode/` dir if missing |
 | `format-error-with-suggestion.ts` | Format errors with actionable suggestions |
-| `generate-omo-config.ts` | Generate `opencode-crew.jsonc` from install selections |
+| `generate-crew-config.ts` | Generate `opencode-crew.jsonc` from install selections |
 | `jsonc-provider-editor.ts` | Read/write JSONC files with comment preservation |
 | `npm-dist-tags.ts` | Fetch latest version from npm registry (dist-tags) |
 | `opencode-binary.ts` | Detect OpenCode binary location, verify it's installed |
@@ -38,7 +38,7 @@ Functions are called sequentially by `src/cli/install.ts` / `src/cli/tui-install
 2. detect-current-config (check what's already set up)
 3. opencode-binary (verify opencode installed)
 4. npm-dist-tags (get latest version)
-5. generate-omo-config (build config from user selections)
+5. generate-crew-config (build config from user selections)
 6. write-omo-config
 7. add-plugin-to-opencode-config
 8. add-provider-config (for each provider selected)

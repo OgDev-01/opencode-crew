@@ -1,5 +1,5 @@
 {
-  "name": "@buldtech/opencode-crew-darwin-arm64",
+  "name": "@ogdev/opencode-crew-darwin-arm64",
   "version": "1.0.0",
   "description": "Platform-specific binary for opencode-crew (darwin-arm64)",
   "license": "MIT",

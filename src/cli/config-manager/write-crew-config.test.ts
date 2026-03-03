@@ -6,7 +6,7 @@ import { join } from "node:path"
 import { parseJsonc } from "../../shared/config/jsonc-parser"
 import type { InstallConfig } from "../types"
 import { resetConfigContext } from "./config-context"
-import { generateOmoConfig } from "./generate-omo-config"
+import { generateCrewConfig } from "./generate-crew-config"
 import { writeCrewConfig } from "./write-crew-config"
 
 const installConfig: InstallConfig = {
@@ -59,7 +59,7 @@ describe("writeCrewConfig", () => {
     }
     writeFileSync(testConfigPath, JSON.stringify(existingConfig, null, 2) + "\n", "utf-8")
 
-    const generatedDefaults = generateOmoConfig(installConfig)
+    const generatedDefaults = generateCrewConfig(installConfig)
 
     // when
     const result = writeCrewConfig(installConfig)

@@ -1,7 +1,7 @@
 import * as z from "zod"
 import { OpenCodeCrewConfigSchema } from "../src/config/schema"
 
-export function createOhMyOpenCodeJsonSchema(): Record<string, unknown> {
+export function createOpenCodeCrewJsonSchema(): Record<string, unknown> {
   const jsonSchema = z.toJSONSchema(OpenCodeCrewConfigSchema, {
     target: "draft-7",
     unrepresentable: "any",
@@ -9,9 +9,9 @@ export function createOhMyOpenCodeJsonSchema(): Record<string, unknown> {
 
   return {
     $schema: "http://json-schema.org/draft-07/schema#",
-    $id: "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/dev/assets/oh-my-opencode.schema.json",
-    title: "Oh My OpenCode Configuration",
-    description: "Configuration schema for oh-my-opencode plugin",
+    $id: "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json",
+    title: "OpenCode Crew Configuration",
+    description: "Configuration schema for opencode-crew plugin",
     ...jsonSchema,
   }
 }

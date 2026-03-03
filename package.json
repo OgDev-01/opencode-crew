@@ -1,5 +1,5 @@
 {
-  "name": "@buldtech/opencode-crew",
+  "name": "@ogdev/opencode-crew",
   "version": "1.0.0",
   "description": "Your AI dev team for OpenCode — Multi-Agent Orchestration Plugin",
   "main": "dist/index.js",
@@ -77,17 +77,17 @@
     "typescript": "^5.7.3"
   },
   "optionalDependencies": {
-    "@buldtech/opencode-crew-darwin-arm64": "1.0.0",
-    "@buldtech/opencode-crew-darwin-x64": "1.0.0",
-    "@buldtech/opencode-crew-darwin-x64-baseline": "1.0.0",
-    "@buldtech/opencode-crew-linux-arm64": "1.0.0",
-    "@buldtech/opencode-crew-linux-arm64-musl": "1.0.0",
-    "@buldtech/opencode-crew-linux-x64": "1.0.0",
-    "@buldtech/opencode-crew-linux-x64-baseline": "1.0.0",
-    "@buldtech/opencode-crew-linux-x64-musl": "1.0.0",
-    "@buldtech/opencode-crew-linux-x64-musl-baseline": "1.0.0",
-    "@buldtech/opencode-crew-windows-x64": "1.0.0",
-    "@buldtech/opencode-crew-windows-x64-baseline": "1.0.0"
+    "@ogdev/opencode-crew-darwin-arm64": "1.0.0",
+    "@ogdev/opencode-crew-darwin-x64": "1.0.0",
+    "@ogdev/opencode-crew-darwin-x64-baseline": "1.0.0",
+    "@ogdev/opencode-crew-linux-arm64": "1.0.0",
+    "@ogdev/opencode-crew-linux-arm64-musl": "1.0.0",
+    "@ogdev/opencode-crew-linux-x64": "1.0.0",
+    "@ogdev/opencode-crew-linux-x64-baseline": "1.0.0",
+    "@ogdev/opencode-crew-linux-x64-musl": "1.0.0",
+    "@ogdev/opencode-crew-linux-x64-musl-baseline": "1.0.0",
+    "@ogdev/opencode-crew-windows-x64": "1.0.0",
+    "@ogdev/opencode-crew-windows-x64-baseline": "1.0.0"
   },
   "trustedDependencies": [
     "@ast-grep/cli",

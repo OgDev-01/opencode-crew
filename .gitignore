@@ -9,6 +9,8 @@ dist/
 # Platform binaries (built, not committed)
 packages/*/bin/oh-my-opencode
 packages/*/bin/oh-my-opencode.exe
+packages/*/bin/opencode-crew
+packages/*/bin/opencode-crew.exe
 
 # IDE
 .idea/

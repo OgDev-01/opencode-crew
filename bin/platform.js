@@ -23,7 +23,7 @@ export function getPlatformPackage({ platform, arch, libcFamily }) {
   
   // Map platform names: win32 -> windows (for package name)
   const os = platform === "win32" ? "windows" : platform;
-  return `opencode-crew-${os}-${arch}${suffix}`;
+  return `@ogdev/opencode-crew-${os}-${arch}${suffix}`;
 }
 
 /** @param {{ platform: string, arch: string, libcFamily?: string | null, preferBaseline?: boolean }} options */
@@ -45,11 +45,11 @@ function getBaselinePlatformPackage({ platform, arch, libcFamily }) {
   }
 
   if (platform === "darwin") {
-    return "opencode-crew-darwin-x64-baseline";
+    return "@ogdev/opencode-crew-darwin-x64-baseline";
   }
 
   if (platform === "win32") {
-    return "opencode-crew-windows-x64-baseline";
+    return "@ogdev/opencode-crew-windows-x64-baseline";
   }
 
   if (platform === "linux") {
@@ -61,10 +61,10 @@ function getBaselinePlatformPackage({ platform, arch, libcFamily }) {
     }
 
     if (libcFamily === "musl") {
-      return "opencode-crew-linux-x64-musl-baseline";
+      return "@ogdev/opencode-crew-linux-x64-musl-baseline";
     }
 
-    return "opencode-crew-linux-x64-baseline";
+    return "@ogdev/opencode-crew-linux-x64-baseline";
   }
 
   return null;

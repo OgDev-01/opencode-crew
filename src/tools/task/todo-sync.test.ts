@@ -1,4 +1,5 @@
 /// <reference types="bun-types/test-globals" />
+import { vi, describe, it, expect, beforeEach } from "bun:test";
 import type { Task } from "../../features/claude-tasks/types";
 import {
   syncTaskToTodo,

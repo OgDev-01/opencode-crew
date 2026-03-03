@@ -7,7 +7,7 @@ import { detectConfigFormat } from "./opencode-config-format"
 import { parseOpenCodeConfigFileWithError, type OpenCodeConfig } from "./parse-opencode-config-file"
 import { getPluginNameWithVersion } from "./plugin-name-with-version"
 
-const PACKAGE_NAME = "@buldtech/opencode-crew"
+const PACKAGE_NAME = "@ogdev/opencode-crew"
 
 export async function addPluginToOpenCodeConfig(currentVersion: string): Promise<ConfigMergeResult> {
   try {

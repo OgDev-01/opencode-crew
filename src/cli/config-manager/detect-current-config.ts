@@ -60,7 +60,7 @@ export function detectCurrentConfig(): DetectedConfig {
 
   const openCodeConfig = parseResult.config
   const plugins = openCodeConfig.plugin ?? []
-  result.isInstalled = plugins.some((p) => p.startsWith("@buldtech/opencode-crew"))
+  result.isInstalled = plugins.some((p) => p.startsWith("@ogdev/opencode-crew"))
 
   if (!result.isInstalled) {
     return result

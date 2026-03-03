@@ -23,7 +23,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("2.14.0")
 
     // #then should use @latest tag
-    expect(result).toBe("@buldtech/opencode-crew@latest")
+    expect(result).toBe("@ogdev/opencode-crew@latest")
   })
 
   test("returns @beta when current version matches beta tag", async () => {
@@ -39,7 +39,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("3.0.0-beta.3")
 
     // #then should use @beta tag
-    expect(result).toBe("@buldtech/opencode-crew@beta")
+    expect(result).toBe("@ogdev/opencode-crew@beta")
   })
 
   test("returns @next when current version matches next tag", async () => {
@@ -55,7 +55,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("3.1.0-next.1")
 
     // #then should use @next tag
-    expect(result).toBe("@buldtech/opencode-crew@next")
+    expect(result).toBe("@ogdev/opencode-crew@next")
   })
 
   test("returns prerelease channel tag when no dist-tag matches prerelease version", async () => {
@@ -71,7 +71,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("3.0.0-beta.2")
 
     // #then should preserve prerelease channel
-    expect(result).toBe("@buldtech/opencode-crew@beta")
+    expect(result).toBe("@ogdev/opencode-crew@beta")
   })
 
   test("returns prerelease channel tag when fetch fails", async () => {
@@ -82,7 +82,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("3.0.0-beta.3")
 
     // #then should preserve prerelease channel
-    expect(result).toBe("@buldtech/opencode-crew@beta")
+    expect(result).toBe("@ogdev/opencode-crew@beta")
   })
 
   test("returns bare package name when npm returns non-ok response for stable version", async () => {
@@ -98,7 +98,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("2.14.0")
 
     // #then should fall back to bare package entry
-    expect(result).toBe("@buldtech/opencode-crew")
+    expect(result).toBe("@ogdev/opencode-crew")
   })
 
   test("prioritizes latest over other tags when version matches multiple", async () => {
@@ -114,7 +114,7 @@ describe("getPluginNameWithVersion", () => {
     const result = await getPluginNameWithVersion("3.0.0")
 
     // #then should prioritize @latest
-    expect(result).toBe("@buldtech/opencode-crew@latest")
+    expect(result).toBe("@ogdev/opencode-crew@latest")
   })
 })
 

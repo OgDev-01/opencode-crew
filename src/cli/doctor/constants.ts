@@ -38,6 +38,6 @@ export const EXIT_CODES = {
 
 export const MIN_OPENCODE_VERSION = "1.0.150"
 
-export const PACKAGE_NAME = "@buldtech/opencode-crew"
+export const PACKAGE_NAME = "@ogdev/opencode-crew"
 
 export const OPENCODE_BINARIES = ["opencode", "opencode-desktop"] as const

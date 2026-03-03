@@ -107,7 +107,7 @@ export async function checkSystem(): Promise<CheckResult> {
     issues.push({
       title: "Loaded plugin is outdated",
       description: `Loaded ${systemInfo.loadedVersion}, latest ${latestVersion}.`,
-      fix: "Update: cd ~/.config/opencode && bun update @buldtech/opencode-crew",
+      fix: "Update: cd ~/.config/opencode && bun update @ogdev/opencode-crew",
       severity: "warning",
       affects: ["plugin features"],
     })

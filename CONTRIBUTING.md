@@ -1,6 +1,6 @@
-# Contributing to Oh My OpenCode
+# Contributing to OpenCode Crew
 
-First off, thanks for taking the time to contribute! This document provides guidelines and instructions for contributing to oh-my-opencode.
+First off, thanks for taking the time to contribute! This document provides guidelines and instructions for contributing to opencode-crew.
 
 ## Table of Contents
 
@@ -61,8 +61,8 @@ If English isn't your first language, don't worry! We value your contributions r
 
 ```bash
 # Clone the repository
-git clone https://github.com/code-yeongyu/oh-my-opencode.git
-cd oh-my-opencode
+git clone https://github.com/OgDev-01/opencode-crew.git
+cd opencode-crew
 
 # Install dependencies (bun only - never use npm/yarn)
 bun install
@@ -84,21 +84,21 @@ After making changes, you can test your local build in OpenCode:
    ```json
    {
      "plugin": [
-       "file:///absolute/path/to/oh-my-opencode/dist/index.js"
+       "file:///absolute/path/to/opencode-crew/dist/index.js"
      ]
    }
    ```
    
-   For example, if your project is at `/Users/yourname/projects/oh-my-opencode`:
+   For example, if your project is at `/Users/yourname/projects/opencode-crew`:
    ```json
    {
      "plugin": [
-       "file:///Users/yourname/projects/oh-my-opencode/dist/index.js"
+       "file:///Users/yourname/projects/opencode-crew/dist/index.js"
      ]
    }
    ```
 
-   > **Note**: Remove `"oh-my-opencode"` from the plugin array if it exists, to avoid conflicts with the npm version.
+   > **Note**: Remove `"opencode-crew"` from the plugin array if it exists, to avoid conflicts with the npm version.
 
 3. **Restart OpenCode** to load the changes.
 
@@ -107,7 +107,7 @@ After making changes, you can test your local build in OpenCode:
 ## Project Structure
 
 ```
-oh-my-opencode/
+opencode-crew/
 ├── src/
 │   ├── index.ts         # Plugin entry (OhMyOpenCodePlugin)
 │   ├── plugin-config.ts # JSONC multi-level config (Zod v4)

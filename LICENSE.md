@@ -1,4 +1,4 @@
-This software is @buldtech/opencode-crew, a modified version of oh-my-opencode
+This software is @ogdev/opencode-crew, a modified version of oh-my-opencode
 (https://github.com/code-yeongyu/oh-my-opencode)
 originally created by YeonGyu-Kim under the SUL-1.0 license.
 The original license follows below.

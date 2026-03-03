@@ -1,6 +1,6 @@
 # Contributor License Agreement
 
-Thank you for your interest in contributing to oh-my-opencode ("Project"), owned by YeonGyu Kim ("Owner").
+Thank you for your interest in contributing to opencode-crew ("Project"), owned by OgDev-01 ("Owner").
 
 By signing this Contributor License Agreement ("Agreement"), you agree to the following terms:
 

@@ -26,6 +26,7 @@ import {
   createPreemptiveCompactionHook,
   createRuntimeFallbackHook,
   createMemoryLearningHook,
+  createMemoryDecisionDetectionHook,
 } from "@/hooks"
 import { createAnthropicEffortHook } from "@/hooks/anthropic-effort"
 import {
@@ -63,6 +64,7 @@ export type SessionHooks = {
   anthropicEffort: ReturnType<typeof createAnthropicEffortHook> | null
   runtimeFallback: ReturnType<typeof createRuntimeFallbackHook> | null
   memoryLearning: ReturnType<typeof createMemoryLearningHook> | null
+  memoryDecisionDetection: ReturnType<typeof createMemoryDecisionDetectionHook> | null
 }
 
 export function createSessionHooks(args: {
@@ -208,9 +210,29 @@ export function createSessionHooks(args: {
         try {
           const { getMemoryManager } = require("../../features/memory/manager")
           const manager = getMemoryManager()
-          return createMemoryLearningHook({ storage: manager.storage })
+          return createMemoryLearningHook({
+            storage: manager.storage,
+            autoCapture: pluginConfig.memory?.auto_capture,
+          })
         } catch (error) {
           log(`Failed to initialize memory-learning hook: ${error instanceof Error ? error.message : String(error)}`)
+          return null
+        }
+      }, { enabled: safeHookEnabled })
+    : null
+
+  const memoryDecisionDetection = isHookEnabled("memory-decision-detection")
+    ? safeCreateHook("memory-decision-detection", () => {
+        try {
+          const { getMemoryManager } = require("../../features/memory/manager")
+          const manager = getMemoryManager()
+          return createMemoryDecisionDetectionHook({
+            storage: manager.storage,
+            autoCapture: pluginConfig.memory?.auto_capture,
+            privacyTags: pluginConfig.memory?.privacy_tags,
+          })
+        } catch (error) {
+          log(`Failed to initialize memory-decision-detection hook: ${error instanceof Error ? error.message : String(error)}`)
           return null
         }
       }, { enabled: safeHookEnabled })
@@ -241,5 +263,6 @@ export function createSessionHooks(args: {
     anthropicEffort,
     runtimeFallback,
     memoryLearning,
+    memoryDecisionDetection,
   }
 }

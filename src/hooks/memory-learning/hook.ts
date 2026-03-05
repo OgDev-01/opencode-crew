@@ -1,10 +1,12 @@
 import type { IMemoryStorage, Learning, LearningType } from "@/features/memory/types"
+import type { AutoCaptureConfig } from "@/config/schema/memory"
 import { filterContent, shouldSkipTool } from "@/features/memory/privacy-filter"
 import { log } from "@/shared/logger"
 
 export interface MemoryLearningDeps {
   storage: IMemoryStorage
   privacyTags?: string[]
+  autoCapture?: AutoCaptureConfig
 }
 
 type HookInput = { tool: string; sessionID: string; callID: string }
@@ -14,13 +16,8 @@ const ERROR_PATTERN = /error|failed|not found|permission denied/i
 
 const NOISE_TOOLS = new Set(["Read", "Glob", "Grep"])
 
-function shouldCapture(tool: string, output: HookOutput): boolean {
+function shouldCaptureFailure(tool: string, output: HookOutput): boolean {
   if (!output) return false
-  if (shouldSkipTool(tool)) return false
-
-  if (output.metadata?.memory_capture === true) return true
-
-  if (NOISE_TOOLS.has(tool)) return false
 
   if (tool === "Bash") {
     const hasError = ERROR_PATTERN.test(output.output)
@@ -32,6 +29,71 @@ function shouldCapture(tool: string, output: HookOutput): boolean {
   if (tool === "Edit" || tool === "Write") {
     const attempt = typeof output.metadata?.attempt === "number" ? output.metadata.attempt : 1
     return attempt > 1
+  }
+
+  return false
+}
+
+function shouldCaptureOriginal(tool: string, output: HookOutput): boolean {
+  if (!output) return false
+  if (shouldSkipTool(tool)) return false
+
+  if (output.metadata?.memory_capture === true) return true
+
+  if (NOISE_TOOLS.has(tool)) return false
+
+  return shouldCaptureFailure(tool, output)
+}
+
+function matchesCapturePattern(output: string, patterns: string[]): boolean {
+  for (const pattern of patterns) {
+    try {
+      if (new RegExp(pattern, "i").test(output)) return true
+    } catch {
+      continue
+    }
+  }
+  return false
+}
+
+function shouldCapture(tool: string, output: HookOutput, config?: AutoCaptureConfig): boolean {
+  if (!config || config.enabled === false) {
+    return shouldCaptureOriginal(tool, output)
+  }
+
+  if (!output) return false
+
+  if (output.metadata?.memory_capture === true) return true
+
+  if (shouldSkipTool(tool)) return false
+
+  const captureTools = config.capture_tools ?? []
+  const skipTools = config.skip_tools ?? ["Read", "Glob", "Grep"]
+
+  if (captureTools.length > 0 && !captureTools.includes(tool)) return false
+  if (captureTools.length === 0 && skipTools.includes(tool)) return false
+
+  if (matchesCapturePattern(output.output, config.patterns ?? [])) return true
+
+  const onFailure = config.on_failure ?? true
+  if (onFailure && shouldCaptureFailure(tool, output)) return true
+
+  const onSuccess = config.on_success ?? false
+  if (!onSuccess) return false
+
+  if (tool === "Bash") {
+    const exitCode = output.metadata?.exitCode
+    const isSuccess = typeof exitCode !== "number" || exitCode === 0
+    return isSuccess && output.output.length > 50
+  }
+
+  if (tool === "Edit" || tool === "Write") {
+    const attempt = typeof output.metadata?.attempt === "number" ? output.metadata.attempt : 1
+    return attempt === 1
+  }
+
+  if (tool === "task" || tool === "delegate_task") {
+    return true
   }
 
   return false
@@ -59,7 +121,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
 
   return {
     "tool.execute.after": async (input: HookInput, output: HookOutput): Promise<void> => {
-      if (!shouldCapture(input.tool, output)) return
+      if (!shouldCapture(input.tool, output, deps.autoCapture)) return
 
       const summary = buildSummary(input.tool, output!.output)
       const contextHash = computeHash(input.tool, input.sessionID, summary)

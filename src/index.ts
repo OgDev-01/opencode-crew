@@ -83,6 +83,7 @@ const OpenCodeCrewPlugin: Plugin = async (ctx) => {
       output: { context: string[] },
     ): Promise<void> => {
       await hooks.compactionTodoPreserver?.capture(_input.sessionID)
+      await hooks.memoryPreCompactionFlush?.flush()
       await hooks.claudeCodeHooks?.["experimental.session.compacting"]?.(
         _input,
         output,

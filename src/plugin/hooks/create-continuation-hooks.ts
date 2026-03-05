@@ -9,10 +9,12 @@ import {
   createCompactionContextInjector,
   createCompactionTodoPreserverHook,
   createRelayHook,
+  createMemoryPreCompactionFlushHook,
 } from "@/hooks"
 import { hookSlot } from "./hook-slot"
 import { safeCreateHook } from "@/shared/hook-utils/safe-create-hook"
 import { createUnstableAgentBabysitter } from "../unstable-agent-babysitter"
+import { log } from "@/shared/logger"
 
 export type ContinuationHooks = {
   stopContinuationGuard: ReturnType<typeof createStopContinuationGuardHook> | null
@@ -22,6 +24,7 @@ export type ContinuationHooks = {
   unstableAgentBabysitter: ReturnType<typeof createUnstableAgentBabysitter> | null
   backgroundNotificationHook: ReturnType<typeof createBackgroundNotificationHook> | null
   relayHook: ReturnType<typeof createRelayHook> | null
+  memoryPreCompactionFlush: ReturnType<typeof createMemoryPreCompactionFlushHook> | null
 }
 
 type SessionRecovery = {
@@ -88,6 +91,22 @@ export function createContinuationHooks(args: {
     safeHookEnabled,
   )
 
+  const memoryPreCompactionFlush = isHookEnabled("memory-pre-compaction-flush")
+    ? safeCreateHook("memory-pre-compaction-flush", () => {
+        try {
+          const { getMemoryManager } = require("../../features/memory/manager")
+          const manager = getMemoryManager()
+          return createMemoryPreCompactionFlushHook({
+            onIdle: () => manager.onIdle(),
+            autoCapture: pluginConfig.memory?.auto_capture,
+          })
+        } catch (error) {
+          log(`Failed to initialize memory-pre-compaction-flush hook: ${error instanceof Error ? error.message : String(error)}`)
+          return null
+        }
+      }, { enabled: safeHookEnabled })
+    : null
+
 
   // OUTLIER: Inter-hook wiring - continuation hooks wire to sessionRecovery callbacks after creation
   if (sessionRecovery) {
@@ -142,5 +161,6 @@ export function createContinuationHooks(args: {
     unstableAgentBabysitter,
     backgroundNotificationHook,
     relayHook,
+    memoryPreCompactionFlush,
   }
 }

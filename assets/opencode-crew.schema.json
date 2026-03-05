@@ -3926,6 +3926,81 @@
         "delegation_cost_awareness": {
           "default": true,
           "type": "boolean"
+        },
+        "auto_capture": {
+          "default": {
+            "enabled": true,
+            "on_success": true,
+            "on_failure": true,
+            "decision_detection": true,
+            "pre_compaction_flush": true,
+            "capture_tools": [],
+            "skip_tools": [
+              "Read",
+              "Glob",
+              "Grep"
+            ],
+            "patterns": []
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "on_success": {
+              "default": true,
+              "type": "boolean"
+            },
+            "on_failure": {
+              "default": true,
+              "type": "boolean"
+            },
+            "decision_detection": {
+              "default": true,
+              "type": "boolean"
+            },
+            "pre_compaction_flush": {
+              "default": true,
+              "type": "boolean"
+            },
+            "capture_tools": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "skip_tools": {
+              "default": [
+                "Read",
+                "Glob",
+                "Grep"
+              ],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "patterns": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "on_success",
+            "on_failure",
+            "decision_detection",
+            "pre_compaction_flush",
+            "capture_tools",
+            "skip_tools",
+            "patterns"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -3945,7 +4020,8 @@
         "global_db_path",
         "privacy_tags",
         "dynamic_prompts_enabled",
-        "delegation_cost_awareness"
+        "delegation_cost_awareness",
+        "auto_capture"
       ],
       "additionalProperties": false
     },

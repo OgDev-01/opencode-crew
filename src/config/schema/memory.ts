@@ -1,5 +1,17 @@
 import { z } from "zod"
 
+export const AutoCaptureConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  on_success: z.boolean().default(true),
+  on_failure: z.boolean().default(true),
+  decision_detection: z.boolean().default(true),
+  pre_compaction_flush: z.boolean().default(true),
+  capture_tools: z.array(z.string()).default([]),
+  skip_tools: z.array(z.string()).default(["Read", "Glob", "Grep"]),
+  patterns: z.array(z.string()).default([]),
+})
+
+export type AutoCaptureConfig = z.infer<typeof AutoCaptureConfigSchema>
 export const MemoryConfigSchema = z.object({
   enabled: z.boolean().default(true),
   scope: z.enum(["project", "global"]).default("project"),
@@ -18,6 +30,16 @@ export const MemoryConfigSchema = z.object({
   privacy_tags: z.array(z.string()).default(["private", "secret", "credential"]),
   dynamic_prompts_enabled: z.boolean().default(true),
   delegation_cost_awareness: z.boolean().default(true),
+  auto_capture: AutoCaptureConfigSchema.optional().default({
+    enabled: true,
+    on_success: true,
+    on_failure: true,
+    decision_detection: true,
+    pre_compaction_flush: true,
+    capture_tools: [],
+    skip_tools: ["Read", "Glob", "Grep"],
+    patterns: [],
+  }),
 })
 
 export type MemoryConfig = z.infer<typeof MemoryConfigSchema>

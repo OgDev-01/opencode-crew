@@ -1,9 +1,38 @@
 import type { OpenCodeCrewConfig } from "@/config"
 import { AGENT_NAMES, agentPattern } from "./agent-resolver"
 import { HOOK_NAME } from "./constants"
+import { readConnectedProvidersCache } from "@/shared"
 import { log } from "@/shared/logger"
+import {
+  AGENT_MODEL_REQUIREMENTS,
+  CATEGORY_MODEL_REQUIREMENTS,
+  type FallbackEntry,
+} from "@/shared/model/model-requirements"
 import { SessionCategoryRegistry } from "@/shared/session/session-category-registry"
 import { normalizeFallbackModels } from "@/shared/model/model-resolver"
+
+export function deriveModelsFromRequirements(agentName: string | undefined, categoryName: string | undefined): string[] {
+  const fallbackChain =
+    (agentName && AGENT_MODEL_REQUIREMENTS[agentName]?.fallbackChain) ||
+    (categoryName && CATEGORY_MODEL_REQUIREMENTS[categoryName]?.fallbackChain)
+
+  if (!fallbackChain) return []
+
+  const connectedProviders = readConnectedProvidersCache()
+  const connectedSet = connectedProviders ? new Set(connectedProviders.map((p) => p.toLowerCase())) : null
+
+  const isReachable = (entry: FallbackEntry): boolean => {
+    if (!connectedSet) return true
+    return entry.providers.some((p) => connectedSet.has(p.toLowerCase()))
+  }
+
+  const selectProvider = (entry: FallbackEntry): string => {
+    if (!connectedSet) return entry.providers[0]
+    return entry.providers.find((p) => connectedSet.has(p.toLowerCase())) ?? entry.providers[0]
+  }
+
+  return fallbackChain.filter(isReachable).map((entry) => `${selectProvider(entry)}/${entry.model}`)
+}
 
 export function getFallbackModelsForSession(
   sessionID: string,
@@ -63,6 +92,12 @@ export function getFallbackModelsForSession(
       log(`[${HOOK_NAME}] Using ${agentName} fallback models (no agent detected)`, { sessionID })
       return result
     }
+  }
+
+  const derived = deriveModelsFromRequirements(agent, sessionCategory ?? undefined)
+  if (derived.length > 0) {
+    log(`[${HOOK_NAME}] Using auto-derived fallback models`, { sessionID, agent, sessionCategory, count: derived.length })
+    return derived
   }
 
   return []

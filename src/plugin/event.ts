@@ -124,10 +124,13 @@ export function createEventHandler(args: {
     hooks.runtimeFallback !== undefined &&
     (typeof args.pluginConfig.runtime_fallback === "boolean"
       ? args.pluginConfig.runtime_fallback
-      : (args.pluginConfig.runtime_fallback?.enabled ?? false));
+      : (args.pluginConfig.runtime_fallback?.enabled ?? true));
 
   const isModelFallbackEnabled =
     hooks.modelFallback !== null && hooks.modelFallback !== undefined;
+
+  // Track sessions that have already been warned about the deprecation
+  const warnedDeprecationSessions = new Set<string>();
 
   // Avoid triggering multiple abort+continue cycles for the same failing assistant message.
   const lastHandledModelErrorMessageID = new Map<string, string>();
@@ -218,6 +221,16 @@ export function createEventHandler(args: {
 
     if (event.type === "session.created") {
       const sessionInfo = props?.info as { id?: string; title?: string; parentID?: string } | undefined;
+
+      // Deprecation warning: log once per session if both fallbacks are enabled
+      if (isRuntimeFallbackEnabled && isModelFallbackEnabled && sessionInfo?.id) {
+        if (!warnedDeprecationSessions.has(sessionInfo.id)) {
+          warnedDeprecationSessions.add(sessionInfo.id);
+          log(
+            "[event] Deprecation: 'model_fallback' is superseded by 'runtime_fallback' (now enabled by default). 'model_fallback' config is ignored when runtime_fallback is active. Remove 'model_fallback: true' from your config."
+          );
+        }
+      }
 
       if (!sessionInfo?.parentID) {
         setMainSession(sessionInfo?.id);

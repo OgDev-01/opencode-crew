@@ -2,6 +2,7 @@ import type { IMemoryStorage, Learning, LearningType } from "@/features/memory/t
 import type { AutoCaptureConfig } from "@/config/schema/memory"
 import { filterContent, shouldSkipTool } from "@/features/memory/privacy-filter"
 import { log } from "@/shared/logger"
+import { subagentSessions } from "@/features/claude-code-session-state"
 
 export interface MemoryLearningDeps {
   storage: IMemoryStorage
@@ -121,6 +122,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
 
   return {
     "tool.execute.after": async (input: HookInput, output: HookOutput): Promise<void> => {
+      if (subagentSessions.has(input.sessionID)) return
       if (!shouldCapture(input.tool, output, deps.autoCapture)) return
 
       const summary = buildSummary(input.tool, output!.output)

@@ -161,7 +161,7 @@ export function createEventHandler(args: {
       const { getMemoryManager } = require("../../features/memory/manager")
       const manager = getMemoryManager()
       await manager.onIdle()
-    } catch {}
+    } catch (e) { log("[event] memory onIdle error", { error: String(e) }) }
   };
 
   const recentSyntheticIdles = new Map<string, number>();
@@ -230,7 +230,7 @@ export function createEventHandler(args: {
           const { getMemoryManager } = require("../../features/memory/manager")
           const manager = getMemoryManager()
           await manager.onSessionStart(sessionInfo?.id ?? "")
-        } catch {}
+        } catch (e) { log("[event] memory onSessionStart error", { error: String(e) }) }
       }
 
       await managers.tmuxSessionManager.onSessionCreated(
@@ -254,7 +254,7 @@ export function createEventHandler(args: {
           const { getMemoryManager } = require("../../features/memory/manager")
           const manager = getMemoryManager()
           await manager.onSessionEnd(sessionInfo.id)
-        } catch {}
+        } catch (e) { log("[event] memory onSessionEnd error", { error: String(e) }) }
 
         clearSessionAgent(sessionInfo.id);
         lastHandledModelErrorMessageID.delete(sessionInfo.id);

@@ -213,6 +213,7 @@ export function createSessionHooks(args: {
           return createMemoryLearningHook({
             storage: manager.storage,
             autoCapture: pluginConfig.memory?.auto_capture,
+            privacyTags: pluginConfig.memory?.privacy_tags,
           })
         } catch (error) {
           log(`Failed to initialize memory-learning hook: ${error instanceof Error ? error.message : String(error)}`)

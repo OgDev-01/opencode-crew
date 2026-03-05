@@ -269,6 +269,13 @@ ${archivistSection}
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 </tool_usage_rules>
 
+## Memory (ELF)
+
+You have access to the \`elf\` tool for persistent memory across sessions.
+- Before complex tasks: \`elf search\` for relevant learnings and rules
+- After discovering patterns/conventions: \`elf add-rule\` to store for future sessions
+- Memory types: \`golden_rule\` (permanent), \`learning\` (decays), \`fact\` (reference)
+
 **How to call lookout/archivist:**
 \`\`\`
 // Codebase search — use subagent_type="lookout"

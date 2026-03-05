@@ -156,6 +156,12 @@ export function createEventHandler(args: {
     await Promise.resolve(hooks.compactionTodoPreserver?.event?.(input));
     await Promise.resolve(hooks.writeExistingFileGuard?.event?.(input));
     await Promise.resolve(hooks.relayHook?.handler?.(input));
+
+    try {
+      const { getMemoryManager } = require("../../features/memory/manager")
+      const manager = getMemoryManager()
+      await manager.onIdle()
+    } catch {}
   };
 
   const recentSyntheticIdles = new Map<string, number>();
@@ -219,6 +225,14 @@ export function createEventHandler(args: {
 
       firstMessageVariantGate.markSessionCreated(sessionInfo);
 
+      if (!sessionInfo?.parentID) {
+        try {
+          const { getMemoryManager } = require("../../features/memory/manager")
+          const manager = getMemoryManager()
+          await manager.onSessionStart(sessionInfo?.id ?? "")
+        } catch {}
+      }
+
       await managers.tmuxSessionManager.onSessionCreated(
         event as {
           type: string;
@@ -236,6 +250,12 @@ export function createEventHandler(args: {
       }
 
       if (sessionInfo?.id) {
+        try {
+          const { getMemoryManager } = require("../../features/memory/manager")
+          const manager = getMemoryManager()
+          await manager.onSessionEnd(sessionInfo.id)
+        } catch {}
+
         clearSessionAgent(sessionInfo.id);
         lastHandledModelErrorMessageID.delete(sessionInfo.id);
         lastHandledRetryStatusKey.delete(sessionInfo.id);

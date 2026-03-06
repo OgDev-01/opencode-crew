@@ -53,7 +53,7 @@ After installing, open OpenCode and try a request like:
 
 ```bash
 # "Captain, add unit tests for the auth module"
-# Captain will plan, delegate to agents, and deliver results
+# Captain will break it down, delegate to agents, and deliver results
 ```
 
 ## How it works

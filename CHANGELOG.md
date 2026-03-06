@@ -1,5 +1,11 @@
 # @ogdev/opencode-crew
 
+## 1.2.1
+
+### Patch Changes
+
+- [#2](https://github.com/OgDev-01/opencode-crew/pull/2) [`70efe43`](https://github.com/OgDev-01/opencode-crew/commit/70efe43fc25340b44df32149b371e99580f4797d) - Add ELF memory auto-capture system with memory dump detection, duplicate hook fix, and production release workflow improvements
+
 ## 1.2.0
 
 ### Minor Changes

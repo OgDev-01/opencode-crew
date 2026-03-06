@@ -188,7 +188,7 @@ jobs:
         run: |
           VERSION="${{ needs.publish-staging.outputs.version }}"
           gh release view "v${VERSION}" >/dev/null 2>&1 || \
-            gh release create "v${VERSION}" --title "v${VERSION}" --notes-file /tmp/changelog.md
+            gh release create "v${VERSION}" --title "v${VERSION} (staging)" --notes-file /tmp/changelog.md --prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -31,7 +31,8 @@
     "prepublishOnly": "bun run clean && bun run build",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "version": "changeset version && bun install"
+    "version": "changeset version && bun install",
+    "changeset": "changeset"
   },
   "keywords": [
     "opencode",

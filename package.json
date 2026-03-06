@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-  "workspaces": ["packages/*"],
+  "workspaces": [".", "packages/*"],
   "bin": {
     "opencode-crew": "bin/opencode-crew.js"
   },

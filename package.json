@@ -52,12 +52,12 @@
   "license": "SUL-1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/buldtech/opencode-crew.git"
+    "url": "git+https://github.com/OgDev-01/opencode-crew.git"
   },
   "bugs": {
-    "url": "https://github.com/buldtech/opencode-crew/issues"
+    "url": "https://github.com/OgDev-01/opencode-crew/issues"
   },
-  "homepage": "https://github.com/buldtech/opencode-crew#readme",
+  "homepage": "https://github.com/OgDev-01/opencode-crew#readme",
   "dependencies": {
     "@ast-grep/cli": "^0.40.0",
     "@ast-grep/napi": "^0.40.0",

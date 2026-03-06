@@ -5,12 +5,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/buldtech/opencode-crew"
+    "url": "https://github.com/OgDev-01/opencode-crew"
   },
   "bugs": {
-    "url": "https://github.com/buldtech/opencode-crew/issues"
+    "url": "https://github.com/OgDev-01/opencode-crew/issues"
   },
-  "homepage": "https://github.com/buldtech/opencode-crew#readme",
+  "homepage": "https://github.com/OgDev-01/opencode-crew#readme",
   "os": [
     "darwin"
   ],

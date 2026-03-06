@@ -1,5 +1,6 @@
 export type ClaudeSubscription = "no" | "yes" | "max20"
 export type BooleanArg = "no" | "yes"
+export type ReleaseChannel = "stable" | "next" | "alpha"
 
 export interface InstallArgs {
   tui: boolean
@@ -11,6 +12,7 @@ export interface InstallArgs {
   zaiCodingPlan?: BooleanArg
   kimiForCoding?: BooleanArg
   skipAuth?: boolean
+  channel?: ReleaseChannel
 }
 
 export interface InstallConfig {

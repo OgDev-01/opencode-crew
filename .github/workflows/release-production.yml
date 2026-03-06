@@ -1,63 +1,94 @@
-# Changeset-driven release workflow.
-# Triggered on push to dev. Creates "Version Packages" PR when changesets exist,
-# or publishes when the Version Packages PR is merged.
-name: release
-run-name: "changeset release"
+# Manual production promotion workflow.
+# Promotes from staging (@next) to production (@latest).
+# MANUAL ONLY — no automated triggers. Safety gate ensures version is on @next first.
+name: release-production
+run-name: "production release ${{ inputs.version || 'from @next' }}"
 
-"on":
-  push:
-    branches: [dev]
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to promote (e.g., 1.2.0). Leave empty to use current @next version."
+        required: false
+        type: string
+      skip_platform:
+        description: "Skip platform binary packages"
+        required: false
+        type: boolean
+        default: false
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
   id-token: write
   actions: write
-  pull-requests: write
 
 jobs:
-  release:
+  verify-staging:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - name: Resolve version
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(npm view @ogdev/opencode-crew@next version 2>/dev/null || echo "")
+            if [ -z "$VERSION" ]; then
+              echo "::error::Could not resolve @next version from npm. Is @next published?"
+              exit 1
+            fi
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Resolved version: $VERSION"
+
+      - name: Verify version is on @next
+        run: |
+          VERSION="${{ steps.resolve.outputs.version }}"
+          NEXT_VERSION=$(npm view @ogdev/opencode-crew@next version 2>/dev/null || echo "")
+          if [ "$VERSION" != "$NEXT_VERSION" ]; then
+            echo "::error::Version $VERSION is not the current @next version ($NEXT_VERSION). Publish to @next (staging) first."
+            exit 1
+          fi
+          echo "✓ Version $VERSION confirmed on @next"
+
+      - name: Assert stable version format
+        run: |
+          VERSION="${{ steps.resolve.outputs.version }}"
+          if [[ "$VERSION" == *"-"* ]]; then
+            echo "::error::Version $VERSION is a prerelease version. Only stable versions (x.y.z) can be promoted to @latest."
+            exit 1
+          fi
+          echo "✓ Version $VERSION is a stable release"
+
+  test:
+    runs-on: ubuntu-latest
+    needs: verify-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-suite
+
+  typecheck:
+    runs-on: ubuntu-latest
+    needs: verify-staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/typecheck
+
+  publish-production:
+    runs-on: ubuntu-latest
+    needs: [verify-staging, test, typecheck]
     if: github.repository == 'OgDev-01/opencode-crew'
     outputs:
-      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-        env:
-          BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
-
-      - name: Create release PR or publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: bun run version
-          publish: echo 'publish handled by downstream jobs'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-main:
-    runs-on: ubuntu-latest
-    needs: [release]
-    if: needs.release.outputs.hasChangesets == 'false'
-    outputs:
       version: ${{ steps.version.outputs.version }}
-      dist_tag: ${{ steps.version.outputs.dist_tag }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: dev
 
       - run: git fetch --force --tags
 
@@ -75,27 +106,21 @@ jobs:
         env:
           BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
 
-      - name: Read version from package.json
+      - name: Set version
         id: version
         run: |
-          VERSION=$(jq -r '.version' package.json)
+          VERSION="${{ needs.verify-staging.outputs.version }}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          if [[ "$VERSION" == *"-"* ]]; then
-            DIST_TAG=$(echo "$VERSION" | cut -d'-' -f2 | cut -d'.' -f1)
-            echo "dist_tag=${DIST_TAG:-next}" >> $GITHUB_OUTPUT
-          else
-            echo "dist_tag=" >> $GITHUB_OUTPUT
-          fi
-          echo "Version: $VERSION"
+          echo "Promoting version: $VERSION"
 
-      - name: Check if already published
+      - name: Check if already published as @latest
         id: check
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/@ogdev%2Fopencode-crew/${VERSION}")
-          if [ "$STATUS" = "200" ]; then
+          LATEST=$(npm view @ogdev/opencode-crew@latest version 2>/dev/null || echo "")
+          if [ "$LATEST" = "$VERSION" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "✓ @ogdev/opencode-crew@${VERSION} already published"
+            echo "✓ @ogdev/opencode-crew@${VERSION} already @latest"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
@@ -121,14 +146,11 @@ jobs:
           bunx tsc --emitDeclarationOnly
           bun run build:schema
 
-      - name: Publish main package
+      - name: Publish to @latest
         if: steps.check.outputs.skip != 'true'
         run: |
-          TAG_ARG=""
-          if [ -n "${{ steps.version.outputs.dist_tag }}" ]; then
-            TAG_ARG="--tag ${{ steps.version.outputs.dist_tag }}"
-          fi
-          npm publish --access public --provenance $TAG_ARG
+          # Production publishes WITHOUT --tag — npm defaults to @latest for stable versions
+          npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
@@ -148,21 +170,22 @@ jobs:
 
   trigger-platform:
     runs-on: ubuntu-latest
-    needs: publish-main
+    needs: publish-production
+    if: inputs.skip_platform != true
     steps:
       - name: Trigger platform publish workflow
         run: |
           gh workflow run publish-platform.yml \
             --repo ${{ github.repository }} \
             --ref ${{ github.ref }} \
-            -f version=${{ needs.publish-main.outputs.version }} \
-            -f dist_tag=${{ needs.publish-main.outputs.dist_tag }}
+            -f version=${{ needs.publish-production.outputs.version }} \
+            -f dist_tag=
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   github-release:
     runs-on: ubuntu-latest
-    needs: publish-main
+    needs: publish-production
     steps:
       - uses: actions/checkout@v4
         with:
@@ -188,35 +211,8 @@ jobs:
 
       - name: Create GitHub release
         run: |
-          VERSION="${{ needs.publish-main.outputs.version }}"
+          VERSION="${{ needs.publish-production.outputs.version }}"
           gh release view "v${VERSION}" >/dev/null 2>&1 || \
-            gh release create "v${VERSION}" --title "v${VERSION}" --notes-file /tmp/changelog.md
+            gh release create "v${VERSION}" --title "v${VERSION}" --notes-file /tmp/changelog.md --latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Delete draft release
-        run: gh release delete next --yes 2>/dev/null || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  merge-to-main:
-    runs-on: ubuntu-latest
-    needs: [github-release, publish-main]
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - run: git fetch --force --tags origin main
-
-      - name: Merge to main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          VERSION="${{ needs.publish-main.outputs.version }}"
-          git checkout main
-          git merge --ff-only "v${VERSION}" || echo "::warning::Failed to fast-forward main"
-          git push origin main || echo "::warning::Failed to push to main"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

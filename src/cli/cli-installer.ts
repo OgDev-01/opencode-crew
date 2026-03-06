@@ -66,9 +66,10 @@ export async function runCliInstaller(args: InstallArgs, version: string): Promi
   }
 
   const config = argsToConfig(args)
+  const channel = args.channel ?? "stable"
 
   printStep(step++, totalSteps, "Adding opencode-crew plugin...")
-  const pluginResult = await addPluginToOpenCodeConfig(version)
+  const pluginResult = await addPluginToOpenCodeConfig(version, channel)
   if (!pluginResult.success) {
     printError(`Failed: ${pluginResult.error}`)
     return 1

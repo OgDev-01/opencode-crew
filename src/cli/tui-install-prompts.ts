@@ -3,7 +3,9 @@ import type { Option } from "@clack/prompts"
 import type {
   ClaudeSubscription,
   DetectedConfig,
+  InstallArgs,
   InstallConfig,
+  ReleaseChannel,
 } from "./types"
 import { detectedToInitialValues } from "./install-validators"
 
@@ -26,8 +28,19 @@ async function selectOrCancel<TValue extends Readonly<string | boolean | number>
   return value as TValue
 }
 
-export async function promptInstallConfig(detected: DetectedConfig): Promise<InstallConfig | null> {
+export async function promptInstallConfig(detected: DetectedConfig, args: InstallArgs): Promise<(InstallConfig & { channel: ReleaseChannel }) | null> {
   const initial = detectedToInitialValues(detected)
+
+  const channel = await selectOrCancel<ReleaseChannel>({
+    message: "Which release channel do you want to install?",
+    options: [
+      { value: "stable", label: "Stable", hint: "Installs @latest \u2014 production release" },
+      { value: "next", label: "Next", hint: "Installs @next \u2014 staging release" },
+      { value: "alpha", label: "Alpha", hint: "Installs @alpha \u2014 experimental release" },
+    ],
+    initialValue: args.channel ?? "stable",
+  })
+  if (!channel) return null
 
   const claude = await selectOrCancel<ClaudeSubscription>({
     message: "Do you have a Claude Pro/Max subscription?",
@@ -101,6 +114,7 @@ export async function promptInstallConfig(detected: DetectedConfig): Promise<Ins
   if (!kimiForCoding) return null
 
   return {
+    channel,
     hasClaude: claude !== "no",
     isMax20: claude === "max20",
     hasOpenAI: openai === "yes",

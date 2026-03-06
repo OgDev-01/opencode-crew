@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, alpha]
   pull_request:
     branches: [main, dev]
 
@@ -30,123 +30,47 @@ jobs:
             echo "PR targets '${{ github.base_ref }}' branch - OK"
           fi
 
-  test:
+  changes:
     runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+      workflows: ${{ steps.filter.outputs.workflows }}
     steps:
       - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          bun-version: latest
+          filters: |
+            src:
+              - 'src/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'bun.lockb'
+              - 'tsconfig*.json'
+            workflows:
+              - '.github/workflows/**'
+              - '.github/actions/**'
 
-      - name: Install dependencies
-        run: bun install
-        env:
-          BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
-
-      - name: Run mock-heavy tests (isolated)
-        run: |
-          # These files use mock.module() which pollutes module cache
-          # Run them in separate processes to prevent cross-file contamination
-          bun test src/plugin-handlers
-          bun test src/hooks/relay
-          bun test src/hooks/compaction-context-injector
-          bun test src/features/tmux-subagent
-          bun test src/cli/doctor/formatter.test.ts
-          bun test src/cli/doctor/format-default.test.ts
-          bun test src/tools/call-agent/sync-executor.test.ts
-          bun test src/tools/call-agent/session-creator.test.ts
-          bun test src/tools/session-manager
-          bun test src/features/opencode-skill-loader/loader.test.ts
-          bun test src/hooks/anthropic-context-window-limit-recovery/recovery-hook.test.ts
-          bun test src/hooks/anthropic-context-window-limit-recovery/executor.test.ts
-          bun test src/shared/binary/port-utils.test.ts
-          bun test src/shared/model/connected-providers-cache.test.ts
-          bun test src/shared/model/model-resolver.test.ts
-          bun test src/shared/model/model-error-classifier.test.ts
-          bun test src/shared/model/model-availability.test.ts
-          bun test src/cli/run/integration.test.ts
-          bun test src/cli/run/server-connection.test.ts
-
-      - name: Run remaining tests
-        run: |
-          # Enumerate subdirectories/files explicitly to EXCLUDE mock-heavy files
-          # that were already run in isolation above.
-          # Excluded from src/cli: doctor/formatter.test.ts, doctor/format-default.test.ts
-          # Excluded from src/cli/run: integration.test.ts, server-connection.test.ts (mock.module + port-utils import chain)
-          # Excluded from src/tools: call-agent/sync-executor.test.ts, call-agent/session-creator.test.ts, session-manager (all)
-          # Excluded from src/hooks/anthropic-context-window-limit-recovery: recovery-hook.test.ts, executor.test.ts
-          # Excluded from src/shared: binary/port-utils.test.ts, model/{connected-providers-cache,model-resolver,model-error-classifier,model-availability}.test.ts
-          bun test bin script src/config src/mcp src/index.test.ts \
-            src/agents \
-            src/shared/agent src/shared/command-executor src/shared/config \
-            src/shared/file-ops src/shared/git-worktree src/shared/hook-utils \
-            src/shared/opencode src/shared/session src/shared/string-transform \
-            src/shared/tmux src/shared/token-metrics src/shared/type-utils \
-            src/shared/migration.test.ts src/shared/first-message-variant.test.ts \
-            src/shared/frontmatter.test.ts src/shared/prompt-tools.test.ts \
-            src/shared/shell-env.test.ts src/shared/skill-path-resolver.test.ts \
-            src/shared/tool-name.test.ts \
-            src/shared/model/model-suggestion-retry.test.ts \
-            src/shared/model/model-requirements.test.ts \
-            src/cli/run/completion-continuation.test.ts src/cli/run/continuation-state-marker.test.ts \
-            src/cli/run/on-complete-hook.test.ts src/cli/run/runner.test.ts \
-            src/cli/run/session-resolver.test.ts src/cli/run/event-handlers.test.ts \
-            src/cli/run/poll-for-completion.test.ts src/cli/run/message-part-delta.test.ts \
-            src/cli/run/opencode-binary-resolver.test.ts src/cli/run/completion-verbose-logging.test.ts \
-            src/cli/run/completion.test.ts src/cli/run/stdin-suppression.test.ts \
-            src/cli/run/events.test.ts src/cli/run/timestamp-output.test.ts \
-            src/cli/run/json-output.test.ts \
-            src/cli/config-manager src/cli/mcp-oauth \
-            src/cli/index.test.ts src/cli/install.test.ts src/cli/model-fallback.test.ts \
-            src/cli/config-manager.test.ts \
-            src/cli/doctor/runner.test.ts src/cli/doctor/checks \
-            src/tools/ast-grep src/tools/background-task src/tools/delegate-task \
-            src/tools/glob src/tools/grep src/tools/interactive-bash \
-            src/tools/look-at src/tools/lsp \
-            src/tools/skill src/tools/skill-mcp src/tools/slashcommand src/tools/task \
-            src/tools/call-agent/background-agent-executor.test.ts \
-            src/tools/call-agent/background-executor.test.ts \
-            src/tools/call-agent/subagent-session-creator.test.ts \
-            src/hooks/anthropic-context-window-limit-recovery/empty-content-recovery-sdk.test.ts src/hooks/anthropic-context-window-limit-recovery/parser.test.ts src/hooks/anthropic-context-window-limit-recovery/pruning-deduplication.test.ts src/hooks/anthropic-context-window-limit-recovery/recovery-deduplication.test.ts src/hooks/anthropic-context-window-limit-recovery/storage.test.ts \
-            src/hooks/claude-code-compatibility \
-            src/hooks/context-injection \
-            src/hooks/provider-toast \
-            src/hooks/session-notification \
-            src/hooks/captain \
-            src/hooks/todo-continuation-enforcer \
-            src/features/background-agent \
-            src/features/builtin-commands \
-            src/features/builtin-skills \
-            src/features/claude-code-session-state \
-            src/features/hook-message-injector \
-            src/features/opencode-skill-loader/config-source-discovery.test.ts \
-            src/features/opencode-skill-loader/merger.test.ts \
-            src/features/opencode-skill-loader/skill-content.test.ts \
-            src/features/opencode-skill-loader/blocking.test.ts \
-            src/features/opencode-skill-loader/async-loader.test.ts \
-            src/features/skill-mcp-manager
+  test:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.workflows == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-suite
 
   typecheck:
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.workflows == 'true'
     steps:
       - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-        env:
-          BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
-
-      - name: Type check
-        run: bun run typecheck
+      - uses: ./.github/actions/typecheck
 
   build:
     runs-on: ubuntu-latest
-    needs: [test, typecheck]
+    needs: [changes, test, typecheck]
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.workflows == 'true'
     permissions:
       contents: write
     steps:
@@ -187,7 +111,10 @@ jobs:
   draft-release:
     runs-on: ubuntu-latest
     needs: [build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/dev' &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped')
     permissions:
       contents: write
     steps:

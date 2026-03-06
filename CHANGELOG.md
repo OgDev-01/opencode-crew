@@ -1,5 +1,11 @@
 # @ogdev/opencode-crew
 
+## 1.1.1
+
+### Patch Changes
+
+- [#7](https://github.com/OgDev-01/opencode-crew/pull/7) [`df4b619`](https://github.com/OgDev-01/opencode-crew/commit/df4b6199b161e6d9aeff554f09aecf68bf8b03d0) Thanks [@OgDev-01](https://github.com/OgDev-01)! - Complete README rewrite with benefit-focused developer documentation
+
 ## 1.1.0
 
 ### Minor Changes

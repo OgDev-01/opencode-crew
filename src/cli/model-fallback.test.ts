@@ -515,7 +515,7 @@ describe("generateModelConfig", () => {
 
       // #then should include correct schema URL
       expect(result.$schema).toBe(
-        "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json"
+        "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json"
       )
     })
   })

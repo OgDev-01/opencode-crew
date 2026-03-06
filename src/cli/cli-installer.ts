@@ -66,9 +66,10 @@ export async function runCliInstaller(args: InstallArgs, version: string): Promi
   }
 
   const config = argsToConfig(args)
+  const channel = args.channel ?? "stable"
 
   printStep(step++, totalSteps, "Adding opencode-crew plugin...")
-  const pluginResult = await addPluginToOpenCodeConfig(version)
+  const pluginResult = await addPluginToOpenCodeConfig(version, channel)
   if (!pluginResult.success) {
     printError(`Failed: ${pluginResult.error}`)
     return 1
@@ -146,7 +147,8 @@ export async function runCliInstaller(args: InstallArgs, version: string): Promi
 
   console.log(`${SYMBOLS.star} ${color.yellow("If you found this helpful, consider starring the repo!")}`)
   console.log(
-    `  ${color.dim("gh api --silent --method PUT /user/starred/buldtech/opencode-crew >/dev/null 2>&1 || true")}`,
+    `  ${color.dim("gh api --silent --method PUT /user/starred/OgDev-01/opencode-crew >/dev/null 2>&1 || true")}`,
+
   )
   console.log()
   console.log(color.dim("CrewCrewCrewCrew... Enjoy!"))

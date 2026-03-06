@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "OgDev-01/opencode-crew" }],
+  "commit": false,
+  "fixed": [
+    [
+      "@ogdev/opencode-crew",
+      "@ogdev/opencode-crew-darwin-arm64",
+      "@ogdev/opencode-crew-darwin-x64",
+      "@ogdev/opencode-crew-darwin-x64-baseline",
+      "@ogdev/opencode-crew-linux-arm64",
+      "@ogdev/opencode-crew-linux-arm64-musl",
+      "@ogdev/opencode-crew-linux-x64",
+      "@ogdev/opencode-crew-linux-x64-baseline",
+      "@ogdev/opencode-crew-linux-x64-musl",
+      "@ogdev/opencode-crew-linux-x64-musl-baseline",
+      "@ogdev/opencode-crew-windows-x64",
+      "@ogdev/opencode-crew-windows-x64-baseline"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "dev",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}

@@ -42,11 +42,11 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
     spinner.stop(`OpenCode ${openCodeVersion ?? "installed"} ${color.green("[OK]")}`)
   }
 
-  const config = await promptInstallConfig(detected)
+  const config = await promptInstallConfig(detected, args)
   if (!config) return 1
 
   spinner.start("Adding opencode-crew to OpenCode config")
-  const pluginResult = await addPluginToOpenCodeConfig(version)
+  const pluginResult = await addPluginToOpenCodeConfig(version, config.channel)
   if (!pluginResult.success) {
     spinner.stop(`Failed to add plugin: ${pluginResult.error}`)
     p.outro(color.red("Installation failed."))
@@ -115,7 +115,8 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
 
   p.log.message(`${color.yellow("★")} If you found this helpful, consider starring the repo!`)
   p.log.message(
-    `  ${color.dim("gh api --silent --method PUT /user/starred/buldtech/opencode-crew >/dev/null 2>&1 || true")}`,
+    `  ${color.dim("gh api --silent --method PUT /user/starred/OgDev-01/opencode-crew >/dev/null 2>&1 || true")}`,
+
   )
 
   p.outro(color.green("CrewCrewCrewCrew... Enjoy!"))

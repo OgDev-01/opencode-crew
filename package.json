@@ -1,10 +1,14 @@
 {
   "name": "@ogdev/opencode-crew",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Your AI dev team for OpenCode — Multi-Agent Orchestration Plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "workspaces": [
+    ".",
+    "packages/*"
+  ],
   "bin": {
     "opencode-crew": "bin/opencode-crew.js"
   },
@@ -29,7 +33,9 @@
     "postinstall": "node postinstall.mjs",
     "prepublishOnly": "bun run clean && bun run build",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "version": "changeset version && bun install",
+    "changeset": "changeset"
   },
   "keywords": [
     "opencode",
@@ -46,12 +52,12 @@
   "license": "SUL-1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/buldtech/opencode-crew.git"
+    "url": "git+https://github.com/OgDev-01/opencode-crew.git"
   },
   "bugs": {
-    "url": "https://github.com/buldtech/opencode-crew/issues"
+    "url": "https://github.com/OgDev-01/opencode-crew/issues"
   },
-  "homepage": "https://github.com/buldtech/opencode-crew#readme",
+  "homepage": "https://github.com/OgDev-01/opencode-crew#readme",
   "dependencies": {
     "@ast-grep/cli": "^0.40.0",
     "@ast-grep/napi": "^0.40.0",
@@ -71,23 +77,25 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.30.0",
     "@types/js-yaml": "^4.0.9",
     "@types/picomatch": "^3.0.2",
     "bun-types": "1.3.6",
     "typescript": "^5.7.3"
   },
   "optionalDependencies": {
-    "@ogdev/opencode-crew-darwin-arm64": "1.0.0",
-    "@ogdev/opencode-crew-darwin-x64": "1.0.0",
-    "@ogdev/opencode-crew-darwin-x64-baseline": "1.0.0",
-    "@ogdev/opencode-crew-linux-arm64": "1.0.0",
-    "@ogdev/opencode-crew-linux-arm64-musl": "1.0.0",
-    "@ogdev/opencode-crew-linux-x64": "1.0.0",
-    "@ogdev/opencode-crew-linux-x64-baseline": "1.0.0",
-    "@ogdev/opencode-crew-linux-x64-musl": "1.0.0",
-    "@ogdev/opencode-crew-linux-x64-musl-baseline": "1.0.0",
-    "@ogdev/opencode-crew-windows-x64": "1.0.0",
-    "@ogdev/opencode-crew-windows-x64-baseline": "1.0.0"
+    "@ogdev/opencode-crew-darwin-arm64": "1.1.1",
+    "@ogdev/opencode-crew-darwin-x64": "1.1.1",
+    "@ogdev/opencode-crew-darwin-x64-baseline": "1.1.1",
+    "@ogdev/opencode-crew-linux-arm64": "1.1.1",
+    "@ogdev/opencode-crew-linux-arm64-musl": "1.1.1",
+    "@ogdev/opencode-crew-linux-x64": "1.1.1",
+    "@ogdev/opencode-crew-linux-x64-baseline": "1.1.1",
+    "@ogdev/opencode-crew-linux-x64-musl": "1.1.1",
+    "@ogdev/opencode-crew-linux-x64-musl-baseline": "1.1.1",
+    "@ogdev/opencode-crew-windows-x64": "1.1.1",
+    "@ogdev/opencode-crew-windows-x64-baseline": "1.1.1"
   },
   "trustedDependencies": [
     "@ast-grep/cli",

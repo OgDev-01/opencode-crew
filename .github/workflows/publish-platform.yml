@@ -59,10 +59,9 @@ jobs:
       - name: Check if already published
         id: check
         run: |
-          PKG_NAME="opencode-crew-${{ matrix.platform }}"
+          PKG_NAME="@ogdev/opencode-crew-${{ matrix.platform }}"
           VERSION="${{ inputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/${PKG_NAME}/${VERSION}")
-          # Convert platform name for output (replace - with _)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/@ogdev%2Fopencode-crew-${{ matrix.platform }}/${VERSION}")
           PLATFORM_KEY="${{ matrix.platform }}"
           PLATFORM_KEY="${PLATFORM_KEY//-/_}"
           if [ "$STATUS" = "200" ]; then
@@ -211,9 +210,9 @@ jobs:
       - name: Check if already published
         id: check
         run: |
-          PKG_NAME="opencode-crew-${{ matrix.platform }}"
+          PKG_NAME="@ogdev/opencode-crew-${{ matrix.platform }}"
           VERSION="${{ inputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/${PKG_NAME}/${VERSION}")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/@ogdev%2Fopencode-crew-${{ matrix.platform }}/${VERSION}")
           if [ "$STATUS" = "200" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "✓ ${PKG_NAME}@${VERSION} already published, skipping"

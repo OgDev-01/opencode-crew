@@ -277,7 +277,7 @@ describe("generateCrewConfig - model fallback system", () => {
     const result = generateCrewConfig(config)
 
     // #then Captain is omitted (requires all fallback providers)
-    expect(result.$schema).toBe("https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json")
+    expect(result.$schema).toBe("https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json")
     expect((result.agents as Record<string, { model: string }>).captain).toBeUndefined()
   })
 

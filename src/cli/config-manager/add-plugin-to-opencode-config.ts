@@ -1,15 +1,15 @@
 import { readFileSync, writeFileSync } from "node:fs"
-import type { ConfigMergeResult } from "../types"
+import type { ConfigMergeResult, ReleaseChannel } from "../types"
 import { getConfigDir } from "./config-context"
 import { ensureConfigDirectoryExists } from "./ensure-config-directory-exists"
 import { formatErrorWithSuggestion } from "./format-error-with-suggestion"
 import { detectConfigFormat } from "./opencode-config-format"
 import { parseOpenCodeConfigFileWithError, type OpenCodeConfig } from "./parse-opencode-config-file"
-import { getPluginNameWithVersion } from "./plugin-name-with-version"
+import { getPluginNameWithVersion, getPluginNameForChannel } from "./plugin-name-with-version"
 
 const PACKAGE_NAME = "@ogdev/opencode-crew"
 
-export async function addPluginToOpenCodeConfig(currentVersion: string): Promise<ConfigMergeResult> {
+export async function addPluginToOpenCodeConfig(currentVersion: string, _channel: ReleaseChannel = "stable"): Promise<ConfigMergeResult> {
   try {
     ensureConfigDirectoryExists()
   } catch (err) {
@@ -21,7 +21,9 @@ export async function addPluginToOpenCodeConfig(currentVersion: string): Promise
   }
 
   const { format, path } = detectConfigFormat()
-  const pluginEntry = await getPluginNameWithVersion(currentVersion)
+  const pluginEntry = _channel !== "stable"
+    ? getPluginNameForChannel(_channel)
+    : await getPluginNameWithVersion(currentVersion)
 
   try {
     if (format === "none") {

@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "OgDev-01/opencode-crew" }],
+  "changelog": ["./.changeset/changelog-config.cjs", { "repo": "OgDev-01/opencode-crew" }],
   "commit": false,
   "fixed": [
     [

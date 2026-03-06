@@ -3,6 +3,7 @@ import { tool } from "@opencode-ai/plugin"
 import type { IMemoryStorage, LearningType, MemoryScope } from "@/features/memory/types"
 import type { SearchOptions } from "@/features/memory/search/search-service"
 import type { MemorySearchResult } from "@/features/memory/types"
+import { isLikelyMemoryDump } from "@/features/memory/memory-dump-detector"
 
 function mapToLearningType(input: string): LearningType {
   if (input === "success" || input === "failure" || input === "observation") return input
@@ -37,6 +38,7 @@ const DESCRIPTION = `Emergent Learning Framework (ELF) memory tool. Actions:
 - metrics: Get memory system statistics. No params needed.`
 
 const PRIVACY_TAGS = ["private", "secret", "credential"]
+
 
 export function createElfTool(deps: ElfToolDeps) {
   return tool({
@@ -104,6 +106,12 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
   const scope = args.scope ?? "project"
 
   const filtered = deps.filterContent(args.content, PRIVACY_TAGS)
+  if (isLikelyMemoryDump(filtered)) {
+    return JSON.stringify({
+      error: "content appears to be a memory dump transcript and was rejected",
+      status: "rejected",
+    })
+  }
   const hash = deps.computeContextHash(entryType, scope, filtered)
   const existingId = deps.findExistingByHash(hash, deps.db)
 

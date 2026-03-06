@@ -2,11 +2,13 @@ import type { MemorySearchResult, GoldenRule, Learning } from "@/features/memory
 import type { ContextSourceType, ContextPriority } from "@/features/context-injector"
 import { estimateTokenCount } from "@/features/memory/token-counter"
 import { log } from "@/shared"
+import { isLikelyMemoryDump } from "@/features/memory/memory-dump-detector"
 
 const DEFAULT_MAX_TOKENS = 500
 const DEFAULT_GOLDEN_RULE_MAX_TOKENS = 200
 const THROTTLE_THRESHOLD = 0.70
 const SKIP_THRESHOLD = 0.85
+
 
 export interface MemorySearchService {
   searchAll(
@@ -81,10 +83,12 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         const goldenRules = goldenResults
           .filter((r) => r.type === "golden_rule")
           .map((r) => (r.entry as GoldenRule).rule)
+          .filter((rule) => !isLikelyMemoryDump(rule))
 
         const learnings = allResults
           .filter((r) => r.type === "learning")
           .map((r) => (r.entry as Learning).summary)
+          .filter((summary) => !isLikelyMemoryDump(summary))
 
         if (goldenRules.length === 0 && learnings.length === 0) return
 

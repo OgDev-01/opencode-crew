@@ -192,6 +192,24 @@ describe("#given ELF tool", () => {
         expect(parsed.deduplicated).toBe(true)
         expect(parsed.existingId).toBe("existing-id-123")
       })
+
+      it("rejects memory-dump shaped content", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          {
+            action: "add-rule",
+            type: "golden_rule",
+            content:
+              "## Agent Memory\n### Golden Rules\n- Rule A\n### Learnings\n- Item B\ntotalMemories: 4\nbyType: {'learnings':1,'golden_rules':3}",
+          },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("rejected")
+        expect(parsed.error).toContain("memory dump")
+      })
     })
   })
 

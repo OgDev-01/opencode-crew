@@ -209,10 +209,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create GitHub release
+      - name: Promote GitHub release to latest
         run: |
           VERSION="${{ needs.publish-production.outputs.version }}"
-          gh release view "v${VERSION}" >/dev/null 2>&1 || \
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            gh release edit "v${VERSION}" --title "v${VERSION}" --notes-file /tmp/changelog.md --latest --prerelease=false
+          else
             gh release create "v${VERSION}" --title "v${VERSION}" --notes-file /tmp/changelog.md --latest
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

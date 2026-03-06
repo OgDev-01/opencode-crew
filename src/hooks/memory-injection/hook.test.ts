@@ -318,6 +318,40 @@ describe("createMemoryInjectionHook", () => {
     })
   })
 
+  describe("#given malformed memory dump entries", () => {
+    describe("#when golden rules contain memory-dump markers", () => {
+      it("#then filters malformed rules and keeps valid rules", async () => {
+        //#given
+        const malformedRule =
+          "## Agent Memory\n### Golden Rules\n- Rule A\n### Relevant Learnings\n- Learning B\ntotalMemories: 4\nbyType: {'learnings':1,'golden_rules':3}"
+        const search = createMockSearch({
+          searchGoldenRules: async () => [
+            goldenRuleResult(malformedRule),
+            goldenRuleResult("Always run tests before claiming completion"),
+          ],
+          searchAll: async () => [],
+        })
+        const hook = createMemoryInjectionHook({
+          search,
+          collector: mockCollector,
+          getUsage: () => ({ usedTokens: 5000, remainingTokens: 15000, usagePercentage: 0.25 }),
+        })
+
+        const input = {}
+        const output: TransformOutput = { messages: [msg("user", "what should I do?")] }
+
+        //#when
+        await hook["experimental.chat.messages.transform"](input, output)
+
+        //#then
+        expect(mockCollector.registered).toHaveLength(1)
+        const injected = mockCollector.registered[0].content
+        expect(injected).toContain("Always run tests before claiming completion")
+        expect(injected).not.toContain("totalMemories: 4")
+      })
+    })
+  })
+
   describe("#given getUsage returns null", () => {
     describe("#when context window usage is unknown", () => {
       it("#then proceeds with full injection (default behavior)", async () => {

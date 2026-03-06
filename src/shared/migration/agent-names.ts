@@ -37,6 +37,19 @@ export const AGENT_NAME_MAP: Record<string, string> = {
   librarian: "archivist",
   explore: "lookout",
   "multimodal-looker": "spotter",
+
+  // PascalCase crew names → lowercase crew names
+  Captain: "captain",
+  Relay: "relay",
+  Craftsman: "craftsman",
+  Sage: "sage",
+  Archivist: "archivist",
+  Lookout: "lookout",
+  Spotter: "spotter",
+  Cadet: "cadet",
+  "Strategist (Planner)": "strategist",
+  "Assessor (Plan Consultant)": "assessor",
+  "Critic (Plan Reviewer)": "critic",
   build: "build",
 }
 

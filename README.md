@@ -58,12 +58,16 @@ After installing, open OpenCode and try a request like:
 
 ## How it works
 
-OpenCode Crew replaces single-prompt interactions with a structured multi-agent process. Captain receives your request, breaks it into a plan, and delegates to specialists who run in parallel.
+Captain receives your request and picks an approach based on what you asked for. By default, Captain creates a task list, fires off research agents to gather context, and starts building. For straightforward work, this is fast and effective.
 
-1. Install the plugin once to activate the crew in your environment.
-2. Captain reads your request and creates a detailed implementation plan.
-3. Specialized agents run in parallel: Archivist searches docs, Lookout maps your codebase, Craftsman builds.
-4. Results come back coordinated and verified, not scattered across multiple prompts.
+For high-complexity tasks, add "ultrawork" or "ulw" to your prompt. This switches Captain into plan-driven orchestration: a dedicated planning agent breaks your request into a parallel task graph before any code is written. Every step requires full context gathering, mandatory delegation to specialists, and verified completion. No partial deliveries, no skipped requirements, no assumptions without investigation.
+
+The difference in practice:
+
+- **Default mode**: "Add a login page" -> Captain creates a todo, dispatches Lookout to scan your codebase and Archivist to pull auth docs, then builds the feature step by step.
+- **Ultrawork mode**: "ultrawork: Rebuild the entire auth system with OAuth, session management, and role-based access" -> Strategist produces a full implementation plan. Archivist and Lookout run 10+ parallel searches. Each agent verifies its output against the plan. Critic checks the result before Captain reports done.
+
+You can also run `/ulw-loop` to start a self-continuing development loop with ultrawork enforced on every iteration. The loop keeps running until the task is complete or hits the max iteration limit, maintaining ultrawork's standards across every cycle.
 
 For example: ask Captain to "add authentication to the API." Strategist breaks it into a concrete plan. Archivist finds the right library and its docs from Context7. Lookout maps your existing auth patterns so nothing gets duplicated. Craftsman writes the implementation across all affected files. Sage reviews the architecture for edge cases. Critic validates the plan was followed. All in one session, with each agent doing what it's designed for.
 
@@ -127,7 +131,7 @@ Eight built-in commands are available immediately after install:
 | `/handoff` | Save full session context for a clean continuation |
 | `/init-deep` | Generate a hierarchical AGENTS.md knowledge base for your project |
 | `/ralph-loop` | Start a self-continuing development loop until the task is done |
-| `/ulw-loop` | Ultrawork loop for high-complexity tasks |
+| `/ulw-loop` | Start a self-continuing loop with ultrawork mode (plan-driven, verified) |
 | `/stop-continuation` | Stop all active loops and continuation mechanisms |
 | `/cancel-ralph` | Cancel a running Ralph Loop |
 

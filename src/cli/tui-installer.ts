@@ -115,7 +115,8 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
 
   p.log.message(`${color.yellow("★")} If you found this helpful, consider starring the repo!`)
   p.log.message(
-    `  ${color.dim("gh api --silent --method PUT /user/starred/buldtech/opencode-crew >/dev/null 2>&1 || true")}`,
+    `  ${color.dim("gh api --silent --method PUT /user/starred/OgDev-01/opencode-crew >/dev/null 2>&1 || true")}`,
+
   )
 
   p.outro(color.green("CrewCrewCrewCrew... Enjoy!"))

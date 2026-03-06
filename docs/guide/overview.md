@@ -16,7 +16,7 @@ Paste this into your LLM agent session:
 
 ```
 Install and configure opencode-crew by following the instructions here:
-https://raw.githubusercontent.com/buldtech/opencode-crew/refs/heads/dev/docs/guide/installation.md
+https://raw.githubusercontent.com/OgDev-01/opencode-crew/refs/heads/dev/docs/guide/installation.md
 ```
 
 Or read the full [Installation Guide](./installation.md) for manual setup, provider authentication, and troubleshooting.
@@ -167,7 +167,7 @@ You can override specific agents or categories in your config:
 
 ```jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "$schema": "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json",
 
   "agents": {
     // Main orchestrator: Claude Opus or Kimi K2.5 work best

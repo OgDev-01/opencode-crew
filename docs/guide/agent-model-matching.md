@@ -162,7 +162,7 @@ See the [Orchestration System Guide](./orchestration.md) for how agents dispatch
 
 ```jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "$schema": "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json",
 
   "agents": {
     // Main orchestrator: Claude Opus or Kimi K2.5 work best

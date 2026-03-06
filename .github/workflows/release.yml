@@ -92,10 +92,10 @@ jobs:
         id: check
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/opencode-crew/${VERSION}")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/@ogdev%2Fopencode-crew/${VERSION}")
           if [ "$STATUS" = "200" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "✓ opencode-crew@${VERSION} already published"
+            echo "✓ @ogdev/opencode-crew@${VERSION} already published"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi

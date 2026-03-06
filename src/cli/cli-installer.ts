@@ -146,7 +146,8 @@ export async function runCliInstaller(args: InstallArgs, version: string): Promi
 
   console.log(`${SYMBOLS.star} ${color.yellow("If you found this helpful, consider starring the repo!")}`)
   console.log(
-    `  ${color.dim("gh api --silent --method PUT /user/starred/buldtech/opencode-crew >/dev/null 2>&1 || true")}`,
+    `  ${color.dim("gh api --silent --method PUT /user/starred/OgDev-01/opencode-crew >/dev/null 2>&1 || true")}`,
+
   )
   console.log()
   console.log(color.dim("CrewCrewCrewCrew... Enjoy!"))

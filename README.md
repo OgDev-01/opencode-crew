@@ -20,7 +20,7 @@ OpenCode plugin extending Claude Code with multi-agent orchestration. Captain or
 ## Installation
 
 ```bash
-npm install -g @ogdev/opencode-crew
+bunx @ogdev/opencode-crew install
 ```
 
 ## Links

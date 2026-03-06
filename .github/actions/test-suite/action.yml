@@ -4,7 +4,6 @@ description: 'Run the full test suite with mock-heavy test isolation'
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v4
 
     - uses: oven-sh/setup-bun@v2
       with:

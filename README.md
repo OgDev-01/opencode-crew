@@ -1,7 +1,5 @@
 <div align="center">
 
-[![OpenCodeCrew](./.github/assets/hero.jpg)](https://github.com/OgDev-01/opencode-crew)
-
 [![GitHub Release](https://img.shields.io/github/v/release/OgDev-01/opencode-crew?color=369eff&labelColor=black&logo=github&style=flat-square)](https://github.com/OgDev-01/opencode-crew/releases)
 [![npm version](https://img.shields.io/npm/v/@ogdev/opencode-crew?color=ff6b35&labelColor=black&style=flat-square)](https://www.npmjs.com/package/@ogdev/opencode-crew)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&label=discord&labelColor=black&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/PUwSMR9XNk)
@@ -9,7 +7,8 @@
 
 ### Multi-agent orchestration for OpenCode.
 
-[![Preview](./.github/assets/preview.png)](https://github.com/OgDev-01/opencode-crew)
+<img width="1512" height="968" alt="image" src="https://github.com/user-attachments/assets/cd4613e6-956c-4cad-b44d-7789a0b026ac" />
+
 
 </div>
 

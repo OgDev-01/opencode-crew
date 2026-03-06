@@ -42,11 +42,11 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
     spinner.stop(`OpenCode ${openCodeVersion ?? "installed"} ${color.green("[OK]")}`)
   }
 
-  const config = await promptInstallConfig(detected)
+  const config = await promptInstallConfig(detected, args)
   if (!config) return 1
 
   spinner.start("Adding opencode-crew to OpenCode config")
-  const pluginResult = await addPluginToOpenCodeConfig(version)
+  const pluginResult = await addPluginToOpenCodeConfig(version, config.channel)
   if (!pluginResult.success) {
     spinner.stop(`Failed to add plugin: ${pluginResult.error}`)
     p.outro(color.red("Installation failed."))

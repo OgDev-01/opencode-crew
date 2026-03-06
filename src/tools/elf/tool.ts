@@ -3,6 +3,7 @@ import { tool } from "@opencode-ai/plugin"
 import type { IMemoryStorage, LearningType, MemoryScope } from "@/features/memory/types"
 import type { SearchOptions } from "@/features/memory/search/search-service"
 import type { MemorySearchResult } from "@/features/memory/types"
+import { isLikelyMemoryDump } from "@/features/memory/memory-dump-detector"
 
 function mapToLearningType(input: string): LearningType {
   if (input === "success" || input === "failure" || input === "observation") return input
@@ -38,19 +39,6 @@ const DESCRIPTION = `Emergent Learning Framework (ELF) memory tool. Actions:
 
 const PRIVACY_TAGS = ["private", "secret", "credential"]
 
-function isLikelyMemoryDump(content: string): boolean {
-  const normalized = content.toLowerCase()
-  const markers = [
-    "## agent memory",
-    "golden rules",
-    "learnings",
-    "here's what's stored in elf memory",
-    "totalmemories:",
-    "bytype:",
-  ]
-  const markerHits = markers.reduce((count, marker) => (normalized.includes(marker) ? count + 1 : count), 0)
-  return markerHits >= 2
-}
 
 export function createElfTool(deps: ElfToolDeps) {
   return tool({

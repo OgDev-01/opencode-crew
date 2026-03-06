@@ -2,26 +2,13 @@ import type { MemorySearchResult, GoldenRule, Learning } from "@/features/memory
 import type { ContextSourceType, ContextPriority } from "@/features/context-injector"
 import { estimateTokenCount } from "@/features/memory/token-counter"
 import { log } from "@/shared"
+import { isLikelyMemoryDump } from "@/features/memory/memory-dump-detector"
 
 const DEFAULT_MAX_TOKENS = 500
 const DEFAULT_GOLDEN_RULE_MAX_TOKENS = 200
 const THROTTLE_THRESHOLD = 0.70
 const SKIP_THRESHOLD = 0.85
 
-function isLikelyMemoryDump(content: string): boolean {
-  const normalized = content.toLowerCase()
-  const markers = [
-    "## agent memory",
-    "golden rules",
-    "relevant learnings",
-    "learnings",
-    "totalmemories:",
-    "bytype:",
-    "here's what's stored in elf memory",
-  ]
-  const markerHits = markers.reduce((count, marker) => (normalized.includes(marker) ? count + 1 : count), 0)
-  return markerHits >= 2
-}
 
 export interface MemorySearchService {
   searchAll(

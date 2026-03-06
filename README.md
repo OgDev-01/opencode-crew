@@ -10,6 +10,33 @@
 
 opencode-crew adds a coordinated team of 11 specialized AI agents to [OpenCode](https://github.com/anomalyco/opencode). Instead of a single model trying to do everything, you get a parallel workforce: one agent plans, others research and build simultaneously, and the results come back verified and coordinated.
 
+## Why opencode-crew
+
+Most AI coding tools treat every session as a blank slate. Your agents re-discover project conventions, repeat the same mistakes, and burn tokens re-reading context they already processed yesterday. Developers using tools like Cline and Cursor routinely report $100-500/month in token costs, with individual tasks sometimes costing $50+ when context limits hit. opencode-crew was built specifically to solve these two problems.
+
+### Agents that remember (ELF memory system)
+
+Inspired by [Claude.ai's memory approach](https://www.anthropic.com/news/memory), the Emergent Learning Framework gives your agents persistent, cross-session memory. As agents work, they record project-specific patterns, conventions, and decisions into a local SQLite database. The next session loads that context automatically.
+
+Here's what makes ELF different from dropping notes in a markdown file:
+
+- **Automatic promotion**: Individual observations start as learnings with utility scores. When 3+ related learnings accumulate with high confidence (utility > 0.9, accessed 10+ times, older than 7 days), the system synthesizes them into a golden rule. Golden rules are normalized as "Always ..." statements and capped at 5 per scope to prevent bloat.
+- **Smart retrieval**: Full-text search with BM25 ranking, boosted by recency (exponential decay with ~60-day half-life) and utility scores. Only relevant memories load into context, not a dump of everything.
+- **Privacy by default**: Regex-based filtering strips AWS keys (`AKIA...`), Stripe/OpenAI keys (`sk-...`), GitHub tokens (`ghp_...`), Bearer tokens, and custom `<private>` tags before anything reaches memory. Skips `.env`, `.pem`, and credential files entirely. Zero LLM cost for privacy filtering since it's all heuristic-based.
+- **Token-aware injection**: Memory injection starts with a 500-token budget. At 70% context usage, it throttles to golden-rules-only (200 tokens). At 85%, it skips injection entirely. Golden rules always load first; learnings fill remaining budget.
+
+For example: Craftsman discovers your project uses a custom `AppError` wrapper instead of plain `try/catch`. ELF stores this as a learning. After multiple sessions confirm the pattern, it promotes to a golden rule: "Always use AppError for error handling." Every future agent picks it up automatically without re-discovering it.
+
+### Token optimization
+
+Token waste is the hidden cost of AI-assisted development. A single mismanaged context window can burn through $50 of tokens on one task. opencode-crew applies multiple strategies throughout the agent lifecycle to keep costs predictable.
+
+- **Tool output truncation**: Large tool outputs are capped at 50k tokens (10k for web content). Read, edit, write, and LSP tools are never truncated since their output is always relevant.
+- **Preemptive compaction**: At 70% context window usage, the system triggers summarization before hitting the hard limit. This avoids the expensive retry-and-recover cycle that other tools fall into.
+- **Multi-strategy context recovery**: When context limits do hit, a 5-strategy pipeline kicks in: empty redundant content, deduplicate, targeted truncation (50-80%), aggressive truncation, then summarize-and-retry. Max 2 retries with exponential backoff.
+- **Smart model routing**: 8 task categories (`quick`, `deep`, `ultrabrain`, `visual-engineering`, `artistry`, `writing`, and two general-purpose tiers) route each task to a cost-appropriate model. A typo fix doesn't need the same model as an architecture redesign.
+- **Session continuity**: Agents reuse session IDs to continue conversations without re-sending full context. This alone can save 70%+ tokens on follow-up tasks.
+
 ## Installation
 
 Run the installer once and follow the prompts:
@@ -18,9 +45,16 @@ Run the installer once and follow the prompts:
 bunx @ogdev/opencode-crew install
 ```
 
-Supports macOS (ARM and Intel), Linux (x64, ARM, and musl), and Windows.
+Supports macOS (ARM and Intel), Linux (x64, ARM, and musl), and Windows. You'll need [OpenCode](https://github.com/anomalyco/opencode) already set up with at least one AI provider configured.
 
-You'll need [OpenCode](https://github.com/anomalyco/opencode) already set up with at least one AI provider configured. The installer walks you through plugin activation and verifies your environment with a built-in doctor check.
+### Quick start
+
+After installing, open OpenCode and try a request like:
+
+```bash
+# "Captain, add unit tests for the auth module"
+# Captain will plan, delegate to agents, and deliver results
+```
 
 ## How it works
 
@@ -40,8 +74,6 @@ Your crew has 11 specialized agents split into four groups by what they do.
 ### Planning & quality
 
 Captain orchestrates the entire team, while Strategist creates step-by-step plans for complex work. Assessor identifies hidden requirements or gaps before any code is written, and Critic reviews every plan for completeness and verifiability. Before Captain writes a single line, Assessor flags what's missing and Critic confirms the approach is sound.
-
-This group is especially useful for large or ambiguous requests. When you ask for something complex, Assessor surfaces the questions you didn't think to ask and Critic ensures the answer actually solves the original problem.
 
 ### Research & context
 
@@ -101,43 +133,11 @@ Eight built-in commands are available immediately after install:
 
 ## Key features
 
-Three systems set opencode-crew apart from a basic agent wrapper.
+Beyond memory and token optimization, three more systems set opencode-crew apart.
 
-### Cross-session memory
-
-The ELF (Emergent Learning Framework) memory system lets agents carry knowledge across sessions. As you work, agents record patterns, decisions, and project-specific conventions. On the next session, that context loads automatically. Privacy filtering keeps sensitive data out of memory, and automatic consolidation prevents duplicates from building up.
-
-For example: if Craftsman discovers your project uses a custom error-handling wrapper instead of plain `try/catch`, ELF stores that as a golden rule. Every future agent session picks it up automatically, so no one has to re-discover it.
-
-### Smart task routing
-
-Eight task categories route work to the right model for the job: `quick` for trivial one-file changes, `deep` for thorough research-first problem solving, `ultrabrain` for logic-heavy reasoning tasks, `visual-engineering` for UI and design work, `artistry` for unconventional solutions, `writing` for documentation, and `unspecified-low` / `unspecified-high` for tasks that don't fit elsewhere. Each maps to a model optimized for that workload. If your primary model is unavailable, the system falls back automatically across providers: Claude, Gemini, OpenAI, and others.
-
-You can also add custom categories in your config with your own model mapping, so specialized workloads always hit the right provider.
-
-### Multi-level config
-
-Every agent, tool, model, and feature is configurable. Settings cascade from project level (`.opencode/opencode-crew.json`) to user level (`~/.config/opencode/opencode-crew.json`) to defaults. Override a single model for one agent, disable a tool entirely, or add a custom task category with your own model mapping.
-
-A minimal project config looks like this:
-
-```json
-{
-  "agents": {
-    "craftsman": {
-      "model": "claude-opus-4-5"
-    }
-  },
-  "disabled_tools": ["browser_automation"],
-  "categories": {
-    "data-analysis": {
-      "model": "google/gemini-2.5-pro"
-    }
-  }
-}
-```
-
-Project config is committed to your repo so the whole team shares the same agent setup. User config is local and personal, so model credentials stay off version control.
+- **Session continuity**: Agents pass session IDs between tasks so follow-up work picks up exactly where it left off, with full conversation history intact. No re-reading files, no re-explaining context.
+- **Smart task routing**: Eight task categories route work to the right model. `quick` for one-file changes, `deep` for research-heavy problems, `ultrabrain` for logic-heavy reasoning, `visual-engineering` for UI work. If your primary model is unavailable, the system falls back automatically across providers.
+- **Multi-level config**: Settings cascade from project level to user level to defaults. Override a single model for one agent, disable a tool entirely, or add custom task categories with your own model mapping. Project config is committed to your repo so the whole team shares the same setup.
 
 ## Community
 
@@ -148,4 +148,4 @@ Questions, feedback, and contributions are welcome in both places:
 
 ## Acknowledgments
 
-OpenCode Crew is built upon the foundation of [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode), an outstanding [OpenCode](https://github.com/anomalyco/opencode) plugin that pioneered the multi-agent orchestration patterns used here. We are grateful for their work and the inspiration it provided.
+opencode-crew is built upon the foundation of [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode), an outstanding [OpenCode](https://github.com/anomalyco/opencode) plugin that pioneered the multi-agent orchestration patterns used here.

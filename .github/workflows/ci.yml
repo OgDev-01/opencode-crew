@@ -60,6 +60,11 @@ jobs:
           bun test src/features/opencode-skill-loader/loader.test.ts
           bun test src/hooks/anthropic-context-window-limit-recovery/recovery-hook.test.ts
           bun test src/hooks/anthropic-context-window-limit-recovery/executor.test.ts
+          bun test src/shared/binary/port-utils.test.ts
+          bun test src/shared/model/connected-providers-cache.test.ts
+          bun test src/shared/model/model-resolver.test.ts
+          bun test src/shared/model/model-error-classifier.test.ts
+          bun test src/shared/model/model-availability.test.ts
 
       - name: Run remaining tests
         run: |
@@ -68,8 +73,19 @@ jobs:
           # Excluded from src/cli: doctor/formatter.test.ts, doctor/format-default.test.ts
           # Excluded from src/tools: call-agent/sync-executor.test.ts, call-agent/session-creator.test.ts, session-manager (all)
           # Excluded from src/hooks/anthropic-context-window-limit-recovery: recovery-hook.test.ts, executor.test.ts
+          # Excluded from src/shared: binary/port-utils.test.ts, model/{connected-providers-cache,model-resolver,model-error-classifier,model-availability}.test.ts
           bun test bin script src/config src/mcp src/index.test.ts \
-            src/agents src/shared \
+            src/agents \
+            src/shared/agent src/shared/command-executor src/shared/config \
+            src/shared/file-ops src/shared/git-worktree src/shared/hook-utils \
+            src/shared/opencode src/shared/session src/shared/string-transform \
+            src/shared/tmux src/shared/token-metrics src/shared/type-utils \
+            src/shared/migration.test.ts src/shared/first-message-variant.test.ts \
+            src/shared/frontmatter.test.ts src/shared/prompt-tools.test.ts \
+            src/shared/shell-env.test.ts src/shared/skill-path-resolver.test.ts \
+            src/shared/tool-name.test.ts \
+            src/shared/model/model-suggestion-retry.test.ts \
+            src/shared/model/model-requirements.test.ts \
             src/cli/run src/cli/config-manager src/cli/mcp-oauth \
             src/cli/index.test.ts src/cli/install.test.ts src/cli/model-fallback.test.ts \
             src/cli/config-manager.test.ts \

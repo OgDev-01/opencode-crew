@@ -2,6 +2,9 @@
 .sisyphus/*
 !.sisyphus/rules/
 node_modules/
+.agent/
+.agents/
+skills-lock.json
 
 # Build output
 dist/

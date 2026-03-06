@@ -24,7 +24,7 @@ mock.module("@opencode-ai/sdk", () => ({
   createOpencodeClient: mockCreateOpencodeClient,
 }))
 
-mock.module("../../shared/port-utils", () => ({
+mock.module("../../shared/binary/port-utils", () => ({
   isPortAvailable: mockIsPortAvailable,
   getAvailableServerPort: mockGetAvailableServerPort,
   DEFAULT_SERVER_PORT: 4096,
@@ -36,7 +36,7 @@ mock.module("./opencode-binary-resolver", () => ({
 
 afterAll(() => {
   mock.module("@opencode-ai/sdk", () => originalSdk)
-  mock.module("../../shared/port-utils", () => originalPortUtils)
+  mock.module("../../shared/binary/port-utils", () => originalPortUtils)
   mock.module("./opencode-binary-resolver", () => originalBinaryResolver)
 })
 

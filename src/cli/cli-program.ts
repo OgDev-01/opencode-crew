@@ -32,6 +32,7 @@ program
   .option("--zai-coding-plan <value>", "Z.ai Coding Plan subscription: no, yes (default: no)")
   .option("--kimi-for-coding <value>", "Kimi For Coding subscription: no, yes (default: no)")
   .option("--skip-auth", "Skip authentication setup hints")
+  .option("--channel <value>", "Release channel to install: stable, next, alpha (default: stable)")
   .addHelpText("after", `
 Examples:
   $ bunx opencode-crew install
@@ -58,6 +59,7 @@ Model Providers (Priority: Native > Copilot > OpenCode Zen > Z.ai > Kimi):
       zaiCodingPlan: options.zaiCodingPlan,
       kimiForCoding: options.kimiForCoding,
       skipAuth: options.skipAuth ?? false,
+      channel: options.channel,
     }
     const exitCode = await install(args)
     process.exit(exitCode)

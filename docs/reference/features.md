@@ -820,7 +820,7 @@ When a skill MCP has `oauth` configured:
 Pre-authenticate via CLI:
 
 ```bash
-bunx @buldtech/opencode-crew mcp oauth login <server-name> --server-url https://api.example.com
+bunx @ogdev/opencode-crew mcp oauth login <server-name> --server-url https://api.example.com
 ```
 
 ## Context Injection

@@ -56,10 +56,10 @@ JSONC supports `// line comments`, `/* block comments */`, and trailing commas.
 
 Enable schema autocomplete:
 ```json
-{ "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json" }
+{ "$schema": "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json" }
 ```
 
-Run `bunx @buldtech/opencode-crew install` for guided setup. Run `opencode models` to list available models.
+Run `bunx @ogdev/opencode-crew install` for guided setup. Run `opencode models` to list available models.
 
 ### Quick Start Example
 
@@ -67,7 +67,7 @@ Here's a practical starting configuration:
 
 ```jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/buldtech/opencode-crew/dev/assets/opencode-crew.schema.json",
+  "$schema": "https://raw.githubusercontent.com/OgDev-01/opencode-crew/dev/assets/opencode-crew.schema.json",
 
   "agents": {
     // Main orchestrator: Claude Opus or Kimi K2.5 work best
@@ -275,7 +275,7 @@ Disable categories: `{ "disabled_categories": ["ultrabrain"] }`
 | **unspecified-high** | `claude-opus-4-6` | anthropic → openai → google (via github-copilot/opencode) |
 | **writing** | `k2p5` | kimi-for-coding → google → anthropic |
 
-Run `bunx @buldtech/opencode-crew doctor --verbose` to see effective model resolution for your config.
+Run `bunx @ogdev/opencode-crew doctor --verbose` to see effective model resolution for your config.
 
 ---
 

@@ -6,10 +6,10 @@ Complete reference for the `opencode-crew` command-line interface.
 
 ```bash
 # Display help
-bunx @buldtech/opencode-crew
+bunx @ogdev/opencode-crew
 
 # Or with npx
-npx @buldtech/opencode-crew
+npx @ogdev/opencode-crew
 ```
 
 ## Commands
@@ -32,7 +32,7 @@ Interactive installation tool for initial OpenCode-Crew setup. Provides a TUI ba
 ### Usage
 
 ```bash
-bunx @buldtech/opencode-crew install
+bunx @ogdev/opencode-crew install
 ```
 
 ### Installation Process
@@ -58,7 +58,7 @@ Diagnoses your environment to ensure OpenCode-Crew is functioning correctly. Per
 ### Usage
 
 ```bash
-bunx @buldtech/opencode-crew doctor
+bunx @ogdev/opencode-crew doctor
 ```
 
 ### Diagnostic Categories
@@ -119,7 +119,7 @@ Executes OpenCode sessions and monitors task completion.
 ### Usage
 
 ```bash
-bunx @buldtech/opencode-crew run [prompt]
+bunx @ogdev/opencode-crew run [prompt]
 ```
 
 ### Options
@@ -148,16 +148,16 @@ Manages OAuth 2.1 authentication for remote MCP servers.
 
 ```bash
 # Login to an OAuth-protected MCP server
-bunx @buldtech/opencode-crew mcp oauth login <server-name> --server-url https://api.example.com
+bunx @ogdev/opencode-crew mcp oauth login <server-name> --server-url https://api.example.com
 
 # Login with explicit client ID and scopes
-bunx @buldtech/opencode-crew mcp oauth login my-api --server-url https://api.example.com --client-id my-client --scopes "read,write"
+bunx @ogdev/opencode-crew mcp oauth login my-api --server-url https://api.example.com --client-id my-client --scopes "read,write"
 
 # Remove stored OAuth tokens
-bunx @buldtech/opencode-crew mcp oauth logout <server-name>
+bunx @ogdev/opencode-crew mcp oauth logout <server-name>
 
 # Check OAuth token status
-bunx @buldtech/opencode-crew mcp oauth status [server-name]
+bunx @ogdev/opencode-crew mcp oauth status [server-name]
 ```
 
 ### Options
@@ -182,13 +182,13 @@ Manages Google Antigravity OAuth authentication. Required for using Gemini model
 
 ```bash
 # Login
-bunx @buldtech/opencode-crew auth login
+bunx @ogdev/opencode-crew auth login
 
 # Logout
-bunx @buldtech/opencode-crew auth logout
+bunx @ogdev/opencode-crew auth logout
 
 # Check current status
-bunx @buldtech/opencode-crew auth status
+bunx @ogdev/opencode-crew auth status
 ```
 
 ---
@@ -238,17 +238,17 @@ bun install -g opencode@latest
 
 ```bash
 # Reinstall plugin
-bunx @buldtech/opencode-crew install
+bunx @ogdev/opencode-crew install
 ```
 
 ### Doctor Check Failures
 
 ```bash
 # Diagnose with detailed information
-bunx @buldtech/opencode-crew doctor --verbose
+bunx @ogdev/opencode-crew doctor --verbose
 
 # Check specific category only
-bunx @buldtech/opencode-crew doctor --category authentication
+bunx @ogdev/opencode-crew doctor --category authentication
 ```
 
 ---
@@ -259,10 +259,10 @@ Use the `--no-tui` option for CI/CD environments.
 
 ```bash
 # Run doctor in CI environment
-bunx @buldtech/opencode-crew doctor --no-tui --json
+bunx @ogdev/opencode-crew doctor --no-tui --json
 
 # Save results to file
-bunx @buldtech/opencode-crew doctor --json > doctor-report.json
+bunx @ogdev/opencode-crew doctor --json > doctor-report.json
 ```
 
 ---

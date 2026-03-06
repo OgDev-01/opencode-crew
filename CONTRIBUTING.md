@@ -31,6 +31,7 @@ Be respectful, inclusive, and constructive. We're all here to make better tools 
 **English is the primary language for all communications in this repository.**
 
 This includes:
+
 - Issues and bug reports
 - Pull requests and code reviews
 - Documentation and comments
@@ -45,6 +46,7 @@ This includes:
 ### Need Help with English?
 
 If English isn't your first language, don't worry! We value your contributions regardless of perfect grammar. You can:
+
 - Use translation tools to help compose messages
 - Ask for help from other community members
 - Focus on clear, simple communication rather than perfect prose
@@ -76,25 +78,24 @@ bun run build
 After making changes, you can test your local build in OpenCode:
 
 1. **Build the project**:
+
    ```bash
    bun run build
    ```
 
 2. **Update your OpenCode config** (`~/.config/opencode/opencode.json` or `opencode.jsonc`):
+
    ```json
    {
-     "plugin": [
-       "file:///absolute/path/to/opencode-crew/dist/index.js"
-     ]
+     "plugin": ["file:///absolute/path/to/opencode-crew/dist/index.js"]
    }
    ```
-   
+
    For example, if your project is at `/Users/yourname/projects/opencode-crew`:
+
    ```json
    {
-     "plugin": [
-       "file:///Users/yourname/projects/opencode-crew/dist/index.js"
-     ]
+     "plugin": ["file:///Users/yourname/projects/opencode-crew/dist/index.js"]
    }
    ```
 
@@ -145,17 +146,18 @@ bun run build:schema
 
 ### Code Style & Conventions
 
-| Convention | Rule |
-|------------|------|
-| Package Manager | **Bun only** (`bun run`, `bun build`, `bunx`) |
-| Types | Use `bun-types`, not `@types/node` |
-| Directory Naming | kebab-case (`ast-grep/`, `claude-code-hooks/`) |
-| File Operations | Never use bash commands (mkdir/touch/rm) for file creation in code |
-| Tool Structure | Each tool: `index.ts`, `types.ts`, `constants.ts`, `tools.ts`, `utils.ts` |
-| Hook Pattern | `createXXXHook(input: PluginInput)` function naming |
-| Exports | Barrel pattern (`export * from "./module"` in index.ts) |
+| Convention       | Rule                                                                      |
+| ---------------- | ------------------------------------------------------------------------- |
+| Package Manager  | **Bun only** (`bun run`, `bun build`, `bunx`)                             |
+| Types            | Use `bun-types`, not `@types/node`                                        |
+| Directory Naming | kebab-case (`ast-grep/`, `claude-code-hooks/`)                            |
+| File Operations  | Never use bash commands (mkdir/touch/rm) for file creation in code        |
+| Tool Structure   | Each tool: `index.ts`, `types.ts`, `constants.ts`, `tools.ts`, `utils.ts` |
+| Hook Pattern     | `createXXXHook(input: PluginInput)` function naming                       |
+| Exports          | Barrel pattern (`export * from "./module"` in index.ts)                   |
 
 **Anti-Patterns (Do Not Do)**:
+
 - Using npm/yarn instead of bun
 - Using `@types/node` instead of `bun-types`
 - Suppressing TypeScript errors with `as any`, `@ts-ignore`, `@ts-expect-error`
@@ -267,4 +269,4 @@ export function createMyHook(input: PluginInput) {
 
 ---
 
-Thank you for contributing to Oh My OpenCode! Your efforts help make AI-assisted coding better for everyone.
+Thank you for contributing to Opencode Crew! Your efforts help make AI-assisted coding better for everyone.

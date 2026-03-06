@@ -47,6 +47,20 @@ bunx @ogdev/opencode-crew install
 
 Supports macOS (ARM and Intel), Linux (x64, ARM, and musl), and Windows. You'll need [OpenCode](https://github.com/anomalyco/opencode) already set up with at least one AI provider configured.
 
+### Staging and experimental versions
+
+The stable install above tracks the `@latest` release. If you want to try newer features before they hit production:
+
+```bash
+# Staging (dev branch) — latest merged features, tested but not yet promoted
+bunx @ogdev/opencode-crew@next install
+
+# Alpha (experimental) — bleeding-edge, may break
+bunx @ogdev/opencode-crew@alpha install
+```
+
+You can switch back to stable at any time by re-running the default install command.
+
 ### Quick start
 
 After installing, open OpenCode and try a request like:

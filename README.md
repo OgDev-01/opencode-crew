@@ -31,9 +31,9 @@ For example: Craftsman discovers your project uses a custom `AppError` wrapper i
 
 Token waste is the hidden cost of AI-assisted development. A single mismanaged context window can burn through $50 of tokens on one task. opencode-crew applies multiple strategies throughout the agent lifecycle to keep costs predictable.
 
-- **Tool output truncation**: Large tool outputs are capped at 50k tokens (10k for web content). Read, edit, write, and LSP tools are never truncated since their output is always relevant.
+- **Tool output truncation**: Large tool outputs are capped at 50k tokens (10k for web content). Read, edit, and write tools, along with LSP rename, goto-definition, and find-references, are never truncated since their output is always relevant.
 - **Preemptive compaction**: At 70% context window usage, the system triggers summarization before hitting the hard limit. This avoids the expensive retry-and-recover cycle that other tools fall into.
-- **Multi-strategy context recovery**: When context limits do hit, a 5-strategy pipeline kicks in: empty redundant content, deduplicate, targeted truncation (50-80%), aggressive truncation, then summarize-and-retry. Max 2 retries with exponential backoff.
+- **Multi-strategy context recovery**: When context limits hit, the system first aggressively truncates the largest tool outputs to fit within 50% of the token limit (up to 20 passes). If that's not enough, it falls through to session summarization with retry (max 2 attempts, exponential backoff, 120s timeout). Conditional deduplication and empty-content sanitization handle edge cases during recovery.
 - **Smart model routing**: 8 task categories (`quick`, `deep`, `ultrabrain`, `visual-engineering`, `artistry`, `writing`, and two general-purpose tiers) route each task to a cost-appropriate model. A typo fix doesn't need the same model as an architecture redesign.
 - **Session continuity**: Agents reuse session IDs to continue conversations without re-sending full context. This alone can save 70%+ tokens on follow-up tasks.
 

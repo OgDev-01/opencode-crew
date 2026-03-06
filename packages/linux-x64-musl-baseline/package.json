@@ -1,6 +1,6 @@
 {
   "name": "@ogdev/opencode-crew-linux-x64-musl-baseline",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Platform-specific binary for opencode-crew (linux-x64-musl-baseline, no AVX2)",
   "license": "MIT",
   "repository": {

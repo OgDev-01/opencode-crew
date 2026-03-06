@@ -38,6 +38,20 @@ const DESCRIPTION = `Emergent Learning Framework (ELF) memory tool. Actions:
 
 const PRIVACY_TAGS = ["private", "secret", "credential"]
 
+function isLikelyMemoryDump(content: string): boolean {
+  const normalized = content.toLowerCase()
+  const markers = [
+    "## agent memory",
+    "golden rules",
+    "learnings",
+    "here's what's stored in elf memory",
+    "totalmemories:",
+    "bytype:",
+  ]
+  const markerHits = markers.reduce((count, marker) => (normalized.includes(marker) ? count + 1 : count), 0)
+  return markerHits >= 2
+}
+
 export function createElfTool(deps: ElfToolDeps) {
   return tool({
     description: DESCRIPTION,
@@ -104,6 +118,12 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
   const scope = args.scope ?? "project"
 
   const filtered = deps.filterContent(args.content, PRIVACY_TAGS)
+  if (isLikelyMemoryDump(filtered)) {
+    return JSON.stringify({
+      error: "content appears to be a memory dump transcript and was rejected",
+      status: "rejected",
+    })
+  }
   const hash = deps.computeContextHash(entryType, scope, filtered)
   const existingId = deps.findExistingByHash(hash, deps.db)
 

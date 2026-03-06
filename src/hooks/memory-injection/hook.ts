@@ -8,6 +8,21 @@ const DEFAULT_GOLDEN_RULE_MAX_TOKENS = 200
 const THROTTLE_THRESHOLD = 0.70
 const SKIP_THRESHOLD = 0.85
 
+function isLikelyMemoryDump(content: string): boolean {
+  const normalized = content.toLowerCase()
+  const markers = [
+    "## agent memory",
+    "golden rules",
+    "relevant learnings",
+    "learnings",
+    "totalmemories:",
+    "bytype:",
+    "here's what's stored in elf memory",
+  ]
+  const markerHits = markers.reduce((count, marker) => (normalized.includes(marker) ? count + 1 : count), 0)
+  return markerHits >= 2
+}
+
 export interface MemorySearchService {
   searchAll(
     query: string,
@@ -81,10 +96,12 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         const goldenRules = goldenResults
           .filter((r) => r.type === "golden_rule")
           .map((r) => (r.entry as GoldenRule).rule)
+          .filter((rule) => !isLikelyMemoryDump(rule))
 
         const learnings = allResults
           .filter((r) => r.type === "learning")
           .map((r) => (r.entry as Learning).summary)
+          .filter((summary) => !isLikelyMemoryDump(summary))
 
         if (goldenRules.length === 0 && learnings.length === 0) return
 

@@ -103,17 +103,17 @@ After making changes, you can test your local build in OpenCode:
 
 3. **Restart OpenCode** to load the changes.
 
-4. **Verify** the plugin is loaded by checking for OmO agent availability or startup messages.
+4. **Verify** the plugin is loaded by checking for opencode-crew agent availability or startup messages.
 
 ## Project Structure
 
 ```
 opencode-crew/
 ├── src/
-│   ├── index.ts         # Plugin entry (OhMyOpenCodePlugin)
+│   ├── index.ts         # Plugin entry (OpenCodeCrewPlugin)
 │   ├── plugin-config.ts # JSONC multi-level config (Zod v4)
-│   ├── agents/          # 11 agents (Sisyphus, Hephaestus, Oracle, Librarian, Explore, Atlas, Prometheus, Metis, Momus, Multimodal-Looker, Sisyphus-Junior)
-│   ├── hooks/           # 44 lifecycle hooks across 39 directories
+│   ├── agents/          # 11 agents (Captain, Craftsman, Sage, Archivist, Lookout, Relay, Strategist, Assessor, Critic, Spotter, Cadet)
+│   ├── hooks/           # 46 lifecycle hooks across 39 directories + 6 standalone files
 │   ├── tools/           # 26 tools across 15 directories
 │   ├── mcp/             # 3 built-in remote MCPs (websearch, context7, grep_app)
 │   ├── features/        # 19 feature modules (background-agent, skill-loader, tmux, MCP-OAuth, etc.)
@@ -122,7 +122,7 @@ opencode-crew/
 │   ├── cli/             # CLI: install, run, doctor, mcp-oauth (Commander.js)
 │   ├── plugin/          # 8 OpenCode hook handlers + hook composition
 │   └── plugin-handlers/ # 6-phase config loading pipeline
-├── packages/            # Monorepo: comment-checker, opencode-sdk
+├── packages/            # 11 platform binaries (macOS, Linux, Windows)
 └── dist/                # Build output (ESM + .d.ts)
 ```
 
@@ -142,6 +142,12 @@ bun run rebuild
 
 # Build schema only (after modifying src/config/schema.ts)
 bun run build:schema
+
+# Run tests (always use timeout to avoid hanging processes)
+bun test --timeout 30000
+
+# Run a specific test file
+bun test src/path/to/file.test.ts --timeout 30000
 ```
 
 ### Code Style & Conventions
@@ -245,6 +251,7 @@ export function createMyHook(input: PluginInput) {
 - [ ] Code follows project conventions
 - [ ] `bun run typecheck` passes
 - [ ] `bun run build` succeeds
+- [ ] `bun test --timeout 30000` passes
 - [ ] Tested locally with OpenCode
 - [ ] Updated documentation if needed (README, AGENTS.md)
 - [ ] No version changes in `package.json`
@@ -262,10 +269,10 @@ export function createMyHook(input: PluginInput) {
 
 ## Getting Help
 
+- **Discord**: [Join the community](https://discord.gg/PUwSMR9XNk) for questions, help, and sharing what you build
+- **GitHub Issues**: [Open an issue](https://github.com/OgDev-01/opencode-crew/issues) for bugs or feature requests
 - **Project Knowledge**: Check `AGENTS.md` for detailed project documentation
 - **Code Patterns**: Review existing implementations in `src/`
-- **Issues**: Open an issue for bugs or feature requests
-- **Discussions**: Start a discussion for questions or ideas
 
 ---
 

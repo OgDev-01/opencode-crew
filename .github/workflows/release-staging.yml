@@ -55,6 +55,7 @@ jobs:
     if: needs.release.outputs.hasChangesets == 'false'
     outputs:
       version: ${{ steps.version.outputs.version }}
+      published: ${{ steps.check.outputs.skip != 'true' }}
       dist_tag: "next"
     steps:
       - uses: actions/checkout@v4
@@ -144,6 +145,7 @@ jobs:
   trigger-platform:
     runs-on: ubuntu-latest
     needs: publish-staging
+    if: needs.publish-staging.outputs.published == 'true'
     steps:
       - name: Trigger platform publish workflow
         run: |
@@ -158,6 +160,7 @@ jobs:
   github-release:
     runs-on: ubuntu-latest
     needs: publish-staging
+    if: needs.publish-staging.outputs.published == 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -197,6 +200,7 @@ jobs:
   merge-to-main:
     runs-on: ubuntu-latest
     needs: [github-release, publish-staging]
+    if: needs.publish-staging.outputs.published == 'true'
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4

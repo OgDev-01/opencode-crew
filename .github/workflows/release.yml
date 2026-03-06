@@ -201,7 +201,7 @@ jobs:
 
   merge-to-main:
     runs-on: ubuntu-latest
-    needs: github-release
+    needs: [github-release, publish-main]
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4

@@ -16,7 +16,7 @@ Most AI coding tools treat every session as a blank slate. Your agents re-discov
 
 ### Agents that remember (ELF memory system)
 
-Inspired by [Claude.ai's memory approach](https://www.anthropic.com/news/memory), the Emergent Learning Framework gives your agents persistent, cross-session memory. As agents work, they record project-specific patterns, conventions, and decisions into a local SQLite database. The next session loads that context automatically.
+Built on the [Emergent Learning Framework](https://github.com/Spacehunterz/Emergent-Learning-Framework_ELF) and refined with ideas from [Claude.ai's memory approach](https://www.anthropic.com/news/memory), ELF gives your agents persistent, cross-session memory. As agents work, they record project-specific patterns, conventions, and decisions into a local SQLite database. The next session loads that context automatically.
 
 Here's what makes ELF different from dropping notes in a markdown file:
 

@@ -102,6 +102,7 @@ export function createChatMessageHandler(args: {
     await hooks.keywordDetector?.["chat.message"]?.(input, output)
     await hooks.thinkMode?.["chat.message"]?.(input, output)
     await hooks.claudeCodeHooks?.["chat.message"]?.(input, output)
+    await hooks.memoryDecisionDetection?.["chat.message"]?.(input, output)
     await hooks.autoSlashCommand?.["chat.message"]?.(input, output)
     await hooks.noCaptainGpt?.["chat.message"]?.(input, output)
     await hooks.noCraftsmanNonGpt?.["chat.message"]?.(input, output)

@@ -387,4 +387,198 @@ describe("memory-learning hook", () => {
       expect(storage.learnings[0].type).toBe("failure")
     })
   })
+
+  describe("#given auto_capture.enabled=true and on_success=true", () => {
+    test("captures successful Bash output with more than 50 chars", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Read", "Glob", "Grep"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "Bash", sessionID: "ses_19", callID: "call_19" }
+      const output = {
+        title: "success",
+        output: "Build completed successfully with assets optimized and deployment checks passed.",
+        metadata: { exitCode: 0 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].type).toBe("observation")
+    })
+
+    test("does NOT capture successful Bash output with 50 chars or less", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Read", "Glob", "Grep"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "Bash", sessionID: "ses_20", callID: "call_20" }
+      const output = {
+        title: "success",
+        output: "Build completed successfully in CI",
+        metadata: { exitCode: 0 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(0)
+    })
+  })
+
+  describe("#given auto_capture.enabled=true and capture_tools=[\"Bash\"]", () => {
+    test("captures Bash and skips Edit due to whitelist", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: ["Bash"], skip_tools: ["Read", "Glob", "Grep"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const bashInput = { tool: "Bash", sessionID: "ses_21", callID: "call_21a" }
+      const bashOutput = {
+        title: "success",
+        output: "Bundling finished with deterministic chunks and source maps generated for release.",
+        metadata: { exitCode: 0 } as Record<string, unknown>,
+      }
+      const editInput = { tool: "Edit", sessionID: "ses_21", callID: "call_21b" }
+      const editOutput = {
+        title: "edit",
+        output: "Updated src/app.ts",
+        metadata: { attempt: 2 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](bashInput, bashOutput)
+      await hook["tool.execute.after"](editInput, editOutput)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].tool_name).toBe("Bash")
+    })
+  })
+
+  describe("#given auto_capture.enabled=true and skip_tools=[\"Bash\"]", () => {
+    test("does NOT capture successful Bash output", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Bash"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "Bash", sessionID: "ses_22", callID: "call_22" }
+      const output = {
+        title: "success",
+        output: "Build completed with no warnings and all deployment checks passed in staging.",
+        metadata: { exitCode: 0 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(0)
+    })
+  })
+
+  describe("#given auto_capture.enabled=true and patterns=[\"webpack\"]", () => {
+    test("captures output containing webpack regardless of default success/failure rules", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: false, on_failure: false, capture_tools: [], skip_tools: ["Read", "Glob", "Grep"], patterns: ["webpack"], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "Edit", sessionID: "ses_23", callID: "call_23" }
+      const output = {
+        title: "edit",
+        output: "webpack module federation config updated for host and remotes",
+        metadata: { attempt: 1 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+    })
+  })
+
+  describe("#given auto_capture.enabled=false", () => {
+    test("preserves original behavior and captures only failures", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: false, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Bash"], patterns: ["success"], decision_detection: true, pre_compaction_flush: true },
+      })
+      const successInput = { tool: "Bash", sessionID: "ses_24", callID: "call_24a" }
+      const successOutput = {
+        title: "success",
+        output: "Build completed successfully with all checks green",
+        metadata: { exitCode: 0 } as Record<string, unknown>,
+      }
+      const failureInput = { tool: "Bash", sessionID: "ses_24", callID: "call_24b" }
+      const failureOutput = {
+        title: "failure",
+        output: "Error: command failed with status 2",
+        metadata: { exitCode: 2 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](successInput, successOutput)
+      await hook["tool.execute.after"](failureInput, failureOutput)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].type).toBe("failure")
+    })
+  })
+
+  describe("#given auto_capture.enabled=true and on_success=true for Edit first attempt", () => {
+    test("captures Edit attempt=1 as observation", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Read", "Glob", "Grep"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "Edit", sessionID: "ses_25", callID: "call_25" }
+      const output = {
+        title: "edit",
+        output: "Updated src/hooks/memory-learning/hook.ts",
+        metadata: { attempt: 1 } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].type).toBe("observation")
+    })
+  })
+
+  describe("#given auto_capture.enabled=true and on_success=true for task tool", () => {
+    test("captures task tool completion", async () => {
+      //#given
+      const hook = createMemoryLearningHook({
+        storage,
+        autoCapture: { enabled: true, on_success: true, on_failure: true, capture_tools: [], skip_tools: ["Read", "Glob", "Grep"], patterns: [], decision_detection: true, pre_compaction_flush: true },
+      })
+      const input = { tool: "task", sessionID: "ses_26", callID: "call_26" }
+      const output = {
+        title: "task completed",
+        output: "Completed implementation and verification steps for memory auto-capture behavior.",
+        metadata: {} as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].tool_name).toBe("task")
+      expect(storage.learnings[0].type).toBe("observation")
+    })
+  })
 })

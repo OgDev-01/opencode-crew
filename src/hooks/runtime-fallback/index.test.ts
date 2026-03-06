@@ -3,6 +3,10 @@ import { createRuntimeFallbackHook } from "./index"
 import type { RuntimeFallbackConfig, OpenCodeCrewConfig } from "../../config"
 import * as sharedModule from "../../shared"
 import { SessionCategoryRegistry } from "../../shared/session/session-category-registry"
+import { DEFAULT_CONFIG } from "./constants"
+import { deriveModelsFromRequirements } from "./fallback-models"
+import { subagentSessions, syncSubagentSessions } from "../../features/claude-code-session-state/state"
+import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "../../shared/model/model-requirements"
 
 describe("runtime-fallback", () => {
   let logCalls: Array<{ msg: string; data?: unknown }>
@@ -2290,6 +2294,245 @@ describe("runtime-fallback", () => {
       //#then - chain advances normally (not skipped), consistent with consecutive errors test
       const fallbackLogs = logCalls.filter((call) => call.msg.includes("Preparing fallback"))
       expect(fallbackLogs.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  describe("provider-failover new behavior", () => {
+    test("should have enabled: true and max_fallback_attempts: 5 in DEFAULT_CONFIG", async () => {
+      //#given
+      const expectedEnabled = true
+      const expectedMaxAttempts = 5
+
+      //#when
+      const actualEnabled = DEFAULT_CONFIG.enabled
+      const actualMaxAttempts = DEFAULT_CONFIG.max_fallback_attempts
+
+      //#then
+      expect(actualEnabled).toBe(expectedEnabled)
+      expect(actualMaxAttempts).toBe(expectedMaxAttempts)
+    })
+
+    test("should auto-derive fallback models from AGENT_MODEL_REQUIREMENTS when no explicit config", async () => {
+      //#given
+      const cacheSpy = spyOn(sharedModule, "readConnectedProvidersCache").mockReturnValue(["anthropic", "opencode"])
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), {
+        config: createMockConfig({ notify_on_fallback: false }),
+        pluginConfig: {},
+      })
+      const sessionID = "test-agent-auto-derive"
+      const expectedTo = `${AGENT_MODEL_REQUIREMENTS.captain.fallbackChain[0]?.providers[0]}/${AGENT_MODEL_REQUIREMENTS.captain.fallbackChain[0]?.model}`
+
+      await hook.event({
+        event: {
+          type: "session.created",
+          properties: { info: { id: sessionID, model: "openai/gpt-5.2" } },
+        },
+      })
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, agent: "captain", error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#then
+      const prepareLog = logCalls.find((c) => c.msg.includes("Preparing fallback"))
+      expect(prepareLog).toBeDefined()
+      expect(prepareLog?.data).toMatchObject({ to: expectedTo })
+      cacheSpy.mockRestore()
+    })
+
+    test("should auto-derive fallback models from CATEGORY_MODEL_REQUIREMENTS when no agent match", async () => {
+      //#given
+      const cacheSpy = spyOn(sharedModule, "readConnectedProvidersCache").mockReturnValue(["openai", "google", "anthropic"])
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), {
+        config: createMockConfig({ notify_on_fallback: false }),
+        pluginConfig: {},
+      })
+      const sessionID = "test-category-auto-derive"
+      SessionCategoryRegistry.register(sessionID, "deep")
+      const expectedTo = `${CATEGORY_MODEL_REQUIREMENTS.deep.fallbackChain[0]?.providers[0]}/${CATEGORY_MODEL_REQUIREMENTS.deep.fallbackChain[0]?.model}`
+
+      await hook.event({
+        event: {
+          type: "session.created",
+          properties: { info: { id: sessionID, model: "anthropic/claude-opus-4-6" } },
+        },
+      })
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#then
+      const prepareLog = logCalls.find((c) => c.msg.includes("Preparing fallback"))
+      expect(prepareLog).toBeDefined()
+      expect(prepareLog?.data).toMatchObject({ to: expectedTo })
+      cacheSpy.mockRestore()
+    })
+
+    test("should prefer explicit fallback_models config over auto-derived models", async () => {
+      //#given
+      const cacheSpy = spyOn(sharedModule, "readConnectedProvidersCache").mockReturnValue(["anthropic"])
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), {
+        config: createMockConfig({ notify_on_fallback: false }),
+        pluginConfig: createMockPluginConfigWithCategoryFallback(["openai/gpt-5.2"]),
+      })
+      const sessionID = "test-explicit-over-auto"
+      SessionCategoryRegistry.register(sessionID, "test")
+
+      await hook.event({
+        event: {
+          type: "session.created",
+          properties: { info: { id: sessionID, model: "anthropic/claude-opus-4-6" } },
+        },
+      })
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, agent: "captain", error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#then
+      const prepareLog = logCalls.find((c) => c.msg.includes("Preparing fallback"))
+      expect(prepareLog).toBeDefined()
+      expect(prepareLog?.data).toMatchObject({ to: "openai/gpt-5.2" })
+      cacheSpy.mockRestore()
+    })
+
+    test("should filter auto-derived models to only connected providers", async () => {
+      //#given
+      const cacheSpy = spyOn(sharedModule, "readConnectedProvidersCache").mockReturnValue(["openai"])
+
+      //#when
+      const derived = deriveModelsFromRequirements("sage", undefined)
+
+      //#then
+      expect(derived).toEqual(["openai/gpt-5.2"])
+      cacheSpy.mockRestore()
+    })
+
+    test("should include all models when connected providers cache is null", async () => {
+      //#given
+      const cacheSpy = spyOn(sharedModule, "readConnectedProvidersCache").mockReturnValue(null)
+
+      //#when
+      const derived = deriveModelsFromRequirements("sage", undefined)
+
+      //#then
+      expect(derived).toEqual(["openai/gpt-5.2", "google/gemini-3.1-pro", "anthropic/claude-opus-4-6"])
+      cacheSpy.mockRestore()
+    })
+
+    test("should return empty array from deriveModelsFromRequirements when agent and category are unknown", async () => {
+      //#given
+      const unknownAgent = "unknown-agent"
+      const unknownCategory = "unknown-category"
+
+      //#when
+      const derived = deriveModelsFromRequirements(unknownAgent, unknownCategory)
+
+      //#then
+      expect(derived).toEqual([])
+    })
+
+    test("should show exhaustion toast when all fallback providers are exhausted", async () => {
+      //#given
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), {
+        config: createMockConfig({ max_fallback_attempts: 1, notify_on_fallback: true }),
+        pluginConfig: createMockPluginConfigWithCategoryFallback(["openai/gpt-5.2"]),
+      })
+      const sessionID = "test-exhausted-toast"
+      SessionCategoryRegistry.register(sessionID, "test")
+
+      await hook.event({
+        event: {
+          type: "session.created",
+          properties: { info: { id: sessionID, model: "anthropic/claude-opus-4-6" } },
+        },
+      })
+
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, error: { statusCode: 429, message: "Rate limit again" } },
+        },
+      })
+
+      //#then
+      const exhaustedToast = toastCalls.find((toast) => toast.variant === "error" && toast.message.includes("exhausted"))
+      expect(exhaustedToast).toBeDefined()
+    })
+
+    test("should skip session.error for background-agent sessions", async () => {
+      //#given
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), { config: createMockConfig() })
+      const sessionID = "test-background-session"
+      subagentSessions.add(sessionID)
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#then
+      const sessionErrorLog = logCalls.find((c) => c.msg.includes("session.error received"))
+      expect(sessionErrorLog).toBeUndefined()
+      subagentSessions.delete(sessionID)
+      syncSubagentSessions.delete(sessionID)
+    })
+
+    test("should NOT skip session.error for sync subagent sessions", async () => {
+      //#given
+      const hook = createRuntimeFallbackHook(createMockPluginInput(), {
+        config: createMockConfig({ notify_on_fallback: false }),
+        pluginConfig: createMockPluginConfigWithCategoryFallback(["openai/gpt-5.2"]),
+      })
+      const sessionID = "test-sync-subagent-session"
+      SessionCategoryRegistry.register(sessionID, "test")
+      subagentSessions.add(sessionID)
+      syncSubagentSessions.add(sessionID)
+
+      await hook.event({
+        event: {
+          type: "session.created",
+          properties: { info: { id: sessionID, model: "anthropic/claude-opus-4-6" } },
+        },
+      })
+
+      //#when
+      await hook.event({
+        event: {
+          type: "session.error",
+          properties: { sessionID, error: { statusCode: 429, message: "Rate limit" } },
+        },
+      })
+
+      //#then
+      const sessionErrorLog = logCalls.find((c) => c.msg.includes("session.error received"))
+      expect(sessionErrorLog).toBeDefined()
+      subagentSessions.delete(sessionID)
+      syncSubagentSessions.delete(sessionID)
     })
   })
 })

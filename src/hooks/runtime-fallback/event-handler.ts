@@ -6,6 +6,7 @@ import { extractStatusCode, extractErrorName, classifyErrorType, isRetryableErro
 import { createFallbackState, prepareFallback } from "./fallback-state"
 import { getFallbackModelsForSession } from "./fallback-models"
 import { SessionCategoryRegistry } from "@/shared/session/session-category-registry"
+import { subagentSessions, syncSubagentSessions } from "@/features/claude-code-session-state/state"
 
 export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
   const { config, pluginConfig, sessionStates, sessionLastAccess, sessionRetryInFlight, sessionAwaitingFallbackResult, sessionFallbackTimeouts } = deps
@@ -88,6 +89,12 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
 
     if (!sessionID) {
       log(`[${HOOK_NAME}] session.error without sessionID, skipping`)
+      return
+    }
+
+    // Skip background-agent sessions — they have their own fallback handler
+    if (subagentSessions.has(sessionID) && !syncSubagentSessions.has(sessionID)) {
+      log(`[${HOOK_NAME}] Skipping background session — handled by background-agent fallback`, { sessionID })
       return
     }
 
@@ -179,6 +186,23 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
 
     if (!result.success) {
       log(`[${HOOK_NAME}] Fallback preparation failed`, { sessionID, error: result.error })
+
+      if (config.notify_on_fallback) {
+        const triedProviders = [...new Set(fallbackModels.map(m => m.split("/")[0]))]
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+          .join(", ")
+
+        await deps.ctx.client.tui
+          .showToast({
+            body: {
+              title: "Model Fallback",
+              message: `All providers exhausted (tried: ${triedProviders}). Waiting for cooldown (${config.cooldown_seconds}s) or connect more providers.`,
+              variant: "error",
+              duration: 5000,
+            },
+          })
+          .catch(() => {})
+      }
     }
   }
 

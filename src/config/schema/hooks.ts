@@ -52,6 +52,8 @@ export const HookNameSchema = z.enum([
   "read-image-resizer",
   "memory-learning",
   "memory-injection",
+  "memory-decision-detection",
+  "memory-pre-compaction-flush",
   "heartbeat-pruner",
 ])
 

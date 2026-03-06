@@ -1,0 +1,21 @@
+name: 'Type Check'
+description: 'Run TypeScript type checking'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install
+      env:
+        BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
+
+    - name: Type check
+      shell: bash
+      run: bun run typecheck

@@ -22,7 +22,7 @@ export function extractChannel(version: string | null): string {
   if (isPrereleaseVersion(version)) {
     const prereleasePart = version.split("-")[1]
     if (prereleasePart) {
-      const channelMatch = prereleasePart.match(/^(alpha|beta|rc|canary|next)/)
+      const channelMatch = prereleasePart.match(/^(alpha|rc|next)/)
       if (channelMatch) {
         return channelMatch[1]
       }

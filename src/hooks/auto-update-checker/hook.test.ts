@@ -6,7 +6,7 @@ const mockUpdateAndShowConnectedProvidersCacheStatus = mock(async () => {})
 const mockShowLocalDevToast = mock(async () => {})
 const mockShowVersionToast = mock(async () => {})
 const mockRunBackgroundUpdateCheck = mock(async () => {})
-const mockGetCachedVersion = mock(() => "3.6.0")
+const mockGetCachedVersion = mock(() => "1.2.1")
 const mockGetLocalDevVersion = mock<(directory: string) => string | null>(() => null)
 
 mock.module("./hook/config-errors-toast", () => ({
@@ -64,7 +64,7 @@ beforeEach(() => {
   mockGetCachedVersion.mockClear()
   mockGetLocalDevVersion.mockClear()
 
-  mockGetCachedVersion.mockReturnValue("3.6.0")
+  mockGetCachedVersion.mockReturnValue("1.2.1")
   mockGetLocalDevVersion.mockReturnValue(null)
 })
 
@@ -174,7 +174,7 @@ describe("createAutoUpdateCheckerHook", () => {
 
   it("shows localDevToast when local dev version exists", async () => {
     //#given - local dev version is present
-    mockGetLocalDevVersion.mockReturnValue("3.6.0-dev")
+    mockGetLocalDevVersion.mockReturnValue("1.2.1-dev")
     const createAutoUpdateCheckerHook = await importFreshHookFactory()
     const hook = createAutoUpdateCheckerHook(createPluginInput())
 
@@ -236,7 +236,7 @@ describe("createAutoUpdateCheckerHook", () => {
     expect(mockShowVersionToast).toHaveBeenCalledTimes(1)
     expect(mockShowVersionToast).toHaveBeenCalledWith(
       expect.anything(),
-      "3.6.0",
+      "1.2.1",
       expect.stringContaining("Captain")
     )
   })

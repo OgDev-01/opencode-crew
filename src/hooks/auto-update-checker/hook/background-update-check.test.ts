@@ -12,7 +12,7 @@ type ToastMessageGetter = (isUpdate: boolean, version?: string) => string
 
 function createPluginEntry(overrides?: Partial<PluginEntry>): PluginEntry {
   return {
-    entry: "opencode-crew@3.4.0",
+    entry: "@ogdev/opencode-crew@1.2.1",
     isPinned: false,
     pinnedVersion: null,
     configPath: "/test/opencode.json",
@@ -21,8 +21,8 @@ function createPluginEntry(overrides?: Partial<PluginEntry>): PluginEntry {
 }
 
 const mockFindPluginEntry = mock((_directory: string): PluginEntry | null => createPluginEntry())
-const mockGetCachedVersion = mock((): string | null => "3.4.0")
-const mockGetLatestVersion = mock(async (): Promise<string | null> => "3.5.0")
+const mockGetCachedVersion = mock((): string | null => "1.2.1")
+const mockGetLatestVersion = mock(async (): Promise<string | null> => "1.2.2")
 const mockExtractChannel = mock(() => "latest")
 const mockInvalidatePackage = mock(() => {})
 const mockRunBunInstall = mock(async () => true)
@@ -67,8 +67,8 @@ describe("runBackgroundUpdateCheck", () => {
     mockShowAutoUpdatedToast.mockReset()
 
     mockFindPluginEntry.mockReturnValue(createPluginEntry())
-    mockGetCachedVersion.mockReturnValue("3.4.0")
-    mockGetLatestVersion.mockResolvedValue("3.5.0")
+    mockGetCachedVersion.mockReturnValue("1.2.1")
+    mockGetLatestVersion.mockResolvedValue("1.2.2")
     mockExtractChannel.mockReturnValue("latest")
     mockRunBunInstall.mockResolvedValue(true)
   })
@@ -90,7 +90,7 @@ describe("runBackgroundUpdateCheck", () => {
   describe("#given no version available", () => {
     it("returns early when neither cached nor pinned version exists", async () => {
       //#given
-      mockFindPluginEntry.mockReturnValue(createPluginEntry({ entry: "opencode-crew" }))
+      mockFindPluginEntry.mockReturnValue(createPluginEntry({ entry: "@ogdev/opencode-crew" }))
       mockGetCachedVersion.mockReturnValue(null)
       //#when
       await runBackgroundUpdateCheck(mockCtx, true, getToastMessage)
@@ -138,7 +138,7 @@ describe("runBackgroundUpdateCheck", () => {
       //#when
       await runBackgroundUpdateCheck(mockCtx, autoUpdate, getToastMessage)
       //#then
-      expect(mockShowUpdateAvailableToast).toHaveBeenCalledWith(mockCtx, "3.5.0", getToastMessage)
+      expect(mockShowUpdateAvailableToast).toHaveBeenCalledWith(mockCtx, "1.2.2", getToastMessage)
       expect(mockRunBunInstall).not.toHaveBeenCalled()
       expect(mockShowAutoUpdatedToast).not.toHaveBeenCalled()
     })
@@ -147,7 +147,7 @@ describe("runBackgroundUpdateCheck", () => {
   describe("#given user has pinned a specific version", () => {
     it("shows pinned-version toast without auto-updating", async () => {
       //#given
-      mockFindPluginEntry.mockReturnValue(createPluginEntry({ isPinned: true, pinnedVersion: "3.4.0" }))
+      mockFindPluginEntry.mockReturnValue(createPluginEntry({ isPinned: true, pinnedVersion: "1.2.1" }))
       //#when
       await runBackgroundUpdateCheck(mockCtx, true, getToastMessage)
       //#then
@@ -159,7 +159,7 @@ describe("runBackgroundUpdateCheck", () => {
     it("toast message mentions version pinned", async () => {
       //#given
       let capturedToastMessage: ToastMessageGetter | undefined
-      mockFindPluginEntry.mockReturnValue(createPluginEntry({ isPinned: true, pinnedVersion: "3.4.0" }))
+      mockFindPluginEntry.mockReturnValue(createPluginEntry({ isPinned: true, pinnedVersion: "1.2.1" }))
       mockShowUpdateAvailableToast.mockImplementation(
         async (_ctx: PluginInput, _latestVersion: string, toastMessage: ToastMessageGetter) => {
           capturedToastMessage = toastMessage
@@ -173,9 +173,9 @@ describe("runBackgroundUpdateCheck", () => {
       if (!capturedToastMessage) {
         throw new Error("toast message callback missing")
       }
-      const message = capturedToastMessage(true, "3.5.0")
+      const message = capturedToastMessage(true, "1.2.2")
       expect(message).toContain("version pinned")
-      expect(message).not.toBe("Update to 3.5.0")
+      expect(message).not.toBe("Update to 1.2.2")
     })
   })
 
@@ -188,7 +188,7 @@ describe("runBackgroundUpdateCheck", () => {
       //#then
       expect(mockInvalidatePackage).toHaveBeenCalledTimes(1)
       expect(mockRunBunInstall).toHaveBeenCalledTimes(1)
-      expect(mockShowAutoUpdatedToast).toHaveBeenCalledWith(mockCtx, "3.4.0", "3.5.0")
+      expect(mockShowAutoUpdatedToast).toHaveBeenCalledWith(mockCtx, "1.2.1", "1.2.2")
       expect(mockShowUpdateAvailableToast).not.toHaveBeenCalled()
     })
   })
@@ -201,7 +201,7 @@ describe("runBackgroundUpdateCheck", () => {
       await runBackgroundUpdateCheck(mockCtx, true, getToastMessage)
       //#then
       expect(mockRunBunInstall).toHaveBeenCalledTimes(1)
-      expect(mockShowUpdateAvailableToast).toHaveBeenCalledWith(mockCtx, "3.5.0", getToastMessage)
+      expect(mockShowUpdateAvailableToast).toHaveBeenCalledWith(mockCtx, "1.2.2", getToastMessage)
       expect(mockShowAutoUpdatedToast).not.toHaveBeenCalled()
     })
   })

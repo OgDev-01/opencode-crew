@@ -2,7 +2,7 @@ import * as path from "node:path"
 import * as os from "node:os"
 import { getOpenCodeConfigDir } from "@/shared"
 
-export const PACKAGE_NAME = "opencode-crew"
+export const PACKAGE_NAME = "@ogdev/opencode-crew"
 export const NPM_REGISTRY_URL = `https://registry.npmjs.org/-/package/${PACKAGE_NAME}/dist-tags`
 export const NPM_FETCH_TIMEOUT = 5000
 

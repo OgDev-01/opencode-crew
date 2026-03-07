@@ -3,9 +3,9 @@ import { isPrereleaseVersion, isDistTag, isPrereleaseOrDistTag, extractChannel }
 
 describe("auto-update-checker", () => {
   describe("isPrereleaseVersion", () => {
-    test("returns true for beta versions", () => {
-      // given a beta version
-      const version = "3.0.0-beta.1"
+    test("returns true for next prerelease versions", () => {
+      // given a next prerelease version
+      const version = "1.2.2-next.1"
 
       // when checking if prerelease
       const result = isPrereleaseVersion(version)
@@ -49,9 +49,9 @@ describe("auto-update-checker", () => {
   })
 
   describe("isDistTag", () => {
-    test("returns true for beta dist-tag", () => {
-      // given beta dist-tag
-      const version = "beta"
+    test("returns true for alpha dist-tag", () => {
+      // given alpha dist-tag
+      const version = "alpha"
 
       // when checking if dist-tag
       const result = isDistTag(version)
@@ -71,9 +71,9 @@ describe("auto-update-checker", () => {
       expect(result).toBe(true)
     })
 
-    test("returns true for canary dist-tag", () => {
-      // given canary dist-tag
-      const version = "canary"
+    test("returns true for latest dist-tag", () => {
+      // given latest dist-tag
+      const version = "latest"
 
       // when checking if dist-tag
       const result = isDistTag(version)
@@ -119,7 +119,7 @@ describe("auto-update-checker", () => {
 
     test("returns true for prerelease version", () => {
       // given prerelease version
-      const version = "3.0.0-beta.1"
+      const version = "1.2.2-next.1"
 
       // when checking
       const result = isPrereleaseOrDistTag(version)
@@ -130,7 +130,7 @@ describe("auto-update-checker", () => {
 
     test("returns true for dist-tag", () => {
       // given dist-tag
-      const version = "beta"
+      const version = "alpha"
 
       // when checking
       const result = isPrereleaseOrDistTag(version)
@@ -152,15 +152,15 @@ describe("auto-update-checker", () => {
   })
 
   describe("extractChannel", () => {
-    test("extracts beta from dist-tag", () => {
-      // given beta dist-tag
-      const version = "beta"
+    test("extracts alpha from dist-tag", () => {
+      // given alpha dist-tag
+      const version = "alpha"
 
       // when extracting channel
       const result = extractChannel(version)
 
-      // then returns beta
-      expect(result).toBe("beta")
+      // then returns alpha
+      expect(result).toBe("alpha")
     })
 
     test("extracts next from dist-tag", () => {
@@ -174,26 +174,26 @@ describe("auto-update-checker", () => {
       expect(result).toBe("next")
     })
 
-    test("extracts canary from dist-tag", () => {
-      // given canary dist-tag
-      const version = "canary"
+    test("extracts latest from dist-tag", () => {
+      // given latest dist-tag
+      const version = "latest"
 
       // when extracting channel
       const result = extractChannel(version)
 
-      // then returns canary
-      expect(result).toBe("canary")
+      // then returns latest
+      expect(result).toBe("latest")
     })
 
-    test("extracts beta from prerelease version", () => {
-      // given beta prerelease version
-      const version = "3.0.0-beta.1"
+    test("extracts next from prerelease version", () => {
+      // given next prerelease version
+      const version = "1.2.2-next.1"
 
       // when extracting channel
       const result = extractChannel(version)
 
-      // then returns beta
-      expect(result).toBe("beta")
+      // then returns next
+      expect(result).toBe("next")
     })
 
     test("extracts alpha from prerelease version", () => {
@@ -220,7 +220,7 @@ describe("auto-update-checker", () => {
 
     test("returns latest for stable version", () => {
       // given stable version
-      const version = "2.14.0"
+      const version = "1.2.1"
 
       // when extracting channel
       const result = extractChannel(version)
@@ -242,13 +242,13 @@ describe("auto-update-checker", () => {
 
     test("handles complex prerelease identifiers", () => {
       // given complex prerelease
-      const version = "3.0.0-beta.1.experimental"
+      const version = "1.2.2-next.1.experimental"
 
       // when extracting channel
       const result = extractChannel(version)
 
-      // then returns beta
-      expect(result).toBe("beta")
+      // then returns next
+      expect(result).toBe("next")
     })
   })
 })

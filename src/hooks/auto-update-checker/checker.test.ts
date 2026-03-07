@@ -3,8 +3,8 @@ import { getLatestVersion } from "./checker"
 
 describe("auto-update-checker/checker", () => {
   describe("getLatestVersion", () => {
-    test("accepts channel parameter", async () => {
-      const result = await getLatestVersion("beta")
+    test("accepts next channel", async () => {
+      const result = await getLatestVersion("next")
       
       expect(typeof result === "string" || result === null).toBe(true)
     })

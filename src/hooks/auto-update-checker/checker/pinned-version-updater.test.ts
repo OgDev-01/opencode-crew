@@ -21,18 +21,18 @@ describe("pinned-version-updater", () => {
     test("updates pinned version in config", () => {
       //#given
       const config = JSON.stringify({
-        plugin: ["opencode-crew@3.1.8"],
+        plugin: ["@ogdev/opencode-crew@1.2.1"],
       })
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = updatePinnedVersion(configPath, "opencode-crew@3.1.8", "3.4.0")
+      const result = updatePinnedVersion(configPath, "@ogdev/opencode-crew@1.2.1", "1.2.2")
 
       //#then
       expect(result).toBe(true)
       const updated = fs.readFileSync(configPath, "utf-8")
-      expect(updated).toContain("opencode-crew@3.4.0")
-      expect(updated).not.toContain("opencode-crew@3.1.8")
+      expect(updated).toContain("@ogdev/opencode-crew@1.2.2")
+      expect(updated).not.toContain("@ogdev/opencode-crew@1.2.1")
     })
 
     test("returns false when entry not found", () => {
@@ -43,7 +43,7 @@ describe("pinned-version-updater", () => {
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = updatePinnedVersion(configPath, "opencode-crew@3.1.8", "3.4.0")
+      const result = updatePinnedVersion(configPath, "@ogdev/opencode-crew@1.2.1", "1.2.2")
 
       //#then
       expect(result).toBe(false)
@@ -55,7 +55,7 @@ describe("pinned-version-updater", () => {
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = updatePinnedVersion(configPath, "opencode-crew@3.1.8", "3.4.0")
+      const result = updatePinnedVersion(configPath, "@ogdev/opencode-crew@1.2.1", "1.2.2")
 
       //#then
       expect(result).toBe(false)
@@ -66,46 +66,46 @@ describe("pinned-version-updater", () => {
     test("reverts from failed version back to original entry", () => {
       //#given
       const config = JSON.stringify({
-        plugin: ["opencode-crew@3.4.0"],
+        plugin: ["@ogdev/opencode-crew@1.2.2"],
       })
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = revertPinnedVersion(configPath, "3.4.0", "opencode-crew@3.1.8")
+      const result = revertPinnedVersion(configPath, "1.2.2", "@ogdev/opencode-crew@1.2.1")
 
       //#then
       expect(result).toBe(true)
       const reverted = fs.readFileSync(configPath, "utf-8")
-      expect(reverted).toContain("opencode-crew@3.1.8")
-      expect(reverted).not.toContain("opencode-crew@3.4.0")
+      expect(reverted).toContain("@ogdev/opencode-crew@1.2.1")
+      expect(reverted).not.toContain("@ogdev/opencode-crew@1.2.2")
     })
 
     test("reverts to unpinned entry", () => {
       //#given
       const config = JSON.stringify({
-        plugin: ["opencode-crew@3.4.0"],
+        plugin: ["@ogdev/opencode-crew@1.2.2"],
       })
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = revertPinnedVersion(configPath, "3.4.0", "opencode-crew")
+      const result = revertPinnedVersion(configPath, "1.2.2", "@ogdev/opencode-crew")
 
       //#then
       expect(result).toBe(true)
       const reverted = fs.readFileSync(configPath, "utf-8")
-      expect(reverted).toContain('"opencode-crew"')
-      expect(reverted).not.toContain("opencode-crew@3.4.0")
+      expect(reverted).toContain('"@ogdev/opencode-crew"')
+      expect(reverted).not.toContain("@ogdev/opencode-crew@1.2.2")
     })
 
     test("returns false when failed version not found", () => {
       //#given
       const config = JSON.stringify({
-        plugin: ["opencode-crew@3.1.8"],
+        plugin: ["@ogdev/opencode-crew@1.2.1"],
       })
       fs.writeFileSync(configPath, config)
 
       //#when
-      const result = revertPinnedVersion(configPath, "3.4.0", "opencode-crew@3.1.8")
+      const result = revertPinnedVersion(configPath, "1.2.2", "@ogdev/opencode-crew@1.2.1")
 
       //#then
       expect(result).toBe(false)
@@ -116,18 +116,18 @@ describe("pinned-version-updater", () => {
     test("config returns to original state after update + revert", () => {
       //#given
       const originalConfig = JSON.stringify({
-        plugin: ["opencode-crew@3.1.8"],
+        plugin: ["@ogdev/opencode-crew@1.2.1"],
       })
       fs.writeFileSync(configPath, originalConfig)
 
       //#when
-      updatePinnedVersion(configPath, "opencode-crew@3.1.8", "3.4.0")
-      revertPinnedVersion(configPath, "3.4.0", "opencode-crew@3.1.8")
+      updatePinnedVersion(configPath, "@ogdev/opencode-crew@1.2.1", "1.2.2")
+      revertPinnedVersion(configPath, "1.2.2", "@ogdev/opencode-crew@1.2.1")
 
       //#then
       const finalConfig = fs.readFileSync(configPath, "utf-8")
-      expect(finalConfig).toContain("opencode-crew@3.1.8")
-      expect(finalConfig).not.toContain("opencode-crew@3.4.0")
+      expect(finalConfig).toContain("@ogdev/opencode-crew@1.2.1")
+      expect(finalConfig).not.toContain("@ogdev/opencode-crew@1.2.2")
     })
   })
 })

@@ -21,7 +21,7 @@ describe("findPluginEntry", () => {
 
   test("returns unpinned for bare package name", () => {
     // #given plugin is configured without a tag
-    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["opencode-crew"] }))
+    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["@ogdev/opencode-crew"] }))
 
     // #when plugin entry is detected
     const pluginInfo = findPluginEntry(temporaryDirectory)
@@ -34,7 +34,7 @@ describe("findPluginEntry", () => {
 
   test("returns unpinned for latest dist-tag", () => {
     // #given plugin is configured with latest dist-tag
-    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["opencode-crew@latest"] }))
+    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["@ogdev/opencode-crew@latest"] }))
 
     // #when plugin entry is detected
     const pluginInfo = findPluginEntry(temporaryDirectory)
@@ -45,22 +45,22 @@ describe("findPluginEntry", () => {
     expect(pluginInfo?.pinnedVersion).toBe("latest")
   })
 
-  test("returns unpinned for beta dist-tag", () => {
-    // #given plugin is configured with beta dist-tag
-    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["opencode-crew@beta"] }))
+  test("returns unpinned for next dist-tag", () => {
+    // #given plugin is configured with next dist-tag
+    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["@ogdev/opencode-crew@next"] }))
 
     // #when plugin entry is detected
     const pluginInfo = findPluginEntry(temporaryDirectory)
 
-    // #then beta is treated as channel, not pin
+    // #then next is treated as channel, not pin
     expect(pluginInfo).not.toBeNull()
     expect(pluginInfo?.isPinned).toBe(false)
-    expect(pluginInfo?.pinnedVersion).toBe("beta")
+    expect(pluginInfo?.pinnedVersion).toBe("next")
   })
 
   test("returns pinned for explicit semver", () => {
     // #given plugin is configured with explicit version
-    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["opencode-crew@3.5.2"] }))
+    fs.writeFileSync(configPath, JSON.stringify({ plugin: ["@ogdev/opencode-crew@3.5.2"] }))
 
     // #when plugin entry is detected
     const pluginInfo = findPluginEntry(temporaryDirectory)

@@ -1,6 +1,4 @@
 # Manual production promotion workflow.
-# Promotes from staging (@next) to production (@latest).
-# MANUAL ONLY — no automated triggers. Safety gate ensures version is on @next first.
 name: release-production
 run-name: "production release ${{ inputs.version || 'from @next' }}"
 
@@ -8,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to promote (e.g., 1.2.0). Leave empty to use current @next version."
+        description: "Staging version to promote (e.g., 1.2.3-next.45). Leave empty to use current @next version."
         required: false
         type: string
       skip_platform:
@@ -25,44 +23,61 @@ permissions:
   actions: write
 
 jobs:
+  authorize-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restrict production promotion to repository owner
+        run: |
+          if [ "${{ github.actor }}" != "OgDev-01" ]; then
+            echo "::error::Only OgDev-01 can run the production release workflow."
+            exit 1
+          fi
+
   verify-staging:
     runs-on: ubuntu-latest
+    needs: authorize-production
     outputs:
+      source_version: ${{ steps.resolve.outputs.source_version }}
+      source_tag: ${{ steps.resolve.outputs.source_tag }}
       version: ${{ steps.resolve.outputs.version }}
     steps:
-      - name: Resolve version
+      - name: Resolve source version
         id: resolve
         run: |
           if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
+            SOURCE_VERSION="${{ inputs.version }}"
           else
-            VERSION=$(npm view @ogdev/opencode-crew@next version 2>/dev/null || echo "")
-            if [ -z "$VERSION" ]; then
+            SOURCE_VERSION=$(npm view @ogdev/opencode-crew@next version 2>/dev/null || echo "")
+            if [ -z "$SOURCE_VERSION" ]; then
               echo "::error::Could not resolve @next version from npm. Is @next published?"
               exit 1
             fi
           fi
+          VERSION="${SOURCE_VERSION%%-*}"
+          echo "source_version=$SOURCE_VERSION" >> $GITHUB_OUTPUT
+          echo "source_tag=v${SOURCE_VERSION}" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Resolved version: $VERSION"
+          echo "Resolved source version: $SOURCE_VERSION"
+          echo "Resolved production version: $VERSION"
 
       - name: Verify version is on @next
         run: |
-          VERSION="${{ steps.resolve.outputs.version }}"
+          SOURCE_VERSION="${{ steps.resolve.outputs.source_version }}"
           NEXT_VERSION=$(npm view @ogdev/opencode-crew@next version 2>/dev/null || echo "")
-          if [ "$VERSION" != "$NEXT_VERSION" ]; then
-            echo "::error::Version $VERSION is not the current @next version ($NEXT_VERSION). Publish to @next (staging) first."
+          if [ "$SOURCE_VERSION" != "$NEXT_VERSION" ]; then
+            echo "::error::Version $SOURCE_VERSION is not the current @next version ($NEXT_VERSION). Publish to @next (staging) first."
             exit 1
           fi
-          echo "✓ Version $VERSION confirmed on @next"
+          echo "✓ Version $SOURCE_VERSION confirmed on @next"
 
-      - name: Assert stable version format
+      - name: Assert production version format
         run: |
           VERSION="${{ steps.resolve.outputs.version }}"
-          if [[ "$VERSION" == *"-"* ]]; then
-            echo "::error::Version $VERSION is a prerelease version. Only stable versions (x.y.z) can be promoted to @latest."
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Derived production version $VERSION is not a stable x.y.z version."
             exit 1
           fi
-          echo "✓ Version $VERSION is a stable release"
+          echo "✓ Production version $VERSION is a stable release"
 
   test:
     runs-on: ubuntu-latest
@@ -82,18 +97,28 @@ jobs:
     runs-on: ubuntu-latest
     needs: [verify-staging, test, typecheck]
     if: github.repository == 'OgDev-01/opencode-crew'
+    environment: production
     outputs:
       version: ${{ needs.verify-staging.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: dev
+          ref: ${{ needs.verify-staging.outputs.source_tag }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        env:
+          BUN_INSTALL_ALLOW_SCRIPTS: "@ast-grep/napi"
 
       - name: Check if already @latest
         id: check
@@ -107,21 +132,41 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Promote @next to @latest
+      - name: Sync stable version into package files
         if: steps.check.outputs.skip != 'true'
         run: |
           VERSION="${{ needs.verify-staging.outputs.version }}"
-          # Package already published by staging workflow.
-          # Just move the dist-tag from @next to @latest.
-          npm dist-tag add "@ogdev/opencode-crew@${VERSION}" latest
+          jq --arg v "$VERSION" '.version = $v' package.json > tmp.json && mv tmp.json package.json
+          for platform in darwin-arm64 darwin-x64 darwin-x64-baseline linux-x64 linux-x64-baseline linux-arm64 linux-x64-musl linux-x64-musl-baseline linux-arm64-musl windows-x64 windows-x64-baseline; do
+            jq --arg v "$VERSION" '.version = $v' "packages/${platform}/package.json" > tmp.json
+            mv tmp.json "packages/${platform}/package.json"
+          done
+          jq --arg v "$VERSION" '.optionalDependencies = (.optionalDependencies | to_entries | map(.value = $v) | from_entries)' package.json > tmp.json && mv tmp.json package.json
+
+      - name: Build main package
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi
+          bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi
+          bunx tsc --emitDeclarationOnly
+          bun run build:schema
+
+      - name: Publish stable package to @latest
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          VERSION="${{ needs.verify-staging.outputs.version }}"
+          npm publish --access public --provenance --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
-      - name: Tag release
+      - name: Commit and tag release
         if: steps.check.outputs.skip != 'true'
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
+          git add package.json assets/opencode-crew.schema.json packages/*/package.json
+          git commit -m "release: v${{ needs.verify-staging.outputs.version }}"
           git tag -f "v${{ needs.verify-staging.outputs.version }}"
           git push origin --tags --force
         env:
@@ -131,26 +176,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: promote-production
     if: inputs.skip_platform != true
+    environment: production
     steps:
-      - name: Promote platform binaries to @latest
+      - name: Publish platform binaries to @latest
         run: |
-          VERSION="${{ needs.promote-production.outputs.version }}"
-          for platform in darwin-arm64 darwin-x64 darwin-x64-baseline linux-x64 linux-x64-baseline linux-arm64 linux-x64-musl linux-x64-musl-baseline linux-arm64-musl windows-x64 windows-x64-baseline; do
-            PACKAGE="@ogdev/opencode-crew-${platform}"
-            PUBLISHED=$(npm view "${PACKAGE}@${VERSION}" version 2>/dev/null || echo "")
-            if [ -n "$PUBLISHED" ]; then
-              npm dist-tag add "${PACKAGE}@${VERSION}" latest
-              echo "✓ Promoted ${PACKAGE}@${VERSION} to @latest"
-            else
-              echo "::warning::${PACKAGE}@${VERSION} not found on npm — skipping"
-            fi
-          done
+          gh workflow run publish-platform.yml \
+            --repo ${{ github.repository }} \
+            --ref v${{ needs.promote-production.outputs.version }} \
+            -f version=${{ needs.promote-production.outputs.version }} \
+            -f dist_tag=latest
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   github-release:
     runs-on: ubuntu-latest
     needs: promote-production
+    environment: production
     steps:
       - uses: actions/checkout@v4
         with:
@@ -184,3 +225,26 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  merge-to-main:
+    runs-on: ubuntu-latest
+    needs: [promote-production, github-release]
+    continue-on-error: true
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: git fetch --force --tags origin main
+
+      - name: Merge to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          VERSION="${{ needs.promote-production.outputs.version }}"
+          git checkout main
+          git merge --ff-only "v${VERSION}" || echo "::warning::Failed to fast-forward main"
+          git push origin main || echo "::warning::Failed to push to main"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

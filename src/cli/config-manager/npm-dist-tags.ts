@@ -1,7 +1,7 @@
 export interface NpmDistTags {
   latest?: string
-  beta?: string
   next?: string
+  alpha?: string
   [tag: string]: string | undefined
 }
 

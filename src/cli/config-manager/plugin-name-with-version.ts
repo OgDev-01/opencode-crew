@@ -2,7 +2,7 @@ import { fetchNpmDistTags } from "./npm-dist-tags"
 import type { ReleaseChannel } from "../types"
 
 const PACKAGE_NAME = "@ogdev/opencode-crew"
-const PRIORITIZED_TAGS = ["latest", "beta", "next", "alpha"] as const
+const PRIORITIZED_TAGS = ["latest", "next", "alpha"] as const
 
 function getFallbackEntry(version: string): string {
   const prereleaseMatch = version.match(/-([a-zA-Z][a-zA-Z0-9-]*)(?:\.|$)/)

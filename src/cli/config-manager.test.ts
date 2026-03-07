@@ -11,78 +11,78 @@ describe("getPluginNameWithVersion", () => {
   })
 
   test("returns @latest when current version matches latest tag", async () => {
-    // #given npm dist-tags with latest=2.14.0
+    // #given npm dist-tags with latest=1.2.1
     globalThis.fetch = mock(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ latest: "2.14.0", beta: "3.0.0-beta.3" }),
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" }),
       } as Response)
     ) as unknown as typeof fetch
 
-    // #when current version is 2.14.0
-    const result = await getPluginNameWithVersion("2.14.0")
+    // #when current version is 1.2.1
+    const result = await getPluginNameWithVersion("1.2.1")
 
     // #then should use @latest tag
     expect(result).toBe("@ogdev/opencode-crew@latest")
   })
 
-  test("returns @beta when current version matches beta tag", async () => {
-    // #given npm dist-tags with beta=3.0.0-beta.3
-    globalThis.fetch = mock(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ latest: "2.14.0", beta: "3.0.0-beta.3" }),
-      } as Response)
-    ) as unknown as typeof fetch
-
-    // #when current version is 3.0.0-beta.3
-    const result = await getPluginNameWithVersion("3.0.0-beta.3")
-
-    // #then should use @beta tag
-    expect(result).toBe("@ogdev/opencode-crew@beta")
-  })
-
   test("returns @next when current version matches next tag", async () => {
-    // #given npm dist-tags with next=3.1.0-next.1
+    // #given npm dist-tags with next=1.2.2-next.7
     globalThis.fetch = mock(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ latest: "2.14.0", beta: "3.0.0-beta.3", next: "3.1.0-next.1" }),
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" }),
       } as Response)
     ) as unknown as typeof fetch
 
-    // #when current version is 3.1.0-next.1
-    const result = await getPluginNameWithVersion("3.1.0-next.1")
+    // #when current version is 1.2.2-next.7
+    const result = await getPluginNameWithVersion("1.2.2-next.7")
 
     // #then should use @next tag
     expect(result).toBe("@ogdev/opencode-crew@next")
   })
 
-  test("returns prerelease channel tag when no dist-tag matches prerelease version", async () => {
-    // #given npm dist-tags with beta=3.0.0-beta.3
+  test("returns @alpha when current version matches alpha tag", async () => {
+    // #given npm dist-tags with alpha=1.2.2-alpha.11
     globalThis.fetch = mock(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ latest: "2.14.0", beta: "3.0.0-beta.3" }),
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" }),
       } as Response)
     ) as unknown as typeof fetch
 
-    // #when current version is old beta 3.0.0-beta.2
-    const result = await getPluginNameWithVersion("3.0.0-beta.2")
+    // #when current version is 1.2.2-alpha.11
+    const result = await getPluginNameWithVersion("1.2.2-alpha.11")
+
+    // #then should use @alpha tag
+    expect(result).toBe("@ogdev/opencode-crew@alpha")
+  })
+
+  test("returns prerelease channel tag when no dist-tag matches prerelease version", async () => {
+    // #given npm dist-tags with newer next prerelease
+    globalThis.fetch = mock(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" }),
+      } as Response)
+    ) as unknown as typeof fetch
+
+    // #when current version is older next prerelease
+    const result = await getPluginNameWithVersion("1.2.2-next.3")
 
     // #then should preserve prerelease channel
-    expect(result).toBe("@ogdev/opencode-crew@beta")
+    expect(result).toBe("@ogdev/opencode-crew@next")
   })
 
   test("returns prerelease channel tag when fetch fails", async () => {
     // #given network failure
     globalThis.fetch = mock(() => Promise.reject(new Error("Network error"))) as unknown as typeof fetch
 
-    // #when current version is 3.0.0-beta.3
-    const result = await getPluginNameWithVersion("3.0.0-beta.3")
+    // #when current version is 1.2.2-alpha.11
+    const result = await getPluginNameWithVersion("1.2.2-alpha.11")
 
     // #then should preserve prerelease channel
-    expect(result).toBe("@ogdev/opencode-crew@beta")
+    expect(result).toBe("@ogdev/opencode-crew@alpha")
   })
 
   test("returns bare package name when npm returns non-ok response for stable version", async () => {
@@ -94,24 +94,24 @@ describe("getPluginNameWithVersion", () => {
       } as Response)
     ) as unknown as typeof fetch
 
-    // #when current version is 2.14.0
-    const result = await getPluginNameWithVersion("2.14.0")
+    // #when current version is 1.2.1
+    const result = await getPluginNameWithVersion("1.2.1")
 
     // #then should fall back to bare package entry
     expect(result).toBe("@ogdev/opencode-crew")
   })
 
   test("prioritizes latest over other tags when version matches multiple", async () => {
-    // #given version matches both latest and beta (during release promotion)
+    // #given version matches both latest and next during promotion overlap
     globalThis.fetch = mock(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ beta: "3.0.0", latest: "3.0.0", next: "3.1.0-alpha.1" }),
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.1", alpha: "1.2.2-alpha.11" }),
       } as Response)
     ) as unknown as typeof fetch
 
     // #when current version matches both
-    const result = await getPluginNameWithVersion("3.0.0")
+    const result = await getPluginNameWithVersion("1.2.1")
 
     // #then should prioritize @latest
     expect(result).toBe("@ogdev/opencode-crew@latest")
@@ -130,7 +130,7 @@ describe("fetchNpmDistTags", () => {
     globalThis.fetch = mock(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ latest: "2.14.0", beta: "3.0.0-beta.3" }),
+        json: () => Promise.resolve({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" }),
       } as Response)
     ) as unknown as typeof fetch
 
@@ -138,7 +138,7 @@ describe("fetchNpmDistTags", () => {
     const result = await fetchNpmDistTags("opencode-crew")
 
     // #then should return the tags
-    expect(result).toEqual({ latest: "2.14.0", beta: "3.0.0-beta.3" })
+    expect(result).toEqual({ latest: "1.2.1", next: "1.2.2-next.7", alpha: "1.2.2-alpha.11" })
   })
 
   test("returns null on network failure", async () => {

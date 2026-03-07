@@ -4,7 +4,7 @@ import { $ } from "bun"
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 
-const PACKAGE_NAME = "opencode-crew"
+const PACKAGE_NAME = "@ogdev/opencode-crew"
 const bump = process.env.BUMP as "major" | "minor" | "patch" | undefined
 const versionOverride = process.env.VERSION
 const republishMode = process.env.REPUBLISH === "true"
@@ -24,7 +24,7 @@ console.log("=== Publishing opencode-crew (multi-package) ===\n")
 
 async function fetchPreviousVersion(): Promise<string> {
   try {
-    const res = await fetch(`https://registry.npmjs.org/${PACKAGE_NAME}/latest`)
+    const res = await fetch(`https://registry.npmjs.org/${encodeURIComponent(PACKAGE_NAME)}/latest`)
     if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`)
     const data = (await res.json()) as { version: string }
     console.log(`Previous version: ${data.version}`)
@@ -36,7 +36,6 @@ async function fetchPreviousVersion(): Promise<string> {
 }
 
 function bumpVersion(version: string, type: "major" | "minor" | "patch"): string {
-  // Handle prerelease versions (e.g., 3.0.0-beta.7)
   const baseVersion = version.split("-")[0]
   const [major, minor, patch] = baseVersion.split(".").map(Number)
   switch (type) {
@@ -59,14 +58,12 @@ async function updatePackageVersion(pkgPath: string, newVersion: string): Promis
 async function updateAllPackageVersions(newVersion: string): Promise<void> {
   console.log("\nSyncing version across all packages...")
   
-  // Update main package.json
   const mainPkgPath = new URL("../package.json", import.meta.url).pathname
   await updatePackageVersion(mainPkgPath, newVersion)
-  
-  // Update optionalDependencies versions in main package.json
+
   let mainPkg = await Bun.file(mainPkgPath).text()
   for (const platform of PLATFORM_PACKAGES) {
-    const pkgName = `opencode-crew-${platform}`
+    const pkgName = `@ogdev/opencode-crew-${platform}`
     mainPkg = mainPkg.replace(
       new RegExp(`"${pkgName}": "[^"]+"`),
       `"${pkgName}": "${newVersion}"`
@@ -74,7 +71,6 @@ async function updateAllPackageVersions(newVersion: string): Promise<void> {
   }
   await Bun.write(mainPkgPath, mainPkg)
   
-  // Update each platform package.json
   for (const platform of PLATFORM_PACKAGES) {
     const pkgPath = new URL(`../packages/${platform}/package.json`, import.meta.url).pathname
     if (existsSync(pkgPath)) {
@@ -86,13 +82,12 @@ async function updateAllPackageVersions(newVersion: string): Promise<void> {
 }
 
 async function findPreviousTag(currentVersion: string): Promise<string | null> {
-  // For beta versions, find the previous beta tag (e.g., 3.0.0-beta.11 for 3.0.0-beta.12)
-  const betaMatch = currentVersion.match(/^(\d+\.\d+\.\d+)-beta\.(\d+)$/)
-  if (betaMatch) {
-    const [, base, num] = betaMatch
+  const prereleaseMatch = currentVersion.match(/^(\d+\.\d+\.\d+)-([a-z]+)\.(\d+)$/)
+  if (prereleaseMatch) {
+    const [, base, channel, num] = prereleaseMatch
     const prevNum = parseInt(num) - 1
     if (prevNum >= 1) {
-      const prevTag = `${base}-beta.${prevNum}`
+      const prevTag = `${base}-${channel}.${prevNum}`
       const exists = await $`git rev-parse v${prevTag}`.nothrow()
       if (exists.exitCode === 0) return prevTag
     }
@@ -103,13 +98,12 @@ async function findPreviousTag(currentVersion: string): Promise<string | null> {
 async function generateChangelog(previous: string, currentVersion?: string): Promise<string[]> {
   const notes: string[] = []
 
-  // Try to find the most accurate previous tag for comparison
   let compareTag = previous
   if (currentVersion) {
-    const prevBetaTag = await findPreviousTag(currentVersion)
-    if (prevBetaTag) {
-      compareTag = prevBetaTag
-      console.log(`Using previous beta tag for comparison: v${compareTag}`)
+    const prevPrereleaseTag = await findPreviousTag(currentVersion)
+    if (prevPrereleaseTag) {
+      compareTag = prevPrereleaseTag
+      console.log(`Using previous prerelease tag for comparison: v${compareTag}`)
     }
   }
 
@@ -190,7 +184,7 @@ interface PublishResult {
 
 async function checkPackageVersionExists(pkgName: string, version: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://registry.npmjs.org/${pkgName}/${version}`)
+    const res = await fetch(`https://registry.npmjs.org/${encodeURIComponent(pkgName)}/${version}`)
     return res.ok
   } catch {
     return false
@@ -270,7 +264,7 @@ async function publishAllPackages(version: string): Promise<void> {
       
       const publishPromises = batch.map(async (platform) => {
         const pkgDir = join(process.cwd(), "packages", platform)
-        const pkgName = `opencode-crew-${platform}`
+        const pkgName = `@ogdev/opencode-crew-${platform}`
         
         console.log(`    Starting ${pkgName}...`)
         const result = await publishPackage(pkgDir, distTag, false, pkgName, version)
@@ -299,7 +293,6 @@ async function publishAllPackages(version: string): Promise<void> {
     }
   }
   
-  // Publish main package last
   console.log(`\n📦 Publishing main package...`)
   const mainResult = await publishPackage(process.cwd(), distTag, true, PACKAGE_NAME, version)
   
@@ -336,7 +329,6 @@ async function gitTagAndRelease(newVersion: string, notes: string[]): Promise<vo
   await $`git config user.email "github-actions[bot]@users.noreply.github.com"`
   await $`git config user.name "github-actions[bot]"`
   
-  // Add all package.json files
   await $`git add package.json assets/opencode-crew.schema.json`
   for (const platform of PLATFORM_PACKAGES) {
     await $`git add packages/${platform}/package.json`.nothrow()
@@ -356,7 +348,6 @@ async function gitTagAndRelease(newVersion: string, notes: string[]): Promise<vo
     console.log(`Tag v${newVersion} already exists`)
   }
 
-  // Push tags first (critical for release), then try branch push (non-critical)
   console.log("Pushing tags...")
   await $`git push origin --tags`
   
@@ -379,7 +370,7 @@ async function gitTagAndRelease(newVersion: string, notes: string[]): Promise<vo
 
 async function checkVersionExists(version: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://registry.npmjs.org/${PACKAGE_NAME}/${version}`)
+    const res = await fetch(`https://registry.npmjs.org/${encodeURIComponent(PACKAGE_NAME)}/${version}`)
     return res.ok
   } catch {
     return false
@@ -417,7 +408,7 @@ async function main() {
   await publishAllPackages(newVersion)
   await gitTagAndRelease(newVersion, notes)
 
-  console.log(`\n=== Successfully published ${PACKAGE_NAME}@${newVersion} (8 packages) ===`)
+  console.log(`\n=== Successfully published ${PACKAGE_NAME}@${newVersion} ===`)
 }
 
 main()

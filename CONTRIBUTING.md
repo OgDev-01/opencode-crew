@@ -128,6 +128,10 @@ opencode-crew/
 
 ## Development Workflow
 
+The repository uses `dev` as the default integration branch and `main` for
+production-only releases. Open pull requests against `dev` unless you are
+working on production release operations.
+
 ### Build Commands
 
 ```bash
@@ -143,8 +147,9 @@ bun run rebuild
 # Build schema only (after modifying src/config/schema.ts)
 bun run build:schema
 
-# Run tests (always use timeout to avoid hanging processes)
-bun test --timeout 30000
+# Run tests through the package script
+# This includes the standard timeout and post-test Bun dump cleanup.
+bun run test
 
 # Run a specific test file
 bun test src/path/to/file.test.ts --timeout 30000
@@ -251,25 +256,41 @@ export function createMyHook(input: PluginInput) {
 - [ ] Code follows project conventions
 - [ ] `bun run typecheck` passes
 - [ ] `bun run build` succeeds
-- [ ] `bun test --timeout 30000` passes
+- [ ] `bun run test` passes
 - [ ] Tested locally with OpenCode
 - [ ] Updated documentation if needed (README, AGENTS.md)
 - [ ] No version changes in `package.json`
 
 ## Publishing
 
-**Important**: Publishing is handled exclusively through GitHub Actions.
+Publishing is handled exclusively through GitHub Actions. The repository uses
+three release lanes:
 
 - **Never** run `bun publish` directly (OIDC provenance issues)
 - **Never** modify `package.json` version locally
-- Maintainers use GitHub Actions workflow_dispatch:
-  ```bash
-  gh workflow run publish -f bump=patch  # or minor/major
-  ```
+- `release-staging.yml` publishes prerelease builds to `@next` from `dev`
+- `release-alpha.yml` publishes prerelease builds to `@alpha` from `alpha`
+- `release-production.yml` promotes the current staged prerelease into a
+  stable `@latest` release
+
+For manual production promotion, run:
+
+```bash
+gh workflow run release-production.yml -f version=1.2.3-next.45
+```
+
+Leave `version` empty to promote the current npm `@next` build.
+
+### Maintainer-only production release
+
+Production promotion is reserved for the repository owner. The workflow
+contains an actor check for `OgDev-01`, and the production jobs run against the
+`production` GitHub environment. Contributors should treat `release-production.yml`
+as a maintainer-only workflow and use the staging or alpha release lanes for
+all non-production release work.
 
 ## Getting Help
 
-- **Discord**: [Join the community](https://discord.gg/PUwSMR9XNk) for questions, help, and sharing what you build
 - **GitHub Issues**: [Open an issue](https://github.com/OgDev-01/opencode-crew/issues) for bugs or feature requests
 - **Project Knowledge**: Check `AGENTS.md` for detailed project documentation
 - **Code Patterns**: Review existing implementations in `src/`

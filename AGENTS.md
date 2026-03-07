@@ -122,7 +122,9 @@ bunx opencode-crew run     # Non-interactive session
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | ci.yml | push/PR | Tests (split: mock-heavy isolated + batch), typecheck, build, schema auto-commit |
-| publish.yml | manual | Version bump, npm publish, platform binaries, GitHub release, merge to dev |
+| release-staging.yml | push to `dev` | Create Version Packages PRs or publish prerelease builds to `@next` |
+| release-alpha.yml | push to `alpha` | Publish prerelease builds to `@alpha` |
+| release-production.yml | manual | Promote staged prerelease to stable `@latest`, publish platform binaries, GitHub release, merge to `main` |
 | publish-platform.yml | called | 11 platform binaries via bun compile (darwin/linux/windows) |
 | captain-agent.yml | @mention | AI agent handles issues/PRs |
 

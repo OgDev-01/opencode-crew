@@ -1,6 +1,6 @@
 <div align="center">
 
-[![GitHub Release](https://img.shields.io/github/v/release/OgDev-01/opencode-crew?color=369eff&labelColor=black&logo=github&style=flat-square)](https://github.com/OgDev-01/opencode-crew/releases) [![npm version](https://img.shields.io/npm/v/@ogdev/opencode-crew?color=ff6b35&labelColor=black&style=flat-square)](https://www.npmjs.com/package/@ogdev/opencode-crew) [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&label=discord&labelColor=black&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/PUwSMR9XNk) [![License](https://img.shields.io/badge/license-SUL--1.0-white?labelColor=black&style=flat-square)](https://github.com/OgDev-01/opencode-crew/blob/dev/LICENSE.md)
+[![GitHub Release](https://img.shields.io/github/v/release/OgDev-01/opencode-crew?color=369eff&labelColor=black&logo=github&style=flat-square)](https://github.com/OgDev-01/opencode-crew/releases) [![npm version](https://img.shields.io/npm/v/@ogdev/opencode-crew?color=ff6b35&labelColor=black&style=flat-square)](https://www.npmjs.com/package/@ogdev/opencode-crew) [![License](https://img.shields.io/badge/license-SUL--1.0-white?labelColor=black&style=flat-square)](https://github.com/OgDev-01/opencode-crew/blob/dev/LICENSE.md)
 
 ### Multi-agent orchestration for OpenCode.
 
@@ -58,6 +58,14 @@ bunx @ogdev/opencode-crew@next install
 # Alpha (experimental) — bleeding-edge, may break
 bunx @ogdev/opencode-crew@alpha install
 ```
+
+`@next` publishes prerelease builds in the form `x.y.z-next.N` from `dev`.
+`@alpha` publishes `x.y.z-alpha.N` from the `alpha` branch. Production uses
+stable `x.y.z` releases on `@latest` only.
+
+Production promotion is maintainer-only. The `release-production.yml`
+workflow is restricted to `OgDev-01` and protected by the repository's
+`production` environment.
 
 You can switch back to stable at any time by re-running the default install command.
 
@@ -161,7 +169,6 @@ Beyond memory and token optimization, three more systems set opencode-crew apart
 
 Questions, feedback, and contributions are welcome in both places:
 
-- [Discord](https://discord.gg/PUwSMR9XNk): ask questions, share what you build, and get help from the community
 - [GitHub](https://github.com/OgDev-01/opencode-crew): file issues, contribute skills, or follow the roadmap
 
 ## Acknowledgments

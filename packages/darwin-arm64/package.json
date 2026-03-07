@@ -1,6 +1,6 @@
 {
   "name": "@ogdev/opencode-crew-darwin-arm64",
-  "version": "1.2.2-next.15",
+  "version": "1.2.2",
   "description": "Platform-specific binary for opencode-crew (darwin-arm64)",
   "license": "MIT",
   "repository": {

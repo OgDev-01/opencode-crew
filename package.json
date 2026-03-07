@@ -30,10 +30,12 @@
     "build:binaries": "bun run script/build-binaries.ts",
     "build:schema": "bun run script/build-schema.ts",
     "clean": "rm -rf dist",
+    "clean:bun-dumps": "bun run script/clean-bun-dumps.ts",
     "postinstall": "node postinstall.mjs",
     "prepublishOnly": "bun run clean && bun run build",
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
+    "test": "bun test --timeout 30000",
+    "posttest": "bun run clean:bun-dumps",
     "version": "changeset version && bun install",
     "changeset": "changeset"
   },

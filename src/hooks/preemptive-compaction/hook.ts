@@ -76,6 +76,7 @@ export function createPreemptiveCompactionHook(
   ctx: PluginInput,
   pluginConfig: OpenCodeCrewConfig,
   modelCacheState?: ModelCacheStateLike,
+  deps?: { beforeSummarize?: (sessionID: string) => Promise<void> },
 ) {
   const compactionInProgress = new Set<string>()
   const compactedSessions = new Set<string>()
@@ -110,6 +111,8 @@ export function createPreemptiveCompactionHook(
     compactionInProgress.add(sessionID)
 
     try {
+      await deps?.beforeSummarize?.(sessionID)
+
       const { providerID: targetProviderID, modelID: targetModelID } = resolveCompactionModel(
         pluginConfig,
         sessionID,

@@ -3856,10 +3856,6 @@
             "global"
           ]
         },
-        "embedding_model": {
-          "default": "Xenova/all-MiniLM-L6-v2",
-          "type": "string"
-        },
         "similarity_threshold": {
           "default": 0.7,
           "type": "number",
@@ -3880,14 +3876,6 @@
         },
         "ttl_learnings_days": {
           "default": 60,
-          "type": "number"
-        },
-        "ttl_golden_rules_days": {
-          "default": 90,
-          "type": "number"
-        },
-        "ttl_heuristics_days": {
-          "default": 180,
           "type": "number"
         },
         "golden_rule_confidence_threshold": {
@@ -3920,10 +3908,6 @@
           }
         },
         "dynamic_prompts_enabled": {
-          "default": true,
-          "type": "boolean"
-        },
-        "delegation_cost_awareness": {
           "default": true,
           "type": "boolean"
         },
@@ -4006,21 +3990,17 @@
       "required": [
         "enabled",
         "scope",
-        "embedding_model",
         "similarity_threshold",
         "max_golden_rules_injected",
         "max_learnings_injected",
         "max_injection_tokens",
         "ttl_learnings_days",
-        "ttl_golden_rules_days",
-        "ttl_heuristics_days",
         "golden_rule_confidence_threshold",
         "golden_rule_validation_count",
         "project_db_path",
         "global_db_path",
         "privacy_tags",
         "dynamic_prompts_enabled",
-        "delegation_cost_awareness",
         "auto_capture"
       ],
       "additionalProperties": false

@@ -59,18 +59,25 @@ function buildManager(config: MemoryConfig): MemoryManager {
 
   function ensureInitialized(): void {
     if (initialized) return
-    const dbPath = config.project_db_path ?? ":memory:"
+    const dbPath = config.scope === "global"
+      ? config.global_db_path ?? config.project_db_path ?? ":memory:"
+      : config.project_db_path ?? ":memory:"
     const db = initializeDatabase(dbPath)
     storageService = createMemoryStorage(db)
     searchService = createSearchService(db)
     consolidationService = createConsolidationService(
       storageService,
-      searchService
+      searchService,
+      {
+        minConfidence: config.golden_rule_confidence_threshold,
+        minValidationCount: config.golden_rule_validation_count,
+      }
     )
     cleanupService = createCleanupService(
       storageService,
       { applyTemporalDecay, isEvictionCandidate },
-      db
+      db,
+      { learningTtlDays: config.ttl_learnings_days }
     )
     initialized = true
     log("[memory] Services initialized")

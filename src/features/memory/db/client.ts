@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite"
 import { mkdirSync } from "node:fs"
 import { homedir } from "node:os"
-import { join, resolve } from "node:path"
+import { dirname, join, resolve } from "node:path"
 import { log } from "@/shared/logger"
 import { isDatabaseHealthy, removeCorruptedDbFiles } from "./health-check"
 
@@ -100,6 +100,9 @@ export function initializeDatabase(dbPath: string): Database {
 }
 
 function openAndValidate(dbPath: string): Database {
+  if (dbPath !== ":memory:") {
+    mkdirSync(dirname(dbPath), { recursive: true })
+  }
   const db = new Database(dbPath)
   db.exec("PRAGMA journal_mode = WAL")
   db.exec("PRAGMA busy_timeout = 5000")
@@ -114,6 +117,11 @@ function openAndValidate(dbPath: string): Database {
   return db
 }
 
+function expandHomePath(dbPath: string): string {
+  if (dbPath.startsWith("~/")) return join(homedir(), dbPath.slice(2))
+  return dbPath
+}
+
 export function getProjectDb(projectRoot: string): Database {
   const dbDir = join(projectRoot, ".opencode", "elf")
   mkdirSync(dbDir, { recursive: true })
@@ -124,6 +132,19 @@ export function getGlobalDb(): Database {
   const dbDir = join(homedir(), ".opencode", "elf")
   mkdirSync(dbDir, { recursive: true })
   return initializeDatabase(join(dbDir, "memory.db"))
+}
+
+export function getConfiguredDb(
+  projectRoot: string,
+  scope: "project" | "global",
+  projectDbPath?: string,
+  globalDbPath?: string
+): Database {
+  const dbPath = scope === "global"
+    ? expandHomePath(globalDbPath ?? "~/.opencode/elf/memory.db")
+    : resolve(projectRoot, projectDbPath ?? ".opencode/elf/memory.db")
+
+  return initializeDatabase(dbPath)
 }
 
 export function closeAll(): void {

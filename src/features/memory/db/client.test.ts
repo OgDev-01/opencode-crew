@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { tmpdir } from "node:os"
 import {
   closeAll,
+  getConfiguredDb,
   getProjectDb,
   initializeDatabase,
 } from "./client"
@@ -75,6 +76,30 @@ describe("#given database client", () => {
       expect(existsSync(expectedDbPath)).toBe(true)
 
       const row = db.prepare("SELECT 1 as one").get() as { one: number }
+      expect(row.one).toBe(1)
+    })
+  })
+
+  describe("#when requesting a configured database", () => {
+    it("#then uses custom project_db_path relative to project root", () => {
+      const projectRoot = mkdtempSync(join(tmpdir(), "memory-configured-project-"))
+      createdDirs.push(projectRoot)
+
+      const db = getConfiguredDb(projectRoot, "project", "custom/project-memory.db")
+      const expectedDbPath = join(projectRoot, "custom", "project-memory.db")
+
+      expect(existsSync(expectedDbPath)).toBe(true)
+      const row = db.prepare("SELECT 1 as one").get() as { one: number }
+      expect(row.one).toBe(1)
+    })
+
+    it("#then uses custom global_db_path with home expansion", () => {
+      const projectRoot = mkdtempSync(join(tmpdir(), "memory-configured-global-"))
+      createdDirs.push(projectRoot)
+
+      const db = getConfiguredDb(projectRoot, "global", undefined, "~/.opencode/elf/test-memory.db")
+      const row = db.prepare("SELECT 1 as one").get() as { one: number }
+
       expect(row.one).toBe(1)
     })
   })

@@ -30,7 +30,7 @@ import {
 import { getMainSessionID } from "../features/claude-code-session-state"
 import { filterDisabledTools } from "../shared/config/disabled-tools"
 import { log } from "../shared"
-import { getProjectDb } from "../features/memory/db/client"
+import { getConfiguredDb } from "../features/memory/db/client"
 import { createMemoryStorage } from "../features/memory/storage/memory-storage"
 import { createSearchService } from "../features/memory/search/search-service"
 import { filterContent } from "../features/memory/privacy-filter"
@@ -127,7 +127,12 @@ export function createToolRegistry(args: {
   const memoryEnabled = pluginConfig.memory?.enabled ?? true
   const elfToolsRecord: Record<string, ToolDefinition> = memoryEnabled
     ? (() => {
-      const db = getProjectDb(ctx.directory)
+      const db = getConfiguredDb(
+        ctx.directory,
+        pluginConfig.memory?.scope ?? "project",
+        pluginConfig.memory?.project_db_path,
+        pluginConfig.memory?.global_db_path
+      )
       const storage = createMemoryStorage(db)
       const search = createSearchService(db)
       return { elf: createElfTool({ storage, search, db, filterContent, computeContextHash, findExistingByHash }) }

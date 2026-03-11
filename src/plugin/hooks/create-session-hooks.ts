@@ -78,6 +78,9 @@ export function createSessionHooks(args: {
   const { ctx, pluginConfig, modelCacheState, isHookEnabled, safeHookEnabled } = args
 
   const flushBeforeSummarize = async (sessionID: string): Promise<void> => {
+    if (pluginConfig.memory?.enabled === false) return
+    if (pluginConfig.memory?.auto_capture?.pre_compaction_flush === false) return
+
     try {
       const { getMemoryManager } = require("../../features/memory/manager")
       const manager = getMemoryManager()

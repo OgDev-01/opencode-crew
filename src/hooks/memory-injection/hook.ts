@@ -39,7 +39,14 @@ export interface MemoryInjectionDeps {
   collector: CollectorLike
   getUsage?: (sessionID: string) => UsageResult | null
   getMainSessionID?: () => string | undefined
-  config?: { maxTokens?: number; goldenRuleMaxTokens?: number }
+  config?: {
+    enabled?: boolean
+    maxTokens?: number
+    goldenRuleMaxTokens?: number
+    maxGoldenRules?: number
+    maxLearnings?: number
+    minRelevance?: number
+  }
   recordLearningConsulted?: (learning: Learning) => Promise<void>
 }
 
@@ -49,8 +56,12 @@ type MessageWithParts = { info: MessageInfo; parts?: unknown[] }
 type TransformOutput = { messages: MessageWithParts[] }
 
 export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
+  const enabled = deps.config?.enabled ?? true
   const maxTokens = deps.config?.maxTokens ?? DEFAULT_MAX_TOKENS
   const goldenRuleMaxTokens = deps.config?.goldenRuleMaxTokens ?? DEFAULT_GOLDEN_RULE_MAX_TOKENS
+  const maxGoldenRules = deps.config?.maxGoldenRules ?? 5
+  const maxLearnings = deps.config?.maxLearnings ?? 5
+  const minRelevance = deps.config?.minRelevance ?? 0.3
 
   return {
     "experimental.chat.messages.transform": async (
@@ -58,6 +69,7 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
       output: TransformOutput,
     ): Promise<void> => {
       try {
+        if (!enabled) return
         const metadata = (input as Record<string, unknown>).metadata as Record<string, unknown> | undefined
         if (metadata?.isSubagent === true) return
 
@@ -75,10 +87,10 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         const query = lastUserMessage ?? ""
 
         const [goldenResults, allResults] = await Promise.all([
-          deps.search.searchGoldenRules("", { maxResults: 5 }),
+          deps.search.searchGoldenRules("", { maxResults: maxGoldenRules }),
           isThrottled
             ? Promise.resolve([])
-            : deps.search.searchAll(query, { maxResults: 5, minRelevance: 0.3, halfLifeDays: 60 }),
+            : deps.search.searchAll(query, { maxResults: maxLearnings, minRelevance, halfLifeDays: 60 }),
         ])
 
         const goldenRules = goldenResults

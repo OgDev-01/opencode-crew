@@ -37,7 +37,7 @@ interface UsageResult {
 export interface MemoryInjectionDeps {
   search: MemorySearchService
   collector: CollectorLike
-  getUsage?: () => UsageResult | null
+  getUsage?: (sessionID: string) => UsageResult | null
   getMainSessionID?: () => string | undefined
   config?: { maxTokens?: number; goldenRuleMaxTokens?: number }
   recordLearningConsulted?: (learning: Learning) => Promise<void>
@@ -61,15 +61,15 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         const metadata = (input as Record<string, unknown>).metadata as Record<string, unknown> | undefined
         if (metadata?.isSubagent === true) return
 
-        const usage = deps.getUsage?.() ?? null
+        const messages = output.messages ?? []
+        const sessionID = resolveSessionID(messages, deps.getMainSessionID)
+        if (!sessionID) return
+
+        const usage = deps.getUsage?.(sessionID) ?? null
         if (usage && usage.usagePercentage > SKIP_THRESHOLD) return
 
         const isThrottled = usage !== null && usage.usagePercentage > THROTTLE_THRESHOLD
         const tokenBudget = isThrottled ? goldenRuleMaxTokens : maxTokens
-
-        const messages = output.messages ?? []
-        const sessionID = resolveSessionID(messages, deps.getMainSessionID)
-        if (!sessionID) return
 
         const lastUserMessage = extractLastUserMessage(messages)
         const query = lastUserMessage ?? ""

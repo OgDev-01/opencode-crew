@@ -18,8 +18,9 @@ export async function executeCompact(
   autoCompactState: AutoCompactState,
   client: Client,
   directory: string,
-  pluginConfig: OpenCodeCrewConfig,
-  _experimental?: ExperimentalConfig
+  pluginConfig?: OpenCodeCrewConfig,
+  _experimental?: ExperimentalConfig,
+  beforeSummarize?: (sessionID: string) => Promise<void>
 ): Promise<void> {
   void _experimental
 
@@ -76,6 +77,7 @@ export async function executeCompact(
       pluginConfig,
       errorType: errorData?.errorType,
       messageIndex: errorData?.messageIndex,
+      beforeSummarize,
     })
   } finally {
     autoCompactState.compactionInProgress.delete(sessionID);

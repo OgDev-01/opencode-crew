@@ -342,6 +342,30 @@ describe("executeCompact lock management", () => {
     truncateSpy.mockRestore()
   })
 
+  test("calls beforeSummarize before summarize retry", async () => {
+    const beforeSummarize = mock(async () => {})
+
+    autoCompactState.errorDataBySession.set(sessionID, {
+      errorType: "token_limit",
+      currentTokens: 100000,
+      maxTokens: 200000,
+    })
+
+    await executeCompact(
+      sessionID,
+      msg,
+      autoCompactState,
+      mockClient,
+      directory,
+      undefined,
+      undefined,
+      beforeSummarize,
+    )
+
+    expect(beforeSummarize).toHaveBeenCalledWith(sessionID)
+    expect(mockClient.session.summarize).toHaveBeenCalled()
+  })
+
   test("does NOT call summarize when truncation is sufficient", async () => {
     // given: Over token limit with truncation returning sufficient
     autoCompactState.errorDataBySession.set(sessionID, {

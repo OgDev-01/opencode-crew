@@ -10,6 +10,7 @@ import { log } from "@/shared/logger"
 export interface AnthropicContextWindowLimitRecoveryOptions {
   experimental?: ExperimentalConfig
   pluginConfig: OpenCodeCrewConfig
+  beforeSummarize?: (sessionID: string) => Promise<void>
 }
 
 function createRecoveryState(): AutoCompactState {
@@ -30,7 +31,7 @@ export function createAnthropicContextWindowLimitRecoveryHook(
 ) {
   const autoCompactState = createRecoveryState()
   const experimental = options?.experimental
-  const pluginConfig = options?.pluginConfig!
+  const pluginConfig = options?.pluginConfig ?? {}
   const pendingCompactionTimeoutBySession = new Map<string, ReturnType<typeof setTimeout>>()
 
   const eventHandler = async ({ event }: { event: { type: string; properties?: unknown } }) => {
@@ -96,6 +97,7 @@ export function createAnthropicContextWindowLimitRecoveryHook(
             ctx.directory,
             pluginConfig,
             experimental,
+            options?.beforeSummarize,
           )
         }, 300)
 
@@ -164,6 +166,7 @@ export function createAnthropicContextWindowLimitRecoveryHook(
         ctx.directory,
         pluginConfig,
         experimental,
+        options?.beforeSummarize,
       )
     }
   }

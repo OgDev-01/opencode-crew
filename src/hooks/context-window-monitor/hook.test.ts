@@ -2,6 +2,7 @@
 
 import { describe, it, expect, mock, beforeEach, afterEach } from "bun:test"
 import { createContextWindowMonitorHook } from "./hook"
+import { clearAllSessionTokenUsage, getSessionContextUsage } from "./session-usage-cache"
 
 const ANTHROPIC_CONTEXT_ENV_KEY = "ANTHROPIC_1M_CONTEXT"
 const VERTEX_CONTEXT_ENV_KEY = "VERTEX_ANTHROPIC_1M_CONTEXT"
@@ -39,12 +40,44 @@ describe("context-window-monitor", () => {
 
   beforeEach(() => {
     ctx = createMockCtx()
+    clearAllSessionTokenUsage()
     delete process.env[ANTHROPIC_CONTEXT_ENV_KEY]
     delete process.env[VERTEX_CONTEXT_ENV_KEY]
   })
 
   afterEach(() => {
+    clearAllSessionTokenUsage()
     resetContextLimitEnv()
+  })
+
+  it("should expose cached session usage for other hooks", async () => {
+    const hook = createContextWindowMonitorHook(ctx as never)
+    const sessionID = "ses_usage_cache"
+
+    await hook.event({
+      event: {
+        type: "message.updated",
+        properties: {
+          info: {
+            role: "assistant",
+            sessionID,
+            providerID: "anthropic",
+            finish: true,
+            tokens: {
+              input: 150000,
+              output: 1000,
+              reasoning: 0,
+              cache: { read: 10000, write: 0 },
+            },
+          },
+        },
+      },
+    })
+
+    const usage = getSessionContextUsage(sessionID)
+    expect(usage).not.toBeNull()
+    expect(usage?.usedTokens).toBe(160000)
+    expect(usage?.usagePercentage).toBe(0.8)
   })
 
   // #given event caches token info from message.updated

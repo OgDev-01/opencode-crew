@@ -178,6 +178,47 @@ describe("#given cleanup service", () => {
     })
   })
 
+  describe("#when cleanup uses configured learning ttl", () => {
+    describe("#then custom ttl overrides the default learning window", () => {
+      it("removes success learnings using the configured ttl_learnings_days", async () => {
+        const customCleanupService = createCleanupService(storage, {
+          applyTemporalDecay,
+          isEvictionCandidate,
+        }, db, { learningTtlDays: 10 })
+
+        const now = new Date()
+        const elevenDaysAgo = new Date(now.getTime() - 11 * 86400000).toISOString()
+
+        db.prepare(
+          "INSERT INTO learnings (id, type, summary, context, tool_name, domain, tags, utility_score, times_consulted, context_hash, confidence, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        ).run(
+          "learn-config-ttl",
+          "success",
+          "Config TTL learning",
+          "test",
+          "test",
+          "test",
+          "",
+          0.8,
+          0,
+          "hash-config-ttl",
+          0.9,
+          elevenDaysAgo,
+          elevenDaysAgo
+        )
+
+        const rowid = (db.prepare("SELECT rowid FROM learnings WHERE id = ?").get("learn-config-ttl") as { rowid: number }).rowid
+        db.prepare(
+          "INSERT INTO learnings_fts(rowid, summary, context, tags, tool_name, domain) VALUES (?, ?, ?, ?, ?, ?)"
+        ).run(rowid, "Config TTL learning", "test", "", "test", "test")
+
+        const report = await customCleanupService.cleanup()
+        expect(report.expired).toBe(1)
+        expect(await storage.getLearning("learn-config-ttl")).toBeNull()
+      })
+    })
+  })
+
   describe("#when cleanup runs in dry-run mode", () => {
     describe("#then dry-run returns report without deleting", () => {
       it("collects would-be deletions but calls no storage.delete", async () => {

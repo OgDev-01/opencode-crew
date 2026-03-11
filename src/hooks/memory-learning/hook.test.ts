@@ -15,6 +15,10 @@ function createMockStorage(): IMemoryStorage & { learnings: Learning[] } {
     async getLearningsByScope(_scope) {
       return learnings
     },
+    async incrementTimesConsulted(id: string) {
+      const learning = learnings.find((entry) => entry.id === id)
+      if (learning) learning.times_consulted += 1
+    },
     async updateLearning(id: string, updates: Partial<Learning>) {
       const idx = learnings.findIndex((l) => l.id === id)
       if (idx >= 0) {

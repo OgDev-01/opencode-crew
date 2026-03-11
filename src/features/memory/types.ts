@@ -80,6 +80,7 @@ export interface IMemoryStorage {
   addLearning(learning: Learning): Promise<void>
   getLearning(id: string): Promise<Learning | null>
   getLearningsByScope(scope: MemoryScope): Promise<Learning[]>
+  incrementTimesConsulted(id: string): Promise<void>
   updateLearning(id: string, updates: Partial<Learning>): Promise<void>
   deleteLearning(id: string): Promise<void>
   addGoldenRule(rule: GoldenRule): Promise<void>

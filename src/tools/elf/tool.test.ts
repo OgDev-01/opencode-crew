@@ -64,6 +64,8 @@ describe("#given ELF tool", () => {
         expect(parsed.results).toBeArray()
         expect(parsed.results.length).toBeGreaterThan(0)
         expect(parsed.results[0].score).toBeNumber()
+        const stored = await storage.getLearning(parsed.results[0].id)
+        expect(stored?.times_consulted).toBe(1)
       })
 
       it("returns empty results for unmatched query", async () => {

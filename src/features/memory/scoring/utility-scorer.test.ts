@@ -120,9 +120,13 @@ describe("#given batchUpdateScores", () => {
           updateLearning: mock(() => Promise.resolve()),
           addLearning: mock(() => Promise.resolve()),
           getLearning: mock(() => Promise.resolve(null)),
+          getLearningsByScope: mock(() => Promise.resolve([])),
+          incrementTimesConsulted: mock(() => Promise.resolve()),
           deleteLearning: mock(() => Promise.resolve()),
           addGoldenRule: mock(() => Promise.resolve()),
           getGoldenRules: mock(() => Promise.resolve([])),
+          getGoldenRulesByScope: mock(() => Promise.resolve([])),
+          deleteGoldenRule: mock(() => Promise.resolve()),
           getStats: mock(() => Promise.resolve({ learnings: 0, goldenRules: 0 })),
         };
 
@@ -140,9 +144,13 @@ describe("#given batchUpdateScores", () => {
           updateLearning: mock(() => Promise.resolve()),
           addLearning: mock(() => Promise.resolve()),
           getLearning: mock(() => Promise.resolve(null)),
+          getLearningsByScope: mock(() => Promise.resolve([])),
+          incrementTimesConsulted: mock(() => Promise.resolve()),
           deleteLearning: mock(() => Promise.resolve()),
           addGoldenRule: mock(() => Promise.resolve()),
           getGoldenRules: mock(() => Promise.resolve([])),
+          getGoldenRulesByScope: mock(() => Promise.resolve([])),
+          deleteGoldenRule: mock(() => Promise.resolve()),
           getStats: mock(() => Promise.resolve({ learnings: 0, goldenRules: 0 })),
         };
 
@@ -160,9 +168,13 @@ describe("#given batchUpdateScores", () => {
           updateLearning: mock(() => Promise.resolve()),
           addLearning: mock(() => Promise.resolve()),
           getLearning: mock(() => Promise.resolve(null)),
+          getLearningsByScope: mock(() => Promise.resolve([])),
+          incrementTimesConsulted: mock(() => Promise.resolve()),
           deleteLearning: mock(() => Promise.resolve()),
           addGoldenRule: mock(() => Promise.resolve()),
           getGoldenRules: mock(() => Promise.resolve([])),
+          getGoldenRulesByScope: mock(() => Promise.resolve([])),
+          deleteGoldenRule: mock(() => Promise.resolve()),
           getStats: mock(() => Promise.resolve({ learnings: 0, goldenRules: 0 })),
         };
 
@@ -182,9 +194,13 @@ describe("#given batchUpdateScores", () => {
           updateLearning: mock(() => Promise.resolve()),
           addLearning: mock(() => Promise.resolve()),
           getLearning: mock(() => Promise.resolve(null)),
+          getLearningsByScope: mock(() => Promise.resolve([])),
+          incrementTimesConsulted: mock(() => Promise.resolve()),
           deleteLearning: mock(() => Promise.resolve()),
           addGoldenRule: mock(() => Promise.resolve()),
           getGoldenRules: mock(() => Promise.resolve([])),
+          getGoldenRulesByScope: mock(() => Promise.resolve([])),
+          deleteGoldenRule: mock(() => Promise.resolve()),
           getStats: mock(() => Promise.resolve({ learnings: 0, goldenRules: 0 })),
         };
 

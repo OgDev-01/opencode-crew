@@ -40,6 +40,7 @@ export interface MemoryInjectionDeps {
   getUsage?: () => UsageResult | null
   getMainSessionID?: () => string | undefined
   config?: { maxTokens?: number; goldenRuleMaxTokens?: number }
+  recordLearningConsulted?: (learning: Learning) => Promise<void>
 }
 
 type TransformInput = Record<string, unknown>
@@ -85,15 +86,19 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
           .map((r) => (r.entry as GoldenRule).rule)
           .filter((rule) => !isLikelyMemoryDump(rule))
 
-        const learnings = allResults
+        const learningEntries = allResults
           .filter((r) => r.type === "learning")
-          .map((r) => (r.entry as Learning).summary)
-          .filter((summary) => !isLikelyMemoryDump(summary))
+          .map((r) => r.entry as Learning)
+          .filter((learning) => !isLikelyMemoryDump(learning.summary))
+
+        const learnings = learningEntries.map((learning) => learning.summary)
 
         if (goldenRules.length === 0 && learnings.length === 0) return
 
         const injectionBlock = buildInjectionBlock(goldenRules, learnings, tokenBudget)
         if (!injectionBlock) return
+
+        const injectedLearningEntries = learningEntries.slice(0, learnings.length)
 
         deps.collector.register(sessionID, {
           id: "memory-injection",
@@ -101,6 +106,22 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
           content: injectionBlock,
           priority: "normal",
         })
+
+        if (deps.recordLearningConsulted) {
+          const consultResults = await Promise.allSettled(
+            injectedLearningEntries.map(async (learning) => {
+              await deps.recordLearningConsulted?.(learning)
+            })
+          )
+
+          for (const result of consultResults) {
+            if (result.status === "rejected") {
+              log("[memory-injection] failed to record learning consultation", {
+                error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+              })
+            }
+          }
+        }
 
         log("[memory-injection] injected memory context", {
           goldenRules: goldenRules.length,

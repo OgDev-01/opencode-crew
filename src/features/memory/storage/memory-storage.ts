@@ -100,6 +100,17 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
     ).run(existing.rowid, merged.summary, merged.context, payload.tags ?? "", merged.tool_name, merged.domain)
   })
 
+  const incrementTimesConsultedTx = db.transaction((id: string) => {
+    const now = new Date().toISOString()
+    const result = db.prepare(
+      "UPDATE learnings SET times_consulted = times_consulted + 1, updated_at = ? WHERE id = ?"
+    ).run(now, id)
+
+    if (result.changes === 0) {
+      throw new Error(`Learning not found: ${id}`)
+    }
+  })
+
   const deleteLearningTx = db.transaction((id: string) => {
     const row = db.prepare("SELECT rowid FROM learnings WHERE id = ?").get(id) as { rowid: number } | null
     if (row) db.prepare("DELETE FROM learnings_fts WHERE rowid = ?").run(row.rowid)
@@ -142,6 +153,9 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
     },
     async updateLearning(id, updates) {
       updateLearningTx(id, updates)
+    },
+    async incrementTimesConsulted(id) {
+      incrementTimesConsultedTx(id)
     },
     async deleteLearning(id) {
       deleteLearningTx(id)

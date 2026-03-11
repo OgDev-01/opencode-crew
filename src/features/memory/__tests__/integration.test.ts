@@ -158,6 +158,11 @@ describe("Memory lifecycle integration", () => {
             search,
             collector: { register(_id, payload) { registered.push({ source: payload.source, content: payload.content }) } },
             getUsage: () => ({ usedTokens: 100, remainingTokens: 900, usagePercentage: 0.1 }),
+            recordLearningConsulted: async (learning) => {
+              await storage.updateLearning(learning.id, {
+                times_consulted: learning.times_consulted + 1,
+              })
+            },
           })
           const preInjectionResults = await search.searchAll("bash", {
             maxResults: 5,
@@ -172,6 +177,7 @@ describe("Memory lifecycle integration", () => {
           )
           expect(registered[0]?.source).toBe("memory")
           expect(registered[0]?.content).toContain("## Agent Memory")
+          expect((await storage.getLearning(targetId))?.times_consulted).toBe(2)
 
           await batchUpdateScores([{ memoryId: targetId, outcome: "used" }], storage)
           expect((await storage.getLearning(targetId))?.utility_score).toBeCloseTo(0.01, 6)
@@ -335,6 +341,8 @@ describe("Memory lifecycle integration", () => {
           const elfTool = createElfTool({ storage, search, db, filterContent, computeContextHash, findExistingByHash })
           const searchResult = JSON.parse((await elfTool.execute({ action: "search", query: "elf search target" }, {} as Parameters<typeof elfTool.execute>[1])) as string) as { results: unknown[] }
           expect(searchResult.results.length).toBeGreaterThanOrEqual(1)
+          const searchedId = (searchResult.results[0] as { id: string }).id
+          expect((await storage.getLearning(searchedId))?.times_consulted).toBe(1)
 
           const addRuleResult = JSON.parse((await elfTool.execute({ action: "add-rule", content: "Always validate memory scope before consolidation", type: "golden_rule", scope: "project" }, {} as Parameters<typeof elfTool.execute>[1])) as string) as { status: string }
           expect(addRuleResult.status).toBe("added")

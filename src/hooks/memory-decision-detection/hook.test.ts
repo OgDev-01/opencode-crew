@@ -14,6 +14,7 @@ function createMockStorage(): IMemoryStorage & { goldenRules: GoldenRule[] } {
     async getLearningsByScope(_scope) {
       return []
     },
+    async incrementTimesConsulted(_id: string) {},
     async updateLearning(_id: string, _updates: Partial<Learning>) {},
     async deleteLearning(_id: string) {},
     async addGoldenRule(rule: GoldenRule) {

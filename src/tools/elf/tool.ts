@@ -85,6 +85,15 @@ async function handleSearch(deps: ElfToolDeps, args: ElfToolArgs): Promise<strin
     results = await deps.search.searchAll(args.query, options)
   }
 
+  await Promise.allSettled(
+    results
+      .filter((result) => result.type === "learning")
+      .map(async (result) => {
+        const learning = result.entry as { id: string }
+        await deps.storage.incrementTimesConsulted(learning.id)
+      })
+  )
+
   return JSON.stringify({
     results: results.map((r) => ({
       id: (r.entry as { id: string }).id,

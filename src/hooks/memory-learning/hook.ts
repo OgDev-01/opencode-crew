@@ -1,4 +1,4 @@
-import type { IMemoryStorage, Learning, LearningType } from "@/features/memory/types"
+import type { IMemoryStorage, Learning, LearningType, MemoryScope } from "@/features/memory/types"
 import type { AutoCaptureConfig } from "@/config/schema/memory"
 import { filterContent, shouldSkipTool } from "@/features/memory/privacy-filter"
 import { log } from "@/shared/logger"
@@ -8,6 +8,7 @@ export interface MemoryLearningDeps {
   storage: IMemoryStorage
   privacyTags?: string[]
   autoCapture?: AutoCaptureConfig
+  scope?: MemoryScope
 }
 
 type HookInput = { tool: string; sessionID: string; callID: string }
@@ -110,15 +111,16 @@ function buildSummary(tool: string, output: string): string {
   return `${tool}: ${firstLine.slice(0, 100)}`
 }
 
-function computeHash(tool: string, sessionID: string, summary: string): string {
+function computeHash(tool: string, sessionID: string, scope: string, summary: string): string {
   const hasher = new Bun.CryptoHasher("sha256")
-  hasher.update(`${tool}:${sessionID}:${summary.slice(0, 100)}`)
+  hasher.update(`${tool}:${sessionID}:${scope}:${summary.slice(0, 100)}`)
   return hasher.digest("hex")
 }
 
 export function createMemoryLearningHook(deps: MemoryLearningDeps) {
   const seenHashes = new Set<string>()
   const privacyTags = deps.privacyTags ?? []
+  const scope = deps.scope ?? "project"
 
   return {
     "tool.execute.after": async (input: HookInput, output: HookOutput): Promise<void> => {
@@ -126,7 +128,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
       if (!shouldCapture(input.tool, output, deps.autoCapture)) return
 
       const summary = buildSummary(input.tool, output!.output)
-      const contextHash = computeHash(input.tool, input.sessionID, summary)
+      const contextHash = computeHash(input.tool, input.sessionID, scope, summary)
 
       if (seenHashes.has(contextHash)) return
       seenHashes.add(contextHash)
@@ -140,7 +142,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
         summary,
         context: filteredContext,
         tool_name: input.tool,
-        domain: "tool-execution",
+        domain: scope,
         tags: [input.tool.toLowerCase()],
         utility_score: 0.5,
         times_consulted: 0,

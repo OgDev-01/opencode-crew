@@ -1,13 +1,14 @@
 import type { AutoCaptureConfig } from "@/config/schema/memory"
 import { subagentSessions } from "@/features/claude-code-session-state"
 import { filterContent } from "@/features/memory/privacy-filter"
-import type { IMemoryStorage } from "@/features/memory/types"
+import type { IMemoryStorage, MemoryScope } from "@/features/memory/types"
 import { log } from "@/shared/logger"
 
 export interface MemoryDecisionDetectionDeps {
   storage: IMemoryStorage
   autoCapture?: AutoCaptureConfig
   privacyTags?: string[]
+  scope?: MemoryScope
 }
 
 type HookInput = {
@@ -88,6 +89,7 @@ function computeHash(sessionID: string, summary: string): string {
 export function createMemoryDecisionDetectionHook(deps: MemoryDecisionDetectionDeps) {
   const seenHashes = new Set<string>()
   const privacyTags = deps.privacyTags ?? []
+  const scope = deps.scope ?? "project"
 
   return {
     "chat.message": async (input: HookInput, output: HookOutput): Promise<void> => {
@@ -113,7 +115,7 @@ export function createMemoryDecisionDetectionHook(deps: MemoryDecisionDetectionD
         await deps.storage.addGoldenRule({
           id: crypto.randomUUID(),
           rule: filteredSummary,
-          domain: "session",
+          domain: scope,
           confidence: 0.8,
           times_validated: 0,
           times_violated: 0,

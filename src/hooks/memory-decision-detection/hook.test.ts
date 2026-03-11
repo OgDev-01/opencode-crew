@@ -58,7 +58,27 @@ describe("memory-decision-detection hook", () => {
       expect(storage.goldenRules).toHaveLength(1)
       expect(storage.goldenRules[0].rule).toBe("Preference: Let's use TypeScript")
       expect(storage.goldenRules[0].confidence).toBe(0.8)
-      expect(storage.goldenRules[0].domain).toBe("session")
+      expect(storage.goldenRules[0].domain).toBe("project")
+    })
+  })
+
+  describe("#given custom memory scope is global", () => {
+    test("captures golden rule in the configured scope", async () => {
+      //#given
+      const hook = createMemoryDecisionDetectionHook({ storage, scope: "global" })
+
+      //#when
+      await hook["chat.message"](
+        { sessionID: "ses_scope" },
+        {
+          message: { role: "user" },
+          parts: [{ type: "text", text: "let's use TypeScript" }],
+        }
+      )
+
+      //#then
+      expect(storage.goldenRules).toHaveLength(1)
+      expect(storage.goldenRules[0].domain).toBe("global")
     })
   })
 

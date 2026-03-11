@@ -27,6 +27,7 @@ import {
   createRuntimeFallbackHook,
   createMemoryLearningHook,
   createMemoryDecisionDetectionHook,
+  flushPendingMemories,
 } from "@/hooks"
 import { createAnthropicEffortHook } from "@/hooks/anthropic-effort"
 import {
@@ -76,6 +77,22 @@ export function createSessionHooks(args: {
 }): SessionHooks {
   const { ctx, pluginConfig, modelCacheState, isHookEnabled, safeHookEnabled } = args
 
+  const flushBeforeSummarize = async (sessionID: string): Promise<void> => {
+    if (pluginConfig.memory?.enabled === false) return
+    if (pluginConfig.memory?.auto_capture?.pre_compaction_flush === false) return
+
+    try {
+      const { getMemoryManager } = require("../../features/memory/manager")
+      const manager = getMemoryManager()
+      await flushPendingMemories(() => manager.onIdle(), pluginConfig.memory?.auto_capture)
+    } catch (error) {
+      log("[memory-pre-compaction-flush] Failed to wire runtime flush", {
+        sessionID,
+        error: error instanceof Error ? error.message : String(error),
+      })
+    }
+  }
+
   const contextWindowMonitor = hookSlot("context-window-monitor", () => createContextWindowMonitorHook(ctx, modelCacheState), isHookEnabled, safeHookEnabled)
 
   // OUTLIER: Double gate - requires both hook enabled AND experimental config flag
@@ -84,7 +101,7 @@ export function createSessionHooks(args: {
     pluginConfig.experimental?.preemptive_compaction
       ? safeCreateHook(
           "preemptive-compaction",
-          () => createPreemptiveCompactionHook(ctx, pluginConfig, modelCacheState),
+          () => createPreemptiveCompactionHook(ctx, pluginConfig, modelCacheState, { beforeSummarize: flushBeforeSummarize }),
           { enabled: safeHookEnabled },
         )
       : null
@@ -180,7 +197,7 @@ export function createSessionHooks(args: {
       )
     : null
 
-  const anthropicContextWindowLimitRecovery = hookSlot("anthropic-context-window-limit-recovery", () => createAnthropicContextWindowLimitRecoveryHook(ctx, { experimental: pluginConfig.experimental, pluginConfig }), isHookEnabled, safeHookEnabled)
+  const anthropicContextWindowLimitRecovery = hookSlot("anthropic-context-window-limit-recovery", () => createAnthropicContextWindowLimitRecoveryHook(ctx, { experimental: pluginConfig.experimental, pluginConfig, beforeSummarize: flushBeforeSummarize }), isHookEnabled, safeHookEnabled)
   const autoUpdateChecker = hookSlot("auto-update-checker", () => createAutoUpdateCheckerHook(ctx, { showStartupToast: isHookEnabled("startup-toast"), isCaptainEnabled: pluginConfig.captain_agent?.disabled !== true, autoUpdate: pluginConfig.auto_update ?? true }), isHookEnabled, safeHookEnabled)
   const agentUsageReminder = hookSlot("agent-usage-reminder", () => createAgentUsageReminderHook(ctx), isHookEnabled, safeHookEnabled)
   const nonInteractiveEnv = hookSlot("non-interactive-env", () => createNonInteractiveEnvHook(ctx), isHookEnabled, safeHookEnabled)

@@ -15,9 +15,10 @@ export async function runSummarizeRetryStrategy(params: {
   autoCompactState: AutoCompactState
   client: Client
   directory: string
-  pluginConfig: OpenCodeCrewConfig
+  pluginConfig?: OpenCodeCrewConfig
   errorType?: string
   messageIndex?: number
+  beforeSummarize?: (sessionID: string) => Promise<void>
 }): Promise<void> {
   const retryState = getOrCreateRetryState(params.autoCompactState, params.sessionID)
   const now = Date.now()
@@ -102,13 +103,18 @@ export async function runSummarizeRetryStrategy(params: {
           .catch(() => {})
 
         const { providerID: targetProviderID, modelID: targetModelID } = resolveCompactionModel(
-          params.pluginConfig,
+          params.pluginConfig ?? {},
           params.sessionID,
           providerID,
           modelID
         )
 
         const summarizeBody = { providerID: targetProviderID, modelID: targetModelID, auto: true }
+        if (params.beforeSummarize) {
+          try {
+            await params.beforeSummarize(params.sessionID)
+          } catch {}
+        }
         await params.client.session.summarize({
           path: { id: params.sessionID },
           body: summarizeBody as never,

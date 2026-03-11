@@ -52,4 +52,4 @@ export { createMemoryLearningHook, type MemoryLearningDeps } from "./memory-lear
 export { createMemoryDecisionDetectionHook, type MemoryDecisionDetectionDeps } from "./memory-decision-detection"
 export { createMemoryInjectionHook, type MemoryInjectionDeps } from "./memory-injection"
 export { createHeartbeatPrunerHook } from "./heartbeat-pruner"
-export { createMemoryPreCompactionFlushHook, type MemoryPreCompactionFlushDeps } from "./memory-pre-compaction-flush"
+export { createMemoryPreCompactionFlushHook, flushPendingMemories, type MemoryPreCompactionFlushDeps } from "./memory-pre-compaction-flush"

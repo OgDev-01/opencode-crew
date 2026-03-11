@@ -70,7 +70,16 @@ export interface MemoryConfig {
   consolidation_threshold: number
   cleanup_threshold: number
   retention_days: number
+  similarity_threshold: number
+  max_golden_rules_injected: number
+  max_learnings_injected: number
+  max_injection_tokens: number
+  ttl_learnings_days: number
+  golden_rule_confidence_threshold: number
+  golden_rule_validation_count: number
   project_db_path?: string
+  global_db_path?: string
+  dynamic_prompts_enabled: boolean
 }
 
 /**

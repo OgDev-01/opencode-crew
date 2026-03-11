@@ -105,6 +105,14 @@ describe("Memory System Types", () => {
           consolidation_threshold: 5,
           cleanup_threshold: 30,
           retention_days: 90,
+          similarity_threshold: 0.7,
+          max_golden_rules_injected: 5,
+          max_learnings_injected: 10,
+          max_injection_tokens: 500,
+          ttl_learnings_days: 60,
+          golden_rule_confidence_threshold: 0.9,
+          golden_rule_validation_count: 10,
+          dynamic_prompts_enabled: true,
         }
         expect(config.enabled).toBe(true)
       })

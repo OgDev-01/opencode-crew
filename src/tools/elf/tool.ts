@@ -112,19 +112,19 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       status: "rejected",
     })
   }
-  const hash = deps.computeContextHash(entryType, scope, filtered)
   const shouldDeduplicate = entryType !== "golden_rule"
-  const existingId = shouldDeduplicate ? deps.findExistingByHash(hash, deps.db) : null
+  const hash = shouldDeduplicate ? deps.computeContextHash(entryType, scope, filtered) : null
+  const existingId = hash ? deps.findExistingByHash(hash, deps.db) : null
 
   if (shouldDeduplicate && existingId) {
     return JSON.stringify({ deduplicated: true, existingId, status: "duplicate" })
   }
 
-  let id: string | null = null
+  const id = crypto.randomUUID()
 
   if (entryType === "golden_rule") {
     await deps.storage.addGoldenRule({
-      id: "",
+      id,
       rule: filtered,
       domain: scope,
       confidence: 0.9,
@@ -134,10 +134,9 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       created_at: "",
       updated_at: "",
     })
-    id = getLatestGoldenRuleId(filtered, scope, deps.db)
   } else {
     await deps.storage.addLearning({
-      id: "",
+      id,
       type: mapToLearningType(entryType),
       summary: filtered,
       context: "",
@@ -146,35 +145,14 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       tags: [],
       utility_score: 0.5,
       times_consulted: 0,
-      context_hash: hash,
+      context_hash: hash!,
       confidence: 0.7,
       created_at: "",
       updated_at: "",
     })
-    id = getLearningIdByHash(hash, deps.db)
-  }
-
-  if (!id) {
-    return JSON.stringify({ error: "failed to resolve inserted memory id", status: "error" })
   }
 
   return JSON.stringify({ id, status: "added", deduplicated: false })
-}
-
-function getLatestGoldenRuleId(rule: string, scope: MemoryScope, db: Database): string | null {
-  const row = db
-    .prepare("SELECT id FROM golden_rules WHERE rule = ? AND domain = ? ORDER BY rowid DESC LIMIT 1")
-    .get(rule, scope) as { id: string } | null
-
-  return row?.id ?? null
-}
-
-function getLearningIdByHash(hash: string, db: Database): string | null {
-  const row = db
-    .prepare("SELECT id FROM learnings WHERE context_hash = ? ORDER BY rowid DESC LIMIT 1")
-    .get(hash) as { id: string } | null
-
-  return row?.id ?? null
 }
 
 async function handleMetrics(deps: ElfToolDeps): Promise<string> {

@@ -111,7 +111,16 @@ export function createPreemptiveCompactionHook(
     compactionInProgress.add(sessionID)
 
     try {
-      await deps?.beforeSummarize?.(sessionID)
+      if (deps?.beforeSummarize) {
+        try {
+          await deps.beforeSummarize(sessionID)
+        } catch (error) {
+          log("[preemptive-compaction] beforeSummarize failed (continuing to summarize)", {
+            sessionID,
+            error: String(error),
+          })
+        }
+      }
 
       const { providerID: targetProviderID, modelID: targetModelID } = resolveCompactionModel(
         pluginConfig,

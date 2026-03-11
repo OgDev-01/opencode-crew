@@ -128,10 +128,14 @@ describe("Memory System Types", () => {
         const storage: IMemoryStorage = {
           addLearning: async () => {},
           getLearning: async () => null,
+          getLearningsByScope: async () => [],
+          incrementTimesConsulted: async () => {},
           updateLearning: async () => {},
           deleteLearning: async () => {},
           addGoldenRule: async () => {},
           getGoldenRules: async () => [],
+          getGoldenRulesByScope: async () => [],
+          deleteGoldenRule: async () => {},
           getStats: async () => ({ learnings: 0, goldenRules: 0 }),
         }
         expect(storage).toBeDefined()
@@ -140,6 +144,7 @@ describe("Memory System Types", () => {
       test("should have IMemorySearch interface with search method", () => {
         const search: IMemorySearch = {
           search: async () => [],
+          searchLearnings: async () => [],
         }
         expect(search).toBeDefined()
       })

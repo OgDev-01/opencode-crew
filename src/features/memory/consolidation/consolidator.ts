@@ -32,6 +32,11 @@ export interface IConsolidationService {
   consolidateAll(): Promise<ConsolidationResult>
 }
 
+interface ConsolidationConfig {
+  minConfidence?: number
+  minValidationCount?: number
+}
+
 const DAY_MS = 86400000
 
 function zeroResult(): ConsolidationResult {
@@ -44,10 +49,14 @@ function normalizeRule(summary: string): string {
   return `Always ${body}`
 }
 
-function isCandidate(learning: ConsolidationLearning, now: number): boolean {
+function isCandidate(
+  learning: ConsolidationLearning,
+  now: number,
+  config: Required<ConsolidationConfig>
+): boolean {
   const accessCount = learning.access_count ?? learning.times_consulted
   const ageMs = now - new Date(learning.created_at).getTime()
-  return learning.utility_score > 0.9 && accessCount >= 10 && ageMs > 7 * DAY_MS && !learning.promoted
+  return learning.utility_score >= config.minConfidence && accessCount >= config.minValidationCount && ageMs > 7 * DAY_MS && !learning.promoted
 }
 
 function learningFromResult(result: MemorySearchResult): ConsolidationLearning | null {
@@ -69,12 +78,18 @@ function lowestByScore<T extends { utility_score?: number; confidence?: number; 
 
 export function createConsolidationService(
   storage: IMemoryStorage,
-  search: ISearchService
+  search: ISearchService,
+  config?: ConsolidationConfig
 ): IConsolidationService {
+  const thresholds: Required<ConsolidationConfig> = {
+    minConfidence: config?.minConfidence ?? 0.9,
+    minValidationCount: config?.minValidationCount ?? 10,
+  }
+
   const consolidate = async (scope: MemoryScope): Promise<ConsolidationResult> => {
     const result = zeroResult()
     const allLearnings = await storage.getLearningsByScope(scope)
-    const candidates = allLearnings.filter((learning) => isCandidate(learning, Date.now()))
+    const candidates = allLearnings.filter((learning) => isCandidate(learning, Date.now(), thresholds))
     const consumed = new Set<string>()
 
     for (const candidate of candidates) {

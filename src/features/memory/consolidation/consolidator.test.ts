@@ -209,4 +209,49 @@ describe("#given consolidation service", () => {
       })
     })
   })
+
+  describe("#when custom consolidation thresholds are lower", () => {
+    describe("#then it promotes learnings using configured confidence and validation counts", () => {
+      it("promotes candidates that would not pass the default thresholds", async () => {
+        const projectLearnings: ConsolidationLearning[] = [
+          createLearning({ id: "c1", summary: "Prefer short feedback loops", utility_score: 0.8, times_consulted: 3 }),
+          createLearning({ id: "c2", summary: "Prefer short dev feedback loops", utility_score: 0.8, times_consulted: 3 }),
+          createLearning({ id: "c3", summary: "Prefer fast feedback loops during development", utility_score: 0.8, times_consulted: 3 }),
+        ]
+        const rules: ConsolidationRule[] = []
+
+        const storage: TestStorage = {
+          async getLearningsByScope() {
+            return projectLearnings
+          },
+          async updateLearning(id, updates) {
+            const target = projectLearnings.find((item) => item.id === id)
+            if (target) Object.assign(target, updates)
+          },
+          async deleteLearning() {},
+          async getGoldenRulesByScope() {
+            return rules
+          },
+          async addGoldenRule(rule) {
+            rules.push(rule)
+          },
+          async deleteGoldenRule() {},
+        }
+
+        const search = {
+          async searchLearnings(): Promise<MemorySearchResult[]> {
+            return projectLearnings.map((entry) => ({ entry, score: 0.8, type: "learning" as const }))
+          },
+        }
+
+        const result = await createConsolidationService(storage, search, {
+          minConfidence: 0.75,
+          minValidationCount: 3,
+        }).consolidate("project")
+
+        expect(result.synthesized).toBe(1)
+        expect(result.promoted).toBe(3)
+      })
+    })
+  })
 })

@@ -27,6 +27,14 @@ const makeConfig = (dbPath: string): MemoryConfig => ({
   consolidation_threshold: 3,
   cleanup_threshold: 50,
   retention_days: 120,
+  similarity_threshold: 0.7,
+  max_golden_rules_injected: 5,
+  max_learnings_injected: 10,
+  max_injection_tokens: 500,
+  ttl_learnings_days: 60,
+  golden_rule_confidence_threshold: 0.9,
+  golden_rule_validation_count: 10,
+  dynamic_prompts_enabled: true,
   project_db_path: dbPath,
 })
 

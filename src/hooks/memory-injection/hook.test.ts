@@ -270,6 +270,71 @@ describe("createMemoryInjectionHook", () => {
     })
   })
 
+  describe("#given dynamic prompts are disabled via config", () => {
+    describe("#when memories are available", () => {
+      it("#then skips injection entirely", async () => {
+        //#given
+        const search = createMockSearch({
+          searchGoldenRules: async () => [goldenRuleResult("Always test")],
+        })
+        const hook = createMemoryInjectionHook({
+          search,
+          collector: mockCollector,
+          config: { enabled: false },
+        })
+
+        const input = {}
+        const output: TransformOutput = { messages: [msg("user", "hello")] }
+
+        //#when
+        await hook["experimental.chat.messages.transform"](input, output)
+
+        //#then
+        expect(mockCollector.registered).toHaveLength(0)
+      })
+    })
+  })
+
+  describe("#given configured injection limits and similarity threshold", () => {
+    describe("#when searches run for injection", () => {
+      it("#then uses configured max results and relevance threshold", async () => {
+        //#given
+        let capturedGoldenOptions: { maxResults: number } | null = null
+        let capturedAllOptions: { maxResults: number; minRelevance: number; halfLifeDays: number } | null = null
+        const search = createMockSearch({
+          searchGoldenRules: async (_query, options) => {
+            capturedGoldenOptions = options
+            return [goldenRuleResult("Always use tests")]
+          },
+          searchAll: async (_query, options) => {
+            capturedAllOptions = options
+            return [learningResult("Use focused assertions")]
+          },
+        })
+        const hook = createMemoryInjectionHook({
+          search,
+          collector: mockCollector,
+          config: {
+            maxTokens: 400,
+            maxGoldenRules: 2,
+            maxLearnings: 3,
+            minRelevance: 0.55,
+          },
+        })
+
+        const input = {}
+        const output: TransformOutput = { messages: [msg("user", "how do I test?")] }
+
+        //#when
+        await hook["experimental.chat.messages.transform"](input, output)
+
+        //#then
+        expect(capturedGoldenOptions).toEqual({ maxResults: 2 })
+        expect(capturedAllOptions).toEqual({ maxResults: 3, minRelevance: 0.55, halfLifeDays: 60 })
+      })
+    })
+  })
+
   describe("#given token budget enforcement", () => {
     describe("#when injection block exceeds maxTokens (500 default)", () => {
       it("#then trims learnings to fit within budget", async () => {

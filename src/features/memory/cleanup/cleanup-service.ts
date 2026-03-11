@@ -11,6 +11,10 @@ export interface ICleanupService {
   cleanup(options?: { dryRun?: boolean }): Promise<CleanupReport>
 }
 
+interface CleanupConfig {
+  learningTtlDays?: number
+}
+
 interface UtilityScorerFunctions {
   applyTemporalDecay(score: number, daysSinceLastAccess: number): number
   isEvictionCandidate(score: number, daysSinceLastAccess: number): boolean
@@ -25,7 +29,8 @@ const TTL_DAYS = {
 export function createCleanupService(
   storage: IMemoryStorage,
   scorer: UtilityScorerFunctions,
-  db?: Database
+  db?: Database,
+  config?: CleanupConfig
 ): ICleanupService {
   return {
     async cleanup(options?: { dryRun?: boolean }): Promise<CleanupReport> {
@@ -55,7 +60,7 @@ export function createCleanupService(
         const daysSinceLastAccess = (now - lastAccessTime) / 86400000
 
         const type = learning.type as keyof typeof TTL_DAYS
-        const ttl = TTL_DAYS[type] ?? 90
+        const ttl = config?.learningTtlDays ?? TTL_DAYS[type] ?? 90
 
         if (daysSinceLastAccess >= ttl) {
           expired++

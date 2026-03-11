@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite"
 import { tool } from "@opencode-ai/plugin"
-import type { IMemoryStorage, LearningType, MemoryScope } from "@/features/memory/types"
+import type { GoldenRule, IMemoryStorage, Learning, LearningType, MemoryScope } from "@/features/memory/types"
 import type { SearchOptions } from "@/features/memory/search/search-service"
 import type { MemorySearchResult } from "@/features/memory/types"
 import { isLikelyMemoryDump } from "@/features/memory/memory-dump-detector"
@@ -232,7 +232,7 @@ async function handleUpdateRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
     if (!existing) {
       return JSON.stringify({ error: `Golden rule not found: ${args.id}`, status: "not_found" })
     }
-    const updates: Record<string, string> = { rule: filtered }
+    const updates: Partial<GoldenRule> = { rule: filtered }
     if (args.scope) updates.domain = args.scope
     await deps.storage.updateGoldenRule(args.id, updates)
     return JSON.stringify({ id: args.id, status: "updated", type: "golden_rule" })
@@ -243,7 +243,7 @@ async function handleUpdateRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
     if (!existing) {
       return JSON.stringify({ error: `Learning not found: ${args.id}`, status: "not_found" })
     }
-    const updates: Record<string, string> = { summary: filtered }
+    const updates: Partial<Learning> = { summary: filtered }
     if (args.scope) updates.domain = args.scope
     await deps.storage.updateLearning(args.id, updates)
     return JSON.stringify({ id: args.id, status: "updated", type: "learning" })
@@ -252,7 +252,7 @@ async function handleUpdateRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
   // Auto-detect: try learning first, then golden rule
   const learning = await deps.storage.getLearning(args.id)
   if (learning) {
-    const updates: Record<string, string> = { summary: filtered }
+    const updates: Partial<Learning> = { summary: filtered }
     if (args.scope) updates.domain = args.scope
     await deps.storage.updateLearning(args.id, updates)
     return JSON.stringify({ id: args.id, status: "updated", type: "learning" })
@@ -260,7 +260,7 @@ async function handleUpdateRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
 
   const goldenRule = await deps.storage.getGoldenRule(args.id)
   if (goldenRule) {
-    const updates: Record<string, string> = { rule: filtered }
+    const updates: Partial<GoldenRule> = { rule: filtered }
     if (args.scope) updates.domain = args.scope
     await deps.storage.updateGoldenRule(args.id, updates)
     return JSON.stringify({ id: args.id, status: "updated", type: "golden_rule" })

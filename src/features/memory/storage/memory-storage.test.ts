@@ -258,9 +258,9 @@ describe("#given memory storage", () => {
       })
 
       it("throws for non-existent ID", async () => {
-        expect(async () => {
-          await storage.updateGoldenRule("non-existent-rule", { rule: "New text" })
-        }).toThrow()
+        await expect(
+          storage.updateGoldenRule("non-existent-rule", { rule: "New text" })
+        ).rejects.toThrow()
       })
     })
   })

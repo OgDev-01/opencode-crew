@@ -9,6 +9,8 @@ function mapToLearningType(input: string): LearningType {
   if (input === "success" || input === "failure" || input === "observation") return input
   return "observation"
 }
+const VALID_MEMORY_TYPES = ["golden_rule", "learning"] as const
+
 
 export interface ElfToolDeps {
   storage: IMemoryStorage
@@ -52,7 +54,7 @@ export function createElfTool(deps: ElfToolDeps) {
       type: tool.schema.string().optional().describe("Memory type filter or entry type"),
       scope: tool.schema.string().optional().describe("project or global scope"),
       limit: tool.schema.number().optional().describe("Max results for search"),
-      content: tool.schema.string().optional().describe("Content for add-rule action"),
+      content: tool.schema.string().optional().describe("Content for add-rule and update-rule actions"),
       id: tool.schema.string().optional().describe("Memory item ID for delete/update operations"),
     },
     async execute(args: ElfToolArgs) {
@@ -177,6 +179,10 @@ async function handleDeleteRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
     return JSON.stringify({ error: "id is required for delete-rule action" })
   }
 
+  if (args.type && !VALID_MEMORY_TYPES.includes(args.type as typeof VALID_MEMORY_TYPES[number])) {
+    return JSON.stringify({ error: `Unsupported type: ${args.type}. Valid types: ${VALID_MEMORY_TYPES.join(", ")}`, status: "error" })
+  }
+
   if (args.type === "golden_rule") {
     const existing = await deps.storage.getGoldenRule(args.id)
     if (!existing) {
@@ -217,6 +223,10 @@ async function handleUpdateRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<s
   }
   if (!args.content) {
     return JSON.stringify({ error: "content is required for update-rule action" })
+  }
+
+  if (args.type && !VALID_MEMORY_TYPES.includes(args.type as typeof VALID_MEMORY_TYPES[number])) {
+    return JSON.stringify({ error: `Unsupported type: ${args.type}. Valid types: ${VALID_MEMORY_TYPES.join(", ")}`, status: "error" })
   }
 
   const filtered = deps.filterContent(args.content, PRIVACY_TAGS)

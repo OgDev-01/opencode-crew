@@ -575,4 +575,33 @@ describe("createMemoryInjectionHook", () => {
       })
     })
   })
+
+  describe("#given getUsage needs the resolved sessionID", () => {
+    describe("#when transform runs with a concrete session id", () => {
+      it("#then passes that session id into getUsage", async () => {
+        //#given
+        let capturedSessionID = ""
+        const search = createMockSearch({
+          searchGoldenRules: async () => [goldenRuleResult("Rule")],
+        })
+        const hook = createMemoryInjectionHook({
+          search,
+          collector: mockCollector,
+          getUsage: (sessionID: string) => {
+            capturedSessionID = sessionID
+            return { usedTokens: 1000, remainingTokens: 9000, usagePercentage: 0.1 }
+          },
+        })
+
+        const input = {}
+        const output: TransformOutput = { messages: [msg("user", "hello", "ses-usage")] }
+
+        //#when
+        await hook["experimental.chat.messages.transform"](input, output)
+
+        //#then
+        expect(capturedSessionID).toBe("ses-usage")
+      })
+    })
+  })
 })

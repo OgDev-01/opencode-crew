@@ -1,5 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import { createSystemDirective, SystemDirectiveTypes } from "@/shared/hook-utils/system-directive"
+import { cacheSessionTokenUsage, clearSessionTokenUsage, getSessionContextUsage } from "./session-usage-cache"
+import type { TokenInfo } from "./session-usage-cache"
 
 const ANTHROPIC_DISPLAY_LIMIT = 1_000_000
 const DEFAULT_ANTHROPIC_ACTUAL_LIMIT = 200_000
@@ -23,28 +25,11 @@ You are using Anthropic Claude with 1M context window.
 You have plenty of context remaining - do NOT rush or skip tasks.
 Complete your work thoroughly and methodically.`
 
-interface TokenInfo {
-  input: number
-  output: number
-  reasoning: number
-  cache: { read: number; write: number }
-}
-
-interface CachedTokenState {
-  providerID: string
-  tokens: TokenInfo
-}
-
-function isAnthropicProvider(providerID: string): boolean {
-  return providerID === "anthropic" || providerID === "google-vertex-anthropic"
-}
-
 export function createContextWindowMonitorHook(
   _ctx: PluginInput,
   modelCacheState?: ModelCacheStateLike,
 ) {
   const remindedSessions = new Set<string>()
-  const tokenCache = new Map<string, CachedTokenState>()
 
   const toolExecuteAfter = async (
     input: { tool: string; sessionID: string; callID: string },
@@ -54,25 +39,20 @@ export function createContextWindowMonitorHook(
 
     if (remindedSessions.has(sessionID)) return
 
-    const cached = tokenCache.get(sessionID)
-    if (!cached) return
-
-    if (!isAnthropicProvider(cached.providerID)) return
-
-    const lastTokens = cached.tokens
-    const totalInputTokens = (lastTokens?.input ?? 0) + (lastTokens?.cache?.read ?? 0)
+    const usage = getSessionContextUsage(sessionID)
+    if (!usage) return
 
     const actualUsagePercentage =
-      totalInputTokens / getAnthropicActualLimit(modelCacheState)
+      usage.usedTokens / getAnthropicActualLimit(modelCacheState)
 
     if (actualUsagePercentage < CONTEXT_WARNING_THRESHOLD) return
 
     remindedSessions.add(sessionID)
 
-    const displayUsagePercentage = totalInputTokens / ANTHROPIC_DISPLAY_LIMIT
+    const displayUsagePercentage = usage.usedTokens / ANTHROPIC_DISPLAY_LIMIT
     const usedPct = (displayUsagePercentage * 100).toFixed(1)
     const remainingPct = ((1 - displayUsagePercentage) * 100).toFixed(1)
-    const usedTokens = totalInputTokens.toLocaleString()
+    const usedTokens = usage.usedTokens.toLocaleString()
     const limitTokens = ANTHROPIC_DISPLAY_LIMIT.toLocaleString()
 
     output.output += `\n\n${CONTEXT_REMINDER}
@@ -86,7 +66,7 @@ export function createContextWindowMonitorHook(
       const sessionInfo = props?.info as { id?: string } | undefined
       if (sessionInfo?.id) {
         remindedSessions.delete(sessionInfo.id)
-        tokenCache.delete(sessionInfo.id)
+        clearSessionTokenUsage(sessionInfo.id)
       }
     }
 
@@ -102,10 +82,12 @@ export function createContextWindowMonitorHook(
       if (!info || info.role !== "assistant" || !info.finish) return
       if (!info.sessionID || !info.providerID || !info.tokens) return
 
-      tokenCache.set(info.sessionID, {
-        providerID: info.providerID,
-        tokens: info.tokens,
-      })
+      cacheSessionTokenUsage(
+        info.sessionID,
+        info.providerID,
+        info.tokens,
+        getAnthropicActualLimit(modelCacheState)
+      )
     }
   }
 

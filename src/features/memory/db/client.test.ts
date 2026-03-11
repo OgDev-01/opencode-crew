@@ -7,6 +7,7 @@ import {
   getConfiguredDb,
   getProjectDb,
   initializeDatabase,
+  resolveConfiguredDbPath,
 } from "./client"
 
 describe("#given database client", () => {
@@ -93,14 +94,33 @@ describe("#given database client", () => {
       expect(row.one).toBe(1)
     })
 
-    it("#then uses custom global_db_path with home expansion", () => {
+    it("#then uses relative global_db_path relative to project root", () => {
       const projectRoot = mkdtempSync(join(tmpdir(), "memory-configured-global-"))
       createdDirs.push(projectRoot)
 
-      const db = getConfiguredDb(projectRoot, "global", undefined, "~/.opencode/elf/test-memory.db")
+      const db = getConfiguredDb(projectRoot, "global", undefined, "shared/global-memory.db")
+      const expectedDbPath = join(projectRoot, "shared", "global-memory.db")
+
+      expect(existsSync(expectedDbPath)).toBe(true)
       const row = db.prepare("SELECT 1 as one").get() as { one: number }
 
       expect(row.one).toBe(1)
+    })
+
+    it("#then resolves home-prefixed paths without opening a real home db", () => {
+      const projectRoot = mkdtempSync(join(tmpdir(), "memory-configured-home-"))
+      createdDirs.push(projectRoot)
+
+      const resolvedPath = resolveConfiguredDbPath(projectRoot, "~/.opencode/elf/test-memory.db", ".opencode/elf/memory.db")
+      expect(resolvedPath).toBe(join(require("node:os").homedir(), ".opencode", "elf", "test-memory.db"))
+    })
+
+    it("#then preserves :memory: paths", () => {
+      const projectRoot = mkdtempSync(join(tmpdir(), "memory-configured-memory-"))
+      createdDirs.push(projectRoot)
+
+      const resolvedPath = resolveConfiguredDbPath(projectRoot, ":memory:", ".opencode/elf/memory.db")
+      expect(resolvedPath).toBe(":memory:")
     })
   })
 

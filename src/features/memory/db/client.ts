@@ -122,6 +122,18 @@ function expandHomePath(dbPath: string): string {
   return dbPath
 }
 
+export function resolveConfiguredDbPath(
+  projectRoot: string,
+  dbPath: string | undefined,
+  fallbackPath: string
+): string {
+  const candidate = dbPath ?? fallbackPath
+  if (!candidate || candidate === ":memory:") return candidate
+  if (candidate.startsWith("~/")) return expandHomePath(candidate)
+  if (candidate.startsWith("/")) return candidate
+  return resolve(projectRoot, candidate)
+}
+
 export function getProjectDb(projectRoot: string): Database {
   const dbDir = join(projectRoot, ".opencode", "elf")
   mkdirSync(dbDir, { recursive: true })
@@ -141,8 +153,8 @@ export function getConfiguredDb(
   globalDbPath?: string
 ): Database {
   const dbPath = scope === "global"
-    ? expandHomePath(globalDbPath ?? "~/.opencode/elf/memory.db")
-    : resolve(projectRoot, projectDbPath ?? ".opencode/elf/memory.db")
+    ? resolveConfiguredDbPath(projectRoot, globalDbPath, "~/.opencode/elf/memory.db")
+    : resolveConfiguredDbPath(projectRoot, projectDbPath, ".opencode/elf/memory.db")
 
   return initializeDatabase(dbPath)
 }

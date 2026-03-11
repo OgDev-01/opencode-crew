@@ -25,10 +25,6 @@ You are using Anthropic Claude with 1M context window.
 You have plenty of context remaining - do NOT rush or skip tasks.
 Complete your work thoroughly and methodically.`
 
-function isAnthropicProvider(providerID: string): boolean {
-  return providerID === "anthropic" || providerID === "google-vertex-anthropic"
-}
-
 export function createContextWindowMonitorHook(
   _ctx: PluginInput,
   modelCacheState?: ModelCacheStateLike,
@@ -86,7 +82,12 @@ export function createContextWindowMonitorHook(
       if (!info || info.role !== "assistant" || !info.finish) return
       if (!info.sessionID || !info.providerID || !info.tokens) return
 
-      cacheSessionTokenUsage(info.sessionID, info.providerID, info.tokens)
+      cacheSessionTokenUsage(
+        info.sessionID,
+        info.providerID,
+        info.tokens,
+        getAnthropicActualLimit(modelCacheState)
+      )
     }
   }
 

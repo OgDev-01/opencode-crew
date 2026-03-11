@@ -37,8 +37,7 @@ describe("#given memory storage", () => {
           .get("Use bun:test for unit tests") as { id: string } | null
 
         expect(row).not.toBeNull()
-        expect(row?.id).not.toBe("caller-provided-id")
-        expect(row?.id).toMatch(/^[0-9a-f-]{36}$/)
+        expect(row?.id).toBe("caller-provided-id")
 
         const learning = await storage.getLearning(row!.id)
         expect(learning?.summary).toBe("Use bun:test for unit tests")
@@ -126,7 +125,7 @@ describe("#given memory storage", () => {
     describe("#then", () => {
       it("filters golden rules by domain and reports counts", async () => {
         await storage.addGoldenRule({
-          id: "ignored",
+          id: "testing-rule-id",
           rule: "Prefer deterministic tests",
           domain: "testing",
           confidence: 0.9,
@@ -137,7 +136,7 @@ describe("#given memory storage", () => {
           updated_at: "",
         })
         await storage.addGoldenRule({
-          id: "ignored",
+          id: "database-rule-id",
           rule: "Batch database writes in transactions",
           domain: "database",
           confidence: 0.8,

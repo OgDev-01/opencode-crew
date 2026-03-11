@@ -134,7 +134,12 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
   return {
     async addLearning(learning) {
       const now = new Date().toISOString()
-      addLearningTx({ ...learning, id: crypto.randomUUID(), created_at: now, updated_at: now })
+      addLearningTx({
+        ...learning,
+        id: learning.id || crypto.randomUUID(),
+        created_at: learning.created_at || now,
+        updated_at: learning.updated_at || now,
+      })
     },
     async getLearning(id) {
       const row = db.prepare("SELECT rowid, * FROM learnings WHERE id = ?").get(id) as LearningRow | null
@@ -148,7 +153,12 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
     },
     async addGoldenRule(rule) {
       const now = new Date().toISOString()
-      addGoldenRuleTx({ ...rule, id: crypto.randomUUID(), created_at: now, updated_at: now })
+      addGoldenRuleTx({
+        ...rule,
+        id: rule.id || crypto.randomUUID(),
+        created_at: rule.created_at || now,
+        updated_at: rule.updated_at || now,
+      })
     },
     async getGoldenRules(domain) {
       const query = domain

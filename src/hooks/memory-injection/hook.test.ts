@@ -32,6 +32,17 @@ function createMockCollector() {
   }
 }
 
+function createConsultTracker() {
+  const consulted: LearningLike[] = []
+  type LearningLike = { id: string; times_consulted: number; summary: string }
+  return {
+    consulted,
+    async record(learning: LearningLike) {
+      consulted.push(learning)
+    },
+  }
+}
+
 type TransformOutput = { messages: Array<{ info: Record<string, unknown>; parts: Array<{ type: string; text?: string }> }> }
 
 function msg(role: string, text: string, sessionID = "ses-1"): TransformOutput["messages"][number] {
@@ -83,9 +94,11 @@ function learningResult(summary: string, score = 0.6): MemorySearchResult {
 
 describe("createMemoryInjectionHook", () => {
   let mockCollector: ReturnType<typeof createMockCollector>
+  let consultTracker: ReturnType<typeof createConsultTracker>
 
   beforeEach(() => {
     mockCollector = createMockCollector()
+    consultTracker = createConsultTracker()
   })
 
   describe("#given subagent session", () => {
@@ -188,6 +201,7 @@ describe("createMemoryInjectionHook", () => {
           search,
           collector: mockCollector,
           getUsage: () => ({ usedTokens: 5000, remainingTokens: 15000, usagePercentage: 0.25 }),
+          recordLearningConsulted: consultTracker.record,
         })
 
         const input = {}
@@ -203,6 +217,10 @@ describe("createMemoryInjectionHook", () => {
         expect(injected.content).toContain("Always use parameterized queries")
         expect(injected.content).toContain("Relevant Learnings")
         expect(injected.content).toContain("Use bun test for running tests")
+        expect(consultTracker.consulted.map((learning) => learning.summary)).toEqual([
+          "Use bun test for running tests",
+          "Mock modules before importing",
+        ])
       })
     })
 

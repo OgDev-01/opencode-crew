@@ -40,6 +40,7 @@ export interface MemoryInjectionDeps {
   getUsage?: () => UsageResult | null
   getMainSessionID?: () => string | undefined
   config?: { maxTokens?: number; goldenRuleMaxTokens?: number }
+  recordLearningConsulted?: (learning: Learning) => Promise<void>
 }
 
 type TransformInput = Record<string, unknown>
@@ -85,10 +86,12 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
           .map((r) => (r.entry as GoldenRule).rule)
           .filter((rule) => !isLikelyMemoryDump(rule))
 
-        const learnings = allResults
-          .filter((r) => r.type === "learning")
-          .map((r) => (r.entry as Learning).summary)
-          .filter((summary) => !isLikelyMemoryDump(summary))
+        const learningEntries = allResults
+          .filter((r): r is MemorySearchResult & { entry: Learning } => r.type === "learning")
+          .map((r) => r.entry as Learning)
+          .filter((learning) => !isLikelyMemoryDump(learning.summary))
+
+        const learnings = learningEntries.map((learning) => learning.summary)
 
         if (goldenRules.length === 0 && learnings.length === 0) return
 
@@ -101,6 +104,14 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
           content: injectionBlock,
           priority: "normal",
         })
+
+        if (deps.recordLearningConsulted) {
+          await Promise.allSettled(
+            learningEntries.map(async (learning) => {
+              await deps.recordLearningConsulted?.(learning)
+            })
+          )
+        }
 
         log("[memory-injection] injected memory context", {
           goldenRules: goldenRules.length,

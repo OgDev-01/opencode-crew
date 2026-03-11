@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import {
+  extractFilePaths,
   filterContent,
   shouldSkipTool,
   shouldSkipFile,
@@ -179,6 +180,30 @@ describe("#given shouldSkipFile", () => {
     it("#then handles full paths with sensitive files", () => {
       expect(shouldSkipFile("/config/prod/.env.production")).toBe(true);
       expect(shouldSkipFile("C:\\project\\credentials.json")).toBe(true);
+    });
+  });
+});
+
+describe("#given extractFilePaths", () => {
+  describe("#when metadata contains common path fields", () => {
+    it("#then returns top-level file path values", () => {
+      const paths = extractFilePaths({
+        filePath: "/tmp/.env",
+        filepath: "/tmp/credentials.json",
+      });
+
+      expect(paths.sort()).toEqual(["/tmp/.env", "/tmp/credentials.json"].sort());
+    });
+
+    it("#then returns nested filediff path values", () => {
+      const paths = extractFilePaths({
+        filediff: {
+          file: "/tmp/private.pem",
+          path: "/tmp/.ssh/id_rsa",
+        },
+      });
+
+      expect(paths.sort()).toEqual(["/tmp/private.pem", "/tmp/.ssh/id_rsa"].sort());
     });
   });
 });

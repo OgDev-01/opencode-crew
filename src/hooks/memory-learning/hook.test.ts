@@ -12,6 +12,9 @@ function createMockStorage(): IMemoryStorage & { learnings: Learning[] } {
     async getLearning(id: string) {
       return learnings.find((l) => l.id === id) ?? null
     },
+    async getLearningsByScope(_scope) {
+      return learnings
+    },
     async updateLearning(id: string, updates: Partial<Learning>) {
       const idx = learnings.findIndex((l) => l.id === id)
       if (idx >= 0) {
@@ -26,6 +29,10 @@ function createMockStorage(): IMemoryStorage & { learnings: Learning[] } {
     async getGoldenRules() {
       return []
     },
+    async getGoldenRulesByScope(_scope) {
+      return []
+    },
+    async deleteGoldenRule(_id: string) {},
     async getStats() {
       return { learnings: learnings.length, goldenRules: 0 }
     },
@@ -57,7 +64,28 @@ describe("memory-learning hook", () => {
       expect(storage.learnings).toHaveLength(1)
       expect(storage.learnings[0].type).toBe("failure")
       expect(storage.learnings[0].tool_name).toBe("Bash")
+      expect(storage.learnings[0].domain).toBe("project")
       expect(storage.learnings[0].summary).toContain("Bash")
+    })
+  })
+
+  describe("#given custom memory scope is global", () => {
+    test("captures learning in the configured scope", async () => {
+      //#given
+      const hook = createMemoryLearningHook({ storage, scope: "global" })
+      const input = { tool: "Bash", sessionID: "ses_scope", callID: "call_scope" }
+      const output = {
+        title: "command failed",
+        output: "Error: module not found",
+        metadata: {} as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+      expect(storage.learnings[0].domain).toBe("global")
     })
   })
 

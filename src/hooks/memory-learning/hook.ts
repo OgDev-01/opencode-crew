@@ -1,4 +1,4 @@
-import type { IMemoryStorage, Learning, LearningType } from "@/features/memory/types"
+import type { IMemoryStorage, Learning, LearningType, MemoryScope } from "@/features/memory/types"
 import type { AutoCaptureConfig } from "@/config/schema/memory"
 import { filterContent, shouldSkipTool } from "@/features/memory/privacy-filter"
 import { log } from "@/shared/logger"
@@ -8,6 +8,7 @@ export interface MemoryLearningDeps {
   storage: IMemoryStorage
   privacyTags?: string[]
   autoCapture?: AutoCaptureConfig
+  scope?: MemoryScope
 }
 
 type HookInput = { tool: string; sessionID: string; callID: string }
@@ -119,6 +120,7 @@ function computeHash(tool: string, sessionID: string, summary: string): string {
 export function createMemoryLearningHook(deps: MemoryLearningDeps) {
   const seenHashes = new Set<string>()
   const privacyTags = deps.privacyTags ?? []
+  const scope = deps.scope ?? "project"
 
   return {
     "tool.execute.after": async (input: HookInput, output: HookOutput): Promise<void> => {
@@ -140,7 +142,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
         summary,
         context: filteredContext,
         tool_name: input.tool,
-        domain: "tool-execution",
+        domain: scope,
         tags: [input.tool.toLowerCase()],
         utility_score: 0.5,
         times_consulted: 0,

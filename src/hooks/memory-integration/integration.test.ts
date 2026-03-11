@@ -99,6 +99,7 @@ function createLifecycleSpies() {
 function createAutoCaptureSystem(args: {
   storage: IMemoryStorage
   autoCapture: AutoCaptureConfig
+  scope?: MemoryScope
   privacyTags?: string[]
   disabledHooks?: HookName[]
   onIdle: () => Promise<void>
@@ -111,6 +112,7 @@ function createAutoCaptureSystem(args: {
         storage: args.storage,
         autoCapture: args.autoCapture,
         privacyTags: args.privacyTags,
+        scope: args.scope,
       })
 
   const decisionHook = disabledHooks.has("memory-decision-detection")
@@ -184,6 +186,7 @@ describe("memory auto-capture integration", () => {
         //#then
         expect(storage.learnings).toHaveLength(1)
         expect(storage.goldenRules).toHaveLength(1)
+        expect(storage.learnings[0].domain).toBe("project")
         expect(storage.goldenRules[0].rule).toBe("Preference: Let's use Bun")
       })
     })

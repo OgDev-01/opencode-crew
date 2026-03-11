@@ -113,11 +113,14 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
     })
   }
   const hash = deps.computeContextHash(entryType, scope, filtered)
-  const existingId = deps.findExistingByHash(hash, deps.db)
+  const shouldDeduplicate = entryType !== "golden_rule"
+  const existingId = shouldDeduplicate ? deps.findExistingByHash(hash, deps.db) : null
 
-  if (existingId) {
+  if (shouldDeduplicate && existingId) {
     return JSON.stringify({ deduplicated: true, existingId, status: "duplicate" })
   }
+
+  let id: string | null = null
 
   if (entryType === "golden_rule") {
     await deps.storage.addGoldenRule({
@@ -131,6 +134,7 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       created_at: "",
       updated_at: "",
     })
+    id = getLatestGoldenRuleId(filtered, scope, deps.db)
   } else {
     await deps.storage.addLearning({
       id: "",
@@ -147,10 +151,30 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       created_at: "",
       updated_at: "",
     })
+    id = getLearningIdByHash(hash, deps.db)
   }
 
-  const id = crypto.randomUUID()
+  if (!id) {
+    return JSON.stringify({ error: "failed to resolve inserted memory id", status: "error" })
+  }
+
   return JSON.stringify({ id, status: "added", deduplicated: false })
+}
+
+function getLatestGoldenRuleId(rule: string, scope: MemoryScope, db: Database): string | null {
+  const row = db
+    .prepare("SELECT id FROM golden_rules WHERE rule = ? AND domain = ? ORDER BY rowid DESC LIMIT 1")
+    .get(rule, scope) as { id: string } | null
+
+  return row?.id ?? null
+}
+
+function getLearningIdByHash(hash: string, db: Database): string | null {
+  const row = db
+    .prepare("SELECT id FROM learnings WHERE context_hash = ? ORDER BY rowid DESC LIMIT 1")
+    .get(hash) as { id: string } | null
+
+  return row?.id ?? null
 }
 
 async function handleMetrics(deps: ElfToolDeps): Promise<string> {

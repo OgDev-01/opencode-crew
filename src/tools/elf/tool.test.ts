@@ -130,6 +130,7 @@ describe("#given ELF tool", () => {
         expect(parsed.id).toBeString()
         expect(parsed.status).toBe("added")
         expect(parsed.deduplicated).toBe(false)
+        expect(await storage.getLearning(parsed.id)).not.toBeNull()
       })
 
       it("adds a golden_rule type", async () => {
@@ -148,6 +149,33 @@ describe("#given ELF tool", () => {
         const parsed = JSON.parse(result as string)
         expect(parsed.id).toBeString()
         expect(parsed.status).toBe("added")
+        const stored = await storage.getGoldenRules("global")
+        expect(stored.some((rule) => rule.id === parsed.id)).toBeTrue()
+      })
+
+      it("does not apply hash-based dedup to golden rules", async () => {
+        const deps = {
+          ...makeDeps(db),
+          findExistingByHash: (_hash: string, _db: Database) => "existing-golden-rule-id",
+        }
+        const tool = createElfTool(deps)
+
+        const result = await tool.execute(
+          {
+            action: "add-rule",
+            content: "Always validate config before startup",
+            type: "golden_rule",
+            scope: "project",
+          },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("added")
+        expect(parsed.deduplicated).toBe(false)
+
+        const stored = await storage.getGoldenRules("project")
+        expect(stored).toHaveLength(1)
       })
 
       it("applies privacy filter before storing", async () => {

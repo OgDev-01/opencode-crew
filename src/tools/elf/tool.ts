@@ -121,16 +121,19 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       status: "rejected",
     })
   }
-  const hash = deps.computeContextHash(entryType, scope, filtered)
-  const existingId = deps.findExistingByHash(hash, deps.db)
+  const shouldDeduplicate = entryType !== "golden_rule"
+  const hash = shouldDeduplicate ? deps.computeContextHash(entryType, scope, filtered) : null
+  const existingId = hash ? deps.findExistingByHash(hash, deps.db) : null
 
-  if (existingId) {
+  if (shouldDeduplicate && existingId) {
     return JSON.stringify({ deduplicated: true, existingId, status: "duplicate" })
   }
 
+  const id = crypto.randomUUID()
+
   if (entryType === "golden_rule") {
     await deps.storage.addGoldenRule({
-      id: "",
+      id,
       rule: filtered,
       domain: scope,
       confidence: 0.9,
@@ -142,7 +145,7 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
     })
   } else {
     await deps.storage.addLearning({
-      id: "",
+      id,
       type: mapToLearningType(entryType),
       summary: filtered,
       context: "",
@@ -151,14 +154,13 @@ async function handleAddRule(deps: ElfToolDeps, args: ElfToolArgs): Promise<stri
       tags: [],
       utility_score: 0.5,
       times_consulted: 0,
-      context_hash: hash,
+      context_hash: hash!,
       confidence: 0.7,
       created_at: "",
       updated_at: "",
     })
   }
 
-  const id = crypto.randomUUID()
   return JSON.stringify({ id, status: "added", deduplicated: false })
 }
 

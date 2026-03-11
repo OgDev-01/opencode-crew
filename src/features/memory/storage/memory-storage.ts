@@ -94,10 +94,7 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
       payload.updated_at,
       id
     )
-    db.prepare("DELETE FROM learnings_fts WHERE rowid = ?").run(existing.rowid)
-    db.prepare(
-      "INSERT INTO learnings_fts(rowid, summary, context, tags, tool_name, domain) VALUES (?, ?, ?, ?, ?, ?)"
-    ).run(existing.rowid, merged.summary, merged.context, payload.tags ?? "", merged.tool_name, merged.domain)
+    db.prepare("INSERT INTO learnings_fts(learnings_fts) VALUES('rebuild')").run()
   })
 
   const incrementTimesConsultedTx = db.transaction((id: string) => {
@@ -120,13 +117,14 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
   const addGoldenRuleTx = db.transaction((rule: GoldenRule) => {
     const payload = toGoldenRuleRow(rule)
     db.prepare(
-      "INSERT INTO golden_rules (id, rule, domain, confidence, times_validated, source_learning_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO golden_rules (id, rule, domain, confidence, times_validated, times_violated, source_learning_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     ).run(
       payload.id,
       payload.rule,
       payload.domain,
       payload.confidence,
       payload.times_validated,
+      payload.times_violated,
       payload.source_learning_ids,
       payload.created_at,
       payload.updated_at
@@ -140,6 +138,33 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
       rule.rule,
       rule.domain
     )
+  })
+
+  const updateGoldenRuleTx = db.transaction((id: string, updates: Partial<GoldenRule>) => {
+    const existing = db.prepare("SELECT rowid, * FROM golden_rules WHERE id = ?").get(id) as GoldenRuleRow | null
+    if (!existing) throw new Error(`Golden rule not found: ${id}`)
+    const now = new Date().toISOString()
+    const merged: GoldenRule = {
+      ...fromGoldenRuleRow(existing),
+      ...updates,
+      id,
+      created_at: existing.created_at,
+      updated_at: now,
+    }
+    const payload = toGoldenRuleRow(merged)
+    db.prepare(
+      "UPDATE golden_rules SET rule = ?, domain = ?, confidence = ?, times_validated = ?, times_violated = ?, source_learning_ids = ?, updated_at = ? WHERE id = ?"
+    ).run(
+      payload.rule,
+      payload.domain,
+      payload.confidence,
+      payload.times_validated,
+      payload.times_violated,
+      payload.source_learning_ids,
+      payload.updated_at,
+      id
+    )
+    db.prepare("INSERT INTO golden_rules_fts(golden_rules_fts) VALUES('rebuild')").run()
   })
 
   return {
@@ -207,6 +232,13 @@ export function createMemoryStorage(db: Database): IMemoryStorage {
       const row = db.prepare("SELECT rowid FROM golden_rules WHERE id = ?").get(id) as { rowid: number } | null
       if (row) db.prepare("DELETE FROM golden_rules_fts WHERE rowid = ?").run(row.rowid)
       db.prepare("DELETE FROM golden_rules WHERE id = ?").run(id)
+    },
+    async getGoldenRule(id) {
+      const row = db.prepare("SELECT rowid, * FROM golden_rules WHERE id = ?").get(id) as GoldenRuleRow | null
+      return row ? fromGoldenRuleRow(row) : null
+    },
+    async updateGoldenRule(id, updates) {
+      updateGoldenRuleTx(id, updates)
     },
   }
 }

@@ -144,6 +144,8 @@ describe("Memory System Types", () => {
           getGoldenRules: async () => [],
           getGoldenRulesByScope: async () => [],
           deleteGoldenRule: async () => {},
+          getGoldenRule: async () => null,
+          updateGoldenRule: async () => {},
           getStats: async () => ({ learnings: 0, goldenRules: 0 }),
         }
         expect(storage).toBeDefined()

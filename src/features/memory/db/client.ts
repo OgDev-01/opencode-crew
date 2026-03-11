@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS golden_rules (
   domain TEXT,
   confidence REAL NOT NULL DEFAULT 0.9,
   times_validated INTEGER DEFAULT 0,
+  times_violated INTEGER DEFAULT 0,
   source_learning_ids TEXT DEFAULT '[]',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))

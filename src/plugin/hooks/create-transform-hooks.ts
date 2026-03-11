@@ -46,7 +46,7 @@ export function createTransformHooks(args: {
 
   const thinkingBlockValidator = hookSlot("thinking-block-validator", () => createThinkingBlockValidatorHook(), isHookEnabled, safeHookEnabled)
 
-  const memoryInjection = hookSlot("memory-injection", () => { try { const { getMemoryManager } = require("../../features/memory/manager"); const manager = getMemoryManager(); return createMemoryInjectionHook({ search: manager.search, collector: contextCollector, getMainSessionID, recordLearningConsulted: async (learning) => { await manager.storage.updateLearning(learning.id, { times_consulted: learning.times_consulted + 1 }) } }) } catch (error) { log(`Failed to initialize memory-injection hook: ${error instanceof Error ? error.message : String(error)}`); return null } }, isHookEnabled, safeHookEnabled)
+  const memoryInjection = hookSlot("memory-injection", () => { try { const { getMemoryManager } = require("../../features/memory/manager"); const manager = getMemoryManager(); return createMemoryInjectionHook({ search: manager.search, collector: contextCollector, getMainSessionID, recordLearningConsulted: async (learning) => { await manager.storage.incrementTimesConsulted(learning.id) } }) } catch (error) { log(`Failed to initialize memory-injection hook: ${error instanceof Error ? error.message : String(error)}`); return null } }, isHookEnabled, safeHookEnabled)
 
   const heartbeatPruner = hookSlot("heartbeat-pruner", () => createHeartbeatPrunerHook(), isHookEnabled, safeHookEnabled)
 

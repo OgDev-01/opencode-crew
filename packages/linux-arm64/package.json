@@ -1,6 +1,6 @@
 {
   "name": "@ogdev/opencode-crew-linux-arm64",
-  "version": "1.2.2-next.17",
+  "version": "1.2.2-next.18",
   "description": "Platform-specific binary for opencode-crew (linux-arm64)",
   "license": "MIT",
   "repository": {

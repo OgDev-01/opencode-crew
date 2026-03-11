@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS golden_rules (
   domain TEXT,
   confidence REAL NOT NULL DEFAULT 0.9,
   times_validated INTEGER DEFAULT 0,
+  times_violated INTEGER DEFAULT 0,
   source_learning_ids TEXT DEFAULT '[]',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -99,6 +100,25 @@ export function initializeDatabase(dbPath: string): Database {
   return db
 }
 
+function getSchemaVersion(db: Database): number {
+  const row = db.prepare("SELECT MAX(version) as v FROM schema_version").get() as { v: number | null } | null
+  return row?.v ?? 0
+}
+
+function runMigrations(db: Database): void {
+  const current = getSchemaVersion(db)
+
+  if (current < 2) {
+    const columns = db.prepare("PRAGMA table_info(golden_rules)").all() as { name: string }[]
+    const hasTimesViolated = columns.some((c) => c.name === "times_violated")
+    if (!hasTimesViolated) {
+      db.exec("ALTER TABLE golden_rules ADD COLUMN times_violated INTEGER DEFAULT 0")
+      log("[memory] Migration v2: added times_violated column to golden_rules")
+    }
+    db.prepare("INSERT OR IGNORE INTO schema_version (version, applied_at) VALUES (2, datetime('now'))").run()
+  }
+}
+
 function openAndValidate(dbPath: string): Database {
   if (dbPath !== ":memory:") {
     mkdirSync(dirname(dbPath), { recursive: true })
@@ -114,6 +134,7 @@ function openAndValidate(dbPath: string): Database {
   db.prepare(
     "INSERT OR IGNORE INTO schema_version (version, applied_at) VALUES (1, datetime('now'))"
   ).run()
+  runMigrations(db)
   return db
 }
 

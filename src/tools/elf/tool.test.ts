@@ -278,6 +278,333 @@ describe("#given ELF tool", () => {
     })
   })
 
+  describe("#when action is delete-rule", () => {
+    describe("#then it removes memory items and returns confirmation", () => {
+      it("deletes a learning by ID", async () => {
+        const learningId = crypto.randomUUID()
+        await storage.addLearning({
+          id: learningId,
+          type: "success",
+          summary: "Deletion test learning",
+          context: "testing",
+          tool_name: "Test",
+          domain: "project",
+          tags: [],
+          utility_score: 0.5,
+          times_consulted: 0,
+          context_hash: "hash-delete-learning-1",
+          confidence: 0.7,
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "delete-rule", id: learningId },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("deleted")
+        expect(parsed.type).toBe("learning")
+        expect(parsed.id).toBe(learningId)
+        expect(await storage.getLearning(learningId)).toBeNull()
+      })
+
+      it("deletes a golden_rule by ID", async () => {
+        const ruleId = crypto.randomUUID()
+        await storage.addGoldenRule({
+          id: ruleId,
+          rule: "Always validate input",
+          domain: "project",
+          confidence: 0.9,
+          times_validated: 0,
+          times_violated: 0,
+          source_learning_ids: [],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "delete-rule", id: ruleId, type: "golden_rule" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("deleted")
+        expect(parsed.type).toBe("golden_rule")
+      })
+
+      it("returns not_found for nonexistent ID", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const fakeId = crypto.randomUUID()
+        const result = await tool.execute(
+          { action: "delete-rule", id: fakeId },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("not_found")
+        expect(parsed.error).toContain("not found")
+      })
+
+      it("returns error when id is missing", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "delete-rule" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.error).toContain("id is required")
+      })
+
+      it("auto-detects type when not specified", async () => {
+        const ruleId = crypto.randomUUID()
+        await storage.addGoldenRule({
+          id: ruleId,
+          rule: "Always use golden rules",
+          domain: "global",
+          confidence: 0.9,
+          times_validated: 0,
+          times_violated: 0,
+          source_learning_ids: [],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "delete-rule", id: ruleId },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("deleted")
+        expect(parsed.type).toBe("golden_rule")
+      })
+    })
+  })
+
+  describe("#when action is update-rule", () => {
+    describe("#then it updates memory items with validation", () => {
+      it("updates a learning's content", async () => {
+        const learningId = crypto.randomUUID()
+        await storage.addLearning({
+          id: learningId,
+          type: "observation",
+          summary: "Original content",
+          context: "testing",
+          tool_name: "Test",
+          domain: "project",
+          tags: [],
+          utility_score: 0.5,
+          times_consulted: 0,
+          context_hash: "hash-update-learning-1",
+          confidence: 0.7,
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", id: learningId, content: "Updated content" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("updated")
+        expect(parsed.type).toBe("learning")
+        const updated = await storage.getLearning(learningId)
+        expect(updated?.summary).toBe("Updated content")
+      })
+
+      it("updates a golden_rule's content", async () => {
+        const ruleId = crypto.randomUUID()
+        await storage.addGoldenRule({
+          id: ruleId,
+          rule: "Original rule",
+          domain: "project",
+          confidence: 0.9,
+          times_validated: 0,
+          times_violated: 0,
+          source_learning_ids: [],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", id: ruleId, content: "Updated rule", type: "golden_rule" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("updated")
+        expect(parsed.type).toBe("golden_rule")
+        const updated = await storage.getGoldenRule(ruleId)
+        expect(updated?.rule).toBe("Updated rule")
+      })
+
+      it("returns not_found for nonexistent ID", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const fakeId = crypto.randomUUID()
+        const result = await tool.execute(
+          { action: "update-rule", id: fakeId, content: "New content" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("not_found")
+        expect(parsed.error).toContain("not found")
+      })
+
+      it("returns error when id is missing", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", content: "Content without ID" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.error).toContain("id is required")
+      })
+
+      it("returns error when content is missing", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", id: crypto.randomUUID() },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.error).toContain("content is required")
+      })
+
+      it("applies privacy filter before updating", async () => {
+        const learningId = crypto.randomUUID()
+        await storage.addLearning({
+          id: learningId,
+          type: "observation",
+          summary: "Original",
+          context: "testing",
+          tool_name: "Test",
+          domain: "project",
+          tags: [],
+          utility_score: 0.5,
+          times_consulted: 0,
+          context_hash: "hash-privacy-filter-1",
+          confidence: 0.7,
+          created_at: "",
+          updated_at: "",
+        })
+
+        let filteredContent = ""
+        const deps = {
+          ...makeDeps(db),
+          filterContent: (content: string, _tags: string[]) => {
+            filteredContent = content.replace(/AKIA[0-9A-Z]{16}/g, "[REDACTED]")
+            return filteredContent
+          },
+        }
+        const tool = createElfTool(deps)
+        await tool.execute(
+          { action: "update-rule", id: learningId, content: "Found key AKIAIOSFODNN7EXAMPLE in config" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        expect(filteredContent).toContain("[REDACTED]")
+        const updated = await storage.getLearning(learningId)
+        expect(updated?.summary).toContain("[REDACTED]")
+      })
+
+      it("rejects memory-dump shaped content", async () => {
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          {
+            action: "update-rule",
+            id: crypto.randomUUID(),
+            content: "## Agent Memory\n### Golden Rules\n- Rule A\n### Learnings\n- Item B\ntotalMemories: 4\nbyType: {'learnings':1,'golden_rules':3}",
+          },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("rejected")
+        expect(parsed.error).toContain("memory dump")
+      })
+
+      it("updates scope when provided", async () => {
+        const learningId = crypto.randomUUID()
+        await storage.addLearning({
+          id: learningId,
+          type: "observation",
+          summary: "Original with project scope",
+          context: "testing",
+          tool_name: "Test",
+          domain: "project",
+          tags: [],
+          utility_score: 0.5,
+          times_consulted: 0,
+          context_hash: "hash-scope-update-1",
+          confidence: 0.7,
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", id: learningId, content: "Updated content", scope: "global" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("updated")
+        const updated = await storage.getLearning(learningId)
+        expect(updated?.domain).toBe("global")
+      })
+
+      it("auto-detects type when not specified", async () => {
+        const ruleId = crypto.randomUUID()
+        await storage.addGoldenRule({
+          id: ruleId,
+          rule: "Auto-detect test",
+          domain: "project",
+          confidence: 0.9,
+          times_validated: 0,
+          times_violated: 0,
+          source_learning_ids: [],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const deps = makeDeps(db)
+        const tool = createElfTool(deps)
+        const result = await tool.execute(
+          { action: "update-rule", id: ruleId, content: "Updated without type" },
+          {} as Parameters<typeof tool.execute>[1]
+        )
+
+        const parsed = JSON.parse(result as string)
+        expect(parsed.status).toBe("updated")
+        expect(parsed.type).toBe("golden_rule")
+      })
+    })
+  })
+
   describe("#when action is unknown", () => {
     describe("#then it returns a helpful error", () => {
       it("returns error with valid actions listed", async () => {
@@ -293,6 +620,8 @@ describe("#given ELF tool", () => {
         expect(result).toContain("search")
         expect(result).toContain("add-rule")
         expect(result).toContain("metrics")
+        expect(result).toContain("delete-rule")
+        expect(result).toContain("update-rule")
       })
     })
   })

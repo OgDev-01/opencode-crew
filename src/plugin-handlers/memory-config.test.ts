@@ -19,10 +19,13 @@ function createMockManager(): MemoryManager {
     getLearningsByScope: async () => [],
     updateLearning: async () => {},
     deleteLearning: async () => {},
+    incrementTimesConsulted: async () => {},
     addGoldenRule: async () => {},
     getGoldenRules: async () => [],
     getGoldenRulesByScope: async () => [],
     deleteGoldenRule: async () => {},
+    getGoldenRule: async () => null,
+    updateGoldenRule: async () => {},
     getStats: async () => ({ learnings: 0, goldenRules: 0 }),
   }
   const search: IMemorySearch = {

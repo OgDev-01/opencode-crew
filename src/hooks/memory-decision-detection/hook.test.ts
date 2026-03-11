@@ -27,6 +27,8 @@ function createMockStorage(): IMemoryStorage & { goldenRules: GoldenRule[] } {
       return goldenRules
     },
     async deleteGoldenRule(_id: string) {},
+    async getGoldenRule(_id: string) { return null },
+    async updateGoldenRule(_id: string, _updates: Partial<import("../../features/memory/types").GoldenRule>) {},
     async getStats() {
       return { learnings: 0, goldenRules: goldenRules.length }
     },

@@ -70,6 +70,13 @@ function createMockStorage(): IMemoryStorage & { learnings: Learning[]; goldenRu
         goldenRules.splice(index, 1)
       }
     },
+    async getGoldenRule(id: string) {
+      return goldenRules.find((rule) => rule.id === id) ?? null
+    },
+    async updateGoldenRule(id: string, updates: Partial<import("../../features/memory/types").GoldenRule>) {
+      const rule = goldenRules.find((r) => r.id === id)
+      if (rule) Object.assign(rule, updates)
+    },
     async getStats() {
       return { learnings: learnings.length, goldenRules: goldenRules.length }
     },

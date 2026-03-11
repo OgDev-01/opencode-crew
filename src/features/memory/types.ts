@@ -96,6 +96,8 @@ export interface IMemoryStorage {
   getGoldenRules(domain?: string): Promise<GoldenRule[]>
   getGoldenRulesByScope(scope: MemoryScope): Promise<GoldenRule[]>
   deleteGoldenRule(id: string): Promise<void>
+  getGoldenRule(id: string): Promise<GoldenRule | null>
+  updateGoldenRule(id: string, updates: Partial<GoldenRule>): Promise<void>
   getStats(): Promise<{ learnings: number; goldenRules: number }>
 }
 

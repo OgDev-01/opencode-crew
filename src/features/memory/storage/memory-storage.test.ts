@@ -162,4 +162,106 @@ describe("#given memory storage", () => {
       })
     })
   })
+
+  describe("#when reading a single golden rule by ID", () => {
+    describe("#then", () => {
+      it("returns the golden rule for a valid ID", async () => {
+        await storage.addGoldenRule({
+          id: "rule-to-fetch",
+          rule: "Always use transactions for database writes",
+          domain: "database",
+          confidence: 0.95,
+          times_validated: 5,
+          times_violated: 0,
+          source_learning_ids: ["learning-1", "learning-2"],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const rule = await storage.getGoldenRule("rule-to-fetch")
+
+        expect(rule).not.toBeNull()
+        expect(rule?.id).toBe("rule-to-fetch")
+        expect(rule?.rule).toBe("Always use transactions for database writes")
+        expect(rule?.domain).toBe("database")
+        expect(rule?.confidence).toBe(0.95)
+        expect(rule?.times_validated).toBe(5)
+        expect(rule?.times_violated).toBe(0)
+        expect(rule?.source_learning_ids).toEqual(["learning-1", "learning-2"])
+        expect(rule?.created_at).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+      })
+
+      it("returns null for a non-existent ID", async () => {
+        const rule = await storage.getGoldenRule("non-existent-rule-id")
+        expect(rule).toBeNull()
+      })
+    })
+  })
+
+  describe("#when updating a golden rule", () => {
+    describe("#then", () => {
+      it("updates rule text and syncs FTS index", async () => {
+        await storage.addGoldenRule({
+          id: "rule-to-update",
+          rule: "Old rule text",
+          domain: "testing",
+          confidence: 0.8,
+          times_validated: 2,
+          times_violated: 1,
+          source_learning_ids: ["learning-3"],
+          created_at: "",
+          updated_at: "",
+        })
+
+        await storage.updateGoldenRule("rule-to-update", {
+          rule: "New rule text about deterministic behavior",
+        })
+
+        const updated = await storage.getGoldenRule("rule-to-update")
+        expect(updated?.rule).toBe("New rule text about deterministic behavior")
+
+        const ftsMatches = db
+          .prepare("SELECT rowid FROM golden_rules_fts WHERE golden_rules_fts MATCH ?")
+          .all("deterministic")
+        expect(ftsMatches.length).toBe(1)
+      })
+
+      it("preserves unchanged fields when updating", async () => {
+        await storage.addGoldenRule({
+          id: "rule-partial-update",
+          rule: "Original rule",
+          domain: "architecture",
+          confidence: 0.75,
+          times_validated: 3,
+          times_violated: 0,
+          source_learning_ids: ["learning-4", "learning-5"],
+          created_at: "",
+          updated_at: "",
+        })
+
+        const originalRule = await storage.getGoldenRule("rule-partial-update")
+        const originalCreatedAt = originalRule?.created_at
+
+        await storage.updateGoldenRule("rule-partial-update", {
+          rule: "Modified rule text",
+        })
+
+        const updated = await storage.getGoldenRule("rule-partial-update")
+
+        expect(updated?.rule).toBe("Modified rule text")
+        expect(updated?.domain).toBe("architecture")
+        expect(updated?.confidence).toBe(0.75)
+        expect(updated?.times_validated).toBe(3)
+        expect(updated?.times_violated).toBe(0)
+        expect(updated?.source_learning_ids).toEqual(["learning-4", "learning-5"])
+        expect(updated?.created_at).toBe(originalCreatedAt)
+      })
+
+      it("throws for non-existent ID", async () => {
+        await expect(
+          storage.updateGoldenRule("non-existent-rule", { rule: "New text" })
+        ).rejects.toThrow()
+      })
+    })
+  })
 })

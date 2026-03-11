@@ -80,6 +80,36 @@ describe("context-window-monitor", () => {
     expect(usage?.usagePercentage).toBe(0.8)
   })
 
+  it("should expose 1M-based usage when model cache enables it", async () => {
+    const hook = createContextWindowMonitorHook(ctx as never, { anthropicContext1MEnabled: true })
+    const sessionID = "ses_usage_cache_1m"
+
+    await hook.event({
+      event: {
+        type: "message.updated",
+        properties: {
+          info: {
+            role: "assistant",
+            sessionID,
+            providerID: "anthropic",
+            finish: true,
+            tokens: {
+              input: 150000,
+              output: 1000,
+              reasoning: 0,
+              cache: { read: 10000, write: 0 },
+            },
+          },
+        },
+      },
+    })
+
+    const usage = getSessionContextUsage(sessionID)
+    expect(usage).not.toBeNull()
+    expect(usage?.usedTokens).toBe(160000)
+    expect(usage?.usagePercentage).toBe(0.16)
+  })
+
   // #given event caches token info from message.updated
   // #when tool.execute.after is called
   // #then session.messages() should NOT be called

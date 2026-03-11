@@ -10,6 +10,7 @@ export interface TokenInfo {
 interface CachedTokenState {
   providerID: string
   tokens: TokenInfo
+  actualLimit: number
 }
 
 export interface SessionUsageSnapshot {
@@ -24,15 +25,13 @@ function isAnthropicProvider(providerID: string): boolean {
   return providerID === "anthropic" || providerID === "google-vertex-anthropic"
 }
 
-function getActualLimit(): number {
-  return process.env.ANTHROPIC_1M_CONTEXT === "true" ||
-    process.env.VERTEX_ANTHROPIC_1M_CONTEXT === "true"
-    ? 1_000_000
-    : DEFAULT_ACTUAL_LIMIT
-}
-
-export function cacheSessionTokenUsage(sessionID: string, providerID: string, tokens: TokenInfo): void {
-  tokenCache.set(sessionID, { providerID, tokens })
+export function cacheSessionTokenUsage(
+  sessionID: string,
+  providerID: string,
+  tokens: TokenInfo,
+  actualLimit = DEFAULT_ACTUAL_LIMIT
+): void {
+  tokenCache.set(sessionID, { providerID, tokens, actualLimit })
 }
 
 export function clearSessionTokenUsage(sessionID: string): void {
@@ -45,7 +44,7 @@ export function getSessionContextUsage(sessionID: string): SessionUsageSnapshot 
   if (!isAnthropicProvider(cached.providerID)) return null
 
   const usedTokens = (cached.tokens.input ?? 0) + (cached.tokens.cache?.read ?? 0)
-  const limit = getActualLimit()
+  const limit = cached.actualLimit
   const usagePercentage = limit > 0 ? usedTokens / limit : 0
 
   return {

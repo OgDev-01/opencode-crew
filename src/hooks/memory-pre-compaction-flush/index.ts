@@ -1,1 +1,1 @@
-export { createMemoryPreCompactionFlushHook, type MemoryPreCompactionFlushDeps } from "./hook"
+export { createMemoryPreCompactionFlushHook, flushPendingMemories, type MemoryPreCompactionFlushDeps } from "./hook"

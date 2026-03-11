@@ -6,18 +6,25 @@ export interface MemoryPreCompactionFlushDeps {
   autoCapture?: AutoCaptureConfig
 }
 
+export async function flushPendingMemories(
+  onIdle: () => Promise<void>,
+  autoCapture?: AutoCaptureConfig
+): Promise<void> {
+  if (autoCapture?.pre_compaction_flush === false) return
+
+  try {
+    await onIdle()
+  } catch (error) {
+    log("[memory-pre-compaction-flush] Failed to flush pending memories", {
+      error: error instanceof Error ? error.message : String(error),
+    })
+  }
+}
+
 export function createMemoryPreCompactionFlushHook(deps: MemoryPreCompactionFlushDeps) {
   return {
     async flush(): Promise<void> {
-      if (deps.autoCapture?.pre_compaction_flush === false) return
-
-      try {
-        await deps.onIdle()
-      } catch (error) {
-        log("[memory-pre-compaction-flush] Failed to flush pending memories", {
-          error: error instanceof Error ? error.message : String(error),
-        })
-      }
+      await flushPendingMemories(deps.onIdle, deps.autoCapture)
     },
   }
 }

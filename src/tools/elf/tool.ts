@@ -85,6 +85,20 @@ async function handleSearch(deps: ElfToolDeps, args: ElfToolArgs): Promise<strin
     results = await deps.search.searchAll(args.query, options)
   }
 
+  await Promise.allSettled(
+    results
+      .filter((result): result is MemorySearchResult & { entry: LearningType extends never ? never : { id: string; times_consulted: number } } => result.type === "learning")
+      .map(async (result) => {
+        const learning = result.entry as unknown as {
+          id: string
+          times_consulted: number
+        }
+        await deps.storage.updateLearning(learning.id, {
+          times_consulted: learning.times_consulted + 1,
+        })
+      })
+  )
+
   return JSON.stringify({
     results: results.map((r) => ({
       id: (r.entry as { id: string }).id,

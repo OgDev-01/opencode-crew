@@ -341,6 +341,8 @@ describe("Memory lifecycle integration", () => {
           const elfTool = createElfTool({ storage, search, db, filterContent, computeContextHash, findExistingByHash })
           const searchResult = JSON.parse((await elfTool.execute({ action: "search", query: "elf search target" }, {} as Parameters<typeof elfTool.execute>[1])) as string) as { results: unknown[] }
           expect(searchResult.results.length).toBeGreaterThanOrEqual(1)
+          const searchedId = (searchResult.results[0] as { id: string }).id
+          expect((await storage.getLearning(searchedId))?.times_consulted).toBe(1)
 
           const addRuleResult = JSON.parse((await elfTool.execute({ action: "add-rule", content: "Always validate memory scope before consolidation", type: "golden_rule", scope: "project" }, {} as Parameters<typeof elfTool.execute>[1])) as string) as { status: string }
           expect(addRuleResult.status).toBe("added")

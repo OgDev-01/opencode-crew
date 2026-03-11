@@ -322,6 +322,62 @@ describe("memory-learning hook", () => {
     })
   })
 
+  describe("#given output metadata references a sensitive file", () => {
+    test("skips capture when metadata.filePath points to a skipped file", async () => {
+      //#given
+      const hook = createMemoryLearningHook({ storage })
+      const input = { tool: "Edit", sessionID: "ses_sensitive_1", callID: "call_sensitive_1" }
+      const output = {
+        title: "edited file",
+        output: "Updated .env secrets",
+        metadata: { attempt: 2, filePath: "/tmp/.env" } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(0)
+    })
+
+    test("skips capture when metadata.filediff references a skipped file", async () => {
+      //#given
+      const hook = createMemoryLearningHook({ storage })
+      const input = { tool: "Write", sessionID: "ses_sensitive_2", callID: "call_sensitive_2" }
+      const output = {
+        title: "written file",
+        output: "Wrote ssh key",
+        metadata: {
+          attempt: 2,
+          filediff: { file: "/tmp/private.pem", path: "/tmp/private.pem" },
+        } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(0)
+    })
+
+    test("still captures when metadata points to a non-sensitive file", async () => {
+      //#given
+      const hook = createMemoryLearningHook({ storage })
+      const input = { tool: "Edit", sessionID: "ses_sensitive_3", callID: "call_sensitive_3" }
+      const output = {
+        title: "edited file",
+        output: "Updated src/app.ts",
+        metadata: { attempt: 2, filePath: "/tmp/src/app.ts" } as Record<string, unknown>,
+      }
+
+      //#when
+      await hook["tool.execute.after"](input, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(1)
+    })
+  })
+
   describe("#given a learning is captured", () => {
     test("sets initial utility_score=0.5 and confidence=0.5", async () => {
       //#given

@@ -93,3 +93,41 @@ export function shouldSkipFile(filePath: string): boolean {
 
   return false;
 }
+
+export function extractFilePaths(metadata: unknown): string[] {
+  if (!metadata || typeof metadata !== "object") {
+    return [];
+  }
+
+  const paths: string[] = [];
+  const candidates = ["filepath", "filePath", "path", "file"];
+
+  const visit = (value: unknown): void => {
+    if (!value || typeof value !== "object") return;
+
+    const objectValue = value as Record<string, unknown>;
+    for (const key of candidates) {
+      const candidate = objectValue[key];
+      if (typeof candidate === "string" && candidate.length > 0) {
+        paths.push(candidate);
+      }
+      if (Array.isArray(candidate)) {
+        for (const item of candidate) {
+          if (typeof item === "string" && item.length > 0) {
+            paths.push(item);
+          }
+        }
+      }
+    }
+
+    for (const nestedValue of Object.values(objectValue)) {
+      if (nestedValue && typeof nestedValue === "object") {
+        visit(nestedValue);
+      }
+    }
+  };
+
+  visit(metadata);
+
+  return Array.from(new Set(paths));
+}

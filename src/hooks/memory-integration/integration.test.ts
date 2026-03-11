@@ -121,6 +121,7 @@ function createAutoCaptureSystem(args: {
         storage: args.storage,
         autoCapture: args.autoCapture,
         privacyTags: args.privacyTags,
+        scope: args.scope,
       })
 
   const flushHook = disabledHooks.has("memory-pre-compaction-flush")
@@ -188,6 +189,7 @@ describe("memory auto-capture integration", () => {
         expect(storage.goldenRules).toHaveLength(1)
         expect(storage.learnings[0].domain).toBe("project")
         expect(storage.goldenRules[0].rule).toBe("Preference: Let's use Bun")
+        expect(storage.goldenRules[0].domain).toBe("project")
       })
     })
   })

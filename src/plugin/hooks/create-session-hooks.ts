@@ -232,6 +232,7 @@ export function createSessionHooks(args: {
             storage: manager.storage,
             autoCapture: pluginConfig.memory?.auto_capture,
             privacyTags: pluginConfig.memory?.privacy_tags,
+            scope: pluginConfig.memory?.scope ?? "project",
           })
         } catch (error) {
           log(`Failed to initialize memory-decision-detection hook: ${error instanceof Error ? error.message : String(error)}`)

@@ -1,6 +1,6 @@
 {
   "name": "@ogdev/opencode-crew-linux-x64-musl",
-  "version": "1.2.2-next.22",
+  "version": "1.2.2-next.23",
   "description": "Platform-specific binary for opencode-crew (linux-x64-musl)",
   "license": "MIT",
   "repository": {

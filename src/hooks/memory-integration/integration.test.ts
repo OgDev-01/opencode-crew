@@ -40,6 +40,10 @@ function createMockStorage(): IMemoryStorage & { learnings: Learning[]; goldenRu
     async getLearningsByScope(_scope: MemoryScope) {
       return learnings
     },
+    async incrementTimesConsulted(id: string) {
+      const learning = learnings.find((entry) => entry.id === id)
+      if (learning) learning.times_consulted += 1
+    },
     async updateLearning(id: string, updates: Partial<Learning>) {
       const index = learnings.findIndex((learning) => learning.id === id)
       if (index < 0) return

@@ -301,6 +301,34 @@ describe("createMemoryInjectionHook", () => {
         const estimatedTokens = Math.ceil(content.length / 4)
         expect(estimatedTokens).toBeLessThanOrEqual(500)
       })
+
+      it("#then records consultations only for learnings that remain after trimming", async () => {
+        //#given
+        const longLearning = "A".repeat(2000)
+        const search = createMockSearch({
+          searchGoldenRules: async () => [goldenRuleResult("Short rule")],
+          searchAll: async () => [
+            learningResult(longLearning),
+            learningResult("Short learning"),
+          ],
+        })
+        const hook = createMemoryInjectionHook({
+          search,
+          collector: mockCollector,
+          getUsage: () => ({ usedTokens: 5000, remainingTokens: 15000, usagePercentage: 0.25 }),
+          recordLearningConsulted: consultTracker.record,
+          config: { maxTokens: 500 },
+        })
+
+        const input = {}
+        const output: TransformOutput = { messages: [msg("user", "test query")] }
+
+        //#when
+        await hook["experimental.chat.messages.transform"](input, output)
+
+        //#then
+        expect(consultTracker.consulted).toHaveLength(0)
+      })
     })
 
     describe("#when golden rules alone exceed goldenRuleMaxTokens (200) in throttled mode", () => {

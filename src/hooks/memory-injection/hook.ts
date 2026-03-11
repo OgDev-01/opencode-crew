@@ -87,7 +87,7 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
           .filter((rule) => !isLikelyMemoryDump(rule))
 
         const learningEntries = allResults
-          .filter((r): r is MemorySearchResult & { entry: Learning } => r.type === "learning")
+          .filter((r) => r.type === "learning")
           .map((r) => r.entry as Learning)
           .filter((learning) => !isLikelyMemoryDump(learning.summary))
 
@@ -98,6 +98,8 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         const injectionBlock = buildInjectionBlock(goldenRules, learnings, tokenBudget)
         if (!injectionBlock) return
 
+        const injectedLearningEntries = learningEntries.slice(0, learnings.length)
+
         deps.collector.register(sessionID, {
           id: "memory-injection",
           source: "memory",
@@ -106,11 +108,19 @@ export function createMemoryInjectionHook(deps: MemoryInjectionDeps) {
         })
 
         if (deps.recordLearningConsulted) {
-          await Promise.allSettled(
-            learningEntries.map(async (learning) => {
+          const consultResults = await Promise.allSettled(
+            injectedLearningEntries.map(async (learning) => {
               await deps.recordLearningConsulted?.(learning)
             })
           )
+
+          for (const result of consultResults) {
+            if (result.status === "rejected") {
+              log("[memory-injection] failed to record learning consultation", {
+                error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+              })
+            }
+          }
         }
 
         log("[memory-injection] injected memory context", {

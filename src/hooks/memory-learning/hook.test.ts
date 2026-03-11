@@ -355,6 +355,26 @@ describe("memory-learning hook", () => {
       expect(storage.learnings[0].context_hash.length).toBe(64)
     })
 
+    test("isolates context_hash by scope", async () => {
+      //#given
+      const projectHook = createMemoryLearningHook({ storage, scope: "project" })
+      const globalHook = createMemoryLearningHook({ storage, scope: "global" })
+      const input = { tool: "Bash", sessionID: "ses_hash_scope", callID: "call_hash_scope" }
+      const output = {
+        title: "failed",
+        output: "Error: permission denied on /etc/shadow",
+        metadata: {} as Record<string, unknown>,
+      }
+
+      //#when
+      await projectHook["tool.execute.after"](input, output)
+      await globalHook["tool.execute.after"]({ ...input, callID: "call_hash_scope_2" }, output)
+
+      //#then
+      expect(storage.learnings).toHaveLength(2)
+      expect(storage.learnings[0].context_hash).not.toBe(storage.learnings[1].context_hash)
+    })
+
     test("generates summary from tool name and first line of output", async () => {
       //#given
       const hook = createMemoryLearningHook({ storage })

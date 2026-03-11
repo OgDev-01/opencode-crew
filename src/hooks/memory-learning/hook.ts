@@ -111,9 +111,9 @@ function buildSummary(tool: string, output: string): string {
   return `${tool}: ${firstLine.slice(0, 100)}`
 }
 
-function computeHash(tool: string, sessionID: string, summary: string): string {
+function computeHash(tool: string, sessionID: string, scope: string, summary: string): string {
   const hasher = new Bun.CryptoHasher("sha256")
-  hasher.update(`${tool}:${sessionID}:${summary.slice(0, 100)}`)
+  hasher.update(`${tool}:${sessionID}:${scope}:${summary.slice(0, 100)}`)
   return hasher.digest("hex")
 }
 
@@ -128,7 +128,7 @@ export function createMemoryLearningHook(deps: MemoryLearningDeps) {
       if (!shouldCapture(input.tool, output, deps.autoCapture)) return
 
       const summary = buildSummary(input.tool, output!.output)
-      const contextHash = computeHash(input.tool, input.sessionID, summary)
+      const contextHash = computeHash(input.tool, input.sessionID, scope, summary)
 
       if (seenHashes.has(contextHash)) return
       seenHashes.add(contextHash)

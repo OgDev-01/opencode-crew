@@ -241,6 +241,7 @@ describe("executeCompact lock management", () => {
     // Max out all attempts
     autoCompactState.retryStateBySession.set(sessionID, {
       attempt: 5,
+      firstAttemptTime: Date.now(),
       lastAttemptTime: Date.now(),
     })
     autoCompactState.truncateStateBySession.set(sessionID, {
@@ -344,6 +345,32 @@ describe("executeCompact lock management", () => {
 
   test("calls beforeSummarize before summarize retry", async () => {
     const beforeSummarize = mock(async () => {})
+
+    autoCompactState.errorDataBySession.set(sessionID, {
+      errorType: "token_limit",
+      currentTokens: 100000,
+      maxTokens: 200000,
+    })
+
+    await executeCompact(
+      sessionID,
+      msg,
+      autoCompactState,
+      mockClient,
+      directory,
+      undefined,
+      undefined,
+      beforeSummarize,
+    )
+
+    expect(beforeSummarize).toHaveBeenCalledWith(sessionID)
+    expect(mockClient.session.summarize).toHaveBeenCalled()
+  })
+
+  test("continues summarize retry when beforeSummarize fails", async () => {
+    const beforeSummarize = mock(async () => {
+      throw new Error("flush failed")
+    })
 
     autoCompactState.errorDataBySession.set(sessionID, {
       errorType: "token_limit",

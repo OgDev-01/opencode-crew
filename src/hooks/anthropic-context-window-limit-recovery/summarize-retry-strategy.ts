@@ -110,7 +110,11 @@ export async function runSummarizeRetryStrategy(params: {
         )
 
         const summarizeBody = { providerID: targetProviderID, modelID: targetModelID, auto: true }
-        await params.beforeSummarize?.(params.sessionID)
+        if (params.beforeSummarize) {
+          try {
+            await params.beforeSummarize(params.sessionID)
+          } catch {}
+        }
         await params.client.session.summarize({
           path: { id: params.sessionID },
           body: summarizeBody as never,

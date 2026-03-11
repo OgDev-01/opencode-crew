@@ -1,6 +1,6 @@
 {
   "name": "@ogdev/opencode-crew",
-  "version": "1.2.2-next.21",
+  "version": "1.2.2-next.22",
   "description": "Your AI dev team for OpenCode — Multi-Agent Orchestration Plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -87,17 +87,17 @@
     "typescript": "^5.7.3"
   },
   "optionalDependencies": {
-    "@ogdev/opencode-crew-darwin-arm64": "1.2.2-next.21",
-    "@ogdev/opencode-crew-darwin-x64": "1.2.2-next.21",
-    "@ogdev/opencode-crew-darwin-x64-baseline": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-arm64": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-arm64-musl": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-x64": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-x64-baseline": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-x64-musl": "1.2.2-next.21",
-    "@ogdev/opencode-crew-linux-x64-musl-baseline": "1.2.2-next.21",
-    "@ogdev/opencode-crew-windows-x64": "1.2.2-next.21",
-    "@ogdev/opencode-crew-windows-x64-baseline": "1.2.2-next.21"
+    "@ogdev/opencode-crew-darwin-arm64": "1.2.2-next.22",
+    "@ogdev/opencode-crew-darwin-x64": "1.2.2-next.22",
+    "@ogdev/opencode-crew-darwin-x64-baseline": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-arm64": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-arm64-musl": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-x64": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-x64-baseline": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-x64-musl": "1.2.2-next.22",
+    "@ogdev/opencode-crew-linux-x64-musl-baseline": "1.2.2-next.22",
+    "@ogdev/opencode-crew-windows-x64": "1.2.2-next.22",
+    "@ogdev/opencode-crew-windows-x64-baseline": "1.2.2-next.22"
   },
   "trustedDependencies": [
     "@ast-grep/cli",
